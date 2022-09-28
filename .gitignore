@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+#MEDIA
+media/
+
 # REACT
 node_modules/
 webpack-stats-local.json
@@ -133,4 +136,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
