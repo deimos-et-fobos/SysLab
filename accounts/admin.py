@@ -1,11 +1,12 @@
-from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import CustomUser, Laboratory, LaboratoryUsers
+from accounts.models import Laboratory, LaboratoryUsers
 from accounts.forms import UserChangeForm, UserCreationForm
 
+User = get_user_model()
 
 class LaboratoryUsersInline(admin.TabularInline):
     model = LaboratoryUsers
@@ -14,7 +15,7 @@ class LaboratoryUsersInline(admin.TabularInline):
 
 class CustomUserAdmin(UserAdmin):
     # The forms to add and change user instances
-    model = CustomUser
+    model = User
     form = UserChangeForm
     add_form = UserCreationForm
     list_display = ('__str__', 'type', 'is_active')
@@ -45,6 +46,6 @@ class LaboratoryUsersAdmin(admin.ModelAdmin):
     list_display = ('user', 'laboratory', 'is_active')
 
 
-admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(User, CustomUserAdmin)
 admin.site.register(Laboratory, LaboratoryAdmin)
 admin.site.register(LaboratoryUsers, LaboratoryUsersAdmin)

@@ -1,10 +1,12 @@
 from django import forms
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+from accounts.models import Laboratory
 
-from accounts.models import CustomUser, Laboratory
+User = get_user_model()
 
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
@@ -15,7 +17,7 @@ class UserCreationForm(forms.ModelForm):
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = ('email', 'first_name', 'last_name')
         # exclude = ['username']
 
@@ -51,11 +53,11 @@ class UserChangeForm(forms.ModelForm):
     )
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = ['email', 'password', 'first_name', 'last_name', 'type', 'profile_pic',
                   'is_superuser', 'is_staff', 'is_active', 'user_permissions',
                   ]
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         password = self.fields.get("password")

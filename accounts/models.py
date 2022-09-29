@@ -50,8 +50,8 @@ class CustomUser(AbstractUser):
     email = models.EmailField(_('email'), max_length=255, unique=True)
     type = models.ForeignKey(Group, verbose_name=_('user type'), on_delete=models.SET_NULL, null=True, blank=True)
     # type = models.CharField(verbose_name='tipo', choices=USER_TYPE, max_length=1, default='T')
-    first_name = models.CharField(_('First name'), max_length=30)
-    last_name = models.CharField(_('Last name'), max_length=30)
+    first_name = models.CharField(_('First name'), max_length=150)
+    last_name = models.CharField(_('Last name'), max_length=150)
     profile_pic = models.ImageField(verbose_name=_('profile picture'), upload_to=upload_location, blank=True, null=True)
     # Fields from AbstractUser:
     # first_name, last_name, groups, is_staff, is_active, is_superuser, last_login, date_joinded

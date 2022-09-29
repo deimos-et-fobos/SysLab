@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-27 21:25-0300\n"
+"POT-Creation-Date: 2022-09-28 03:15-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: accounts/admin.py:23
+#: accounts/admin.py:24
 msgid "Permissions"
 msgstr "Permisos"
 
@@ -26,79 +26,89 @@ msgstr "Permisos"
 msgid "Accounts"
 msgstr "Cuentas"
 
-#: accounts/models.py:17
+#: accounts/forms.py:47
+msgid "Password"
+msgstr ""
+
+#: accounts/forms.py:49
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
+msgstr ""
+
+#: accounts/models.py:24
 msgid "The Email must be set"
 msgstr ""
 
-#: accounts/models.py:30
+#: accounts/models.py:37
 msgid "Superuser must have is_staff=True."
 msgstr ""
 
-#: accounts/models.py:32
+#: accounts/models.py:39
 msgid "Superuser must have is_superuser=True."
 msgstr ""
 
-#: accounts/models.py:43 accounts/models.py:110
+#: accounts/models.py:50 accounts/models.py:117
 msgid "email"
 msgstr "email"
 
-#: accounts/models.py:44
+#: accounts/models.py:51
 msgid "user type"
 msgstr "Tipo de usuario"
 
-#: accounts/models.py:46
+#: accounts/models.py:53
 msgid "First name"
 msgstr "Nombre"
 
-#: accounts/models.py:47
+#: accounts/models.py:54
 msgid "Last name"
 msgstr "Apellido"
 
-#: accounts/models.py:48
+#: accounts/models.py:55 accounts/models.py:121
 msgid "profile picture"
 msgstr "Foto de perfil"
 
-#: accounts/models.py:59 accounts/models.py:64 accounts/models.py:112
-#: accounts/models.py:125
+#: accounts/models.py:66 accounts/models.py:71 accounts/models.py:119
+#: accounts/models.py:133
 msgid "user"
 msgstr "usuario"
 
-#: accounts/models.py:60
+#: accounts/models.py:67
 msgid "users"
 msgstr "usuarios"
 
-#: accounts/models.py:108
+#: accounts/models.py:115
 msgid "name"
 msgstr "nombre"
 
-#: accounts/models.py:109
+#: accounts/models.py:116
 msgid "address"
 msgstr "dirección"
 
-#: accounts/models.py:111
+#: accounts/models.py:118
 msgid "phone number"
 msgstr "número de teléfono"
 
-#: accounts/models.py:113
+#: accounts/models.py:120
 msgid "URL"
 msgstr ""
 
-#: accounts/models.py:114 accounts/models.py:127
+#: accounts/models.py:122 accounts/models.py:135
 msgid "active"
 msgstr "activo"
 
-#: accounts/models.py:120 accounts/models.py:126
+#: accounts/models.py:128 accounts/models.py:134
 msgid "laboratory"
 msgstr "laboratorio"
 
-#: accounts/models.py:121
+#: accounts/models.py:129
 msgid "laboratories"
 msgstr "laboratorios"
 
-#: accounts/models.py:134
+#: accounts/models.py:142
 msgid "Laboratory User"
 msgstr "Usuario de Laboratorios"
 
-#: accounts/models.py:135
+#: accounts/models.py:143
 msgid "Laboratory Users"
 msgstr "Usuarios de Laboratorios"
