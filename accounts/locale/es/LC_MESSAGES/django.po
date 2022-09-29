@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-28 03:15-0300\n"
+"POT-Creation-Date: 2022-09-29 02:51-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,9 +18,25 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: accounts/admin.py:24
+#: accounts/admin.py:28 accounts/admin.py:34
 msgid "Permissions"
 msgstr "Permisos"
+
+#: accounts/admin.py:48 accounts/models.py:128 accounts/models.py:134
+msgid "laboratory"
+msgstr "laboratorio"
+
+#: accounts/admin.py:49 accounts/models.py:129
+msgid "laboratories"
+msgstr "laboratorios"
+
+#: accounts/admin.py:56
+msgid "member"
+msgstr "miembro"
+
+#: accounts/admin.py:57
+msgid "members"
+msgstr "miembros"
 
 #: accounts/apps.py:8
 msgid "Accounts"
@@ -77,7 +93,7 @@ msgstr "usuario"
 msgid "users"
 msgstr "usuarios"
 
-#: accounts/models.py:115
+#: accounts/models.py:75 accounts/models.py:115
 msgid "name"
 msgstr "nombre"
 
@@ -97,18 +113,10 @@ msgstr ""
 msgid "active"
 msgstr "activo"
 
-#: accounts/models.py:128 accounts/models.py:134
-msgid "laboratory"
-msgstr "laboratorio"
-
-#: accounts/models.py:129
-msgid "laboratories"
-msgstr "laboratorios"
-
 #: accounts/models.py:142
-msgid "Laboratory User"
-msgstr "Usuario de Laboratorios"
+msgid "Laboratory Member"
+msgstr "Miembro de Laboratorios"
 
 #: accounts/models.py:143
-msgid "Laboratory Users"
-msgstr "Usuarios de Laboratorios"
+msgid "Laboratory Members"
+msgstr "Miembros de Laboratorios"

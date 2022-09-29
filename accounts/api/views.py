@@ -5,8 +5,8 @@ from knox.views import LoginView as KnoxLoginView
 from rest_framework import generics
 from rest_framework.authentication import BasicAuthentication
 
-from .serializers import UserSerializer, LaboratorySerializer, LaboratoryUsersSerializer
-from accounts.models import Laboratory, LaboratoryUsers
+from .serializers import UserSerializer, LaboratorySerializer, LabMembersSerializer
+from accounts.models import Laboratory, LabMembers
 
 User = get_user_model()
 
@@ -31,6 +31,6 @@ class LaboratoryView(generics.ListAPIView):
     queryset = Laboratory.objects.all()
     serializer_class = LaboratorySerializer
 
-class LaboratoryUsersView(generics.ListAPIView):
-    queryset = LaboratoryUsers.objects.all()
-    serializer_class = LaboratoryUsersSerializer
+class LabMembersView(generics.ListAPIView):
+    queryset = LabMembers.objects.all()
+    serializer_class = LabMembersSerializer

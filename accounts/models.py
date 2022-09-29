@@ -57,7 +57,7 @@ class CustomUser(AbstractUser):
     # first_name, last_name, groups, is_staff, is_active, is_superuser, last_login, date_joinded
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name'] #['first_name', 'last_name', 'type']
+    REQUIRED_FIELDS = [] #['first_name', 'last_name', 'type']
 
     active = ActiveCustomUserManager()
     objects = CustomUserManager()
@@ -67,12 +67,12 @@ class CustomUser(AbstractUser):
         verbose_name_plural = _('users')
 
     def __str__(self):
-        return self.get_full_name()
+        return self.get_username()
     __str__.short_description = _('user')
 
-    # def name(self):
-    #     return self.get_full_name()
-    # name.short_description = _('user')
+    def name(self):
+        return self.get_full_name()
+    name.short_description = _('name')
 
     # def get_absolute_url(self):
     #     if self.is_active:
@@ -116,7 +116,7 @@ class Laboratory(models.Model):
     address = models.CharField(_('address'), max_length=100)
     email = models.EmailField(_('email'), max_length=100)
     phone = models.CharField(_('phone number'), max_length=30)
-    user = models.ManyToManyField(settings.AUTH_USER_MODEL, _('user'), through='LaboratoryUsers')
+    user = models.ManyToManyField(settings.AUTH_USER_MODEL, _('user'), through='LabMembers')
     url = models.URLField(_('URL'), max_length=100)
     profile_pic = models.ImageField(verbose_name=_('profile picture'), upload_to=upload_location, blank=True, null=True)
     is_active = models.BooleanField(_('active'), default=True)
@@ -129,15 +129,15 @@ class Laboratory(models.Model):
         verbose_name_plural = _('laboratories')
 
 
-class LaboratoryUsers(models.Model):
+class LabMembers(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), on_delete=models.CASCADE)
     laboratory = models.ForeignKey(Laboratory, verbose_name=_('laboratory'), on_delete=models.CASCADE)
     is_active = models.BooleanField(_('active'), default=True)
 
     def __str__(self):
-        return f"{self.laboratory} / {self.user}"
+        return f"{self.laboratory} - {self.user}"
 
     class Meta:
         unique_together = ['user', 'laboratory']
-        verbose_name = _('Laboratory User')
-        verbose_name_plural = _('Laboratory Users')
+        verbose_name = _('Laboratory Member')
+        verbose_name_plural = _('Laboratory Members')
