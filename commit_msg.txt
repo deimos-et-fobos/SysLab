@@ -1,6 +1,5 @@
-First Login Page, livereload
+modified and populate accounts.models
 
-- Change LaboratoryUsers --> LabMembers
-- livereload installation and conf
-- Frontend:
-  - First Login Page
+- Modified: LabUserType. It uses Group Class.
+- Installed: django-faker
+- Created populate_accounts.py script

@@ -15,4 +15,4 @@ django-admin compilemessages
 - Reveer tema de tipo de usuario y grupos
 - Tipo de usuario no puede ir en CustomUser
 - Debe ser un tipo de usuario por Laboratorio al que pertenece
-- Mover tipo de usuario a LabMembers
+- Mover tipo de usuario a LabMember

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-29 02:51-0300\n"
+"POT-Creation-Date: 2022-09-29 19:55-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,25 +18,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: accounts/admin.py:28 accounts/admin.py:34
-msgid "Permissions"
-msgstr "Permisos"
-
-#: accounts/admin.py:48 accounts/models.py:128 accounts/models.py:134
+#: accounts/admin.py:14 accounts/models.py:128 accounts/models.py:134
+#: accounts/models.py:152
 msgid "laboratory"
 msgstr "laboratorio"
 
-#: accounts/admin.py:49 accounts/models.py:129
+#: accounts/admin.py:15 accounts/models.py:129
 msgid "laboratories"
 msgstr "laboratorios"
 
-#: accounts/admin.py:56
+#: accounts/admin.py:21
 msgid "member"
 msgstr "miembro"
 
-#: accounts/admin.py:57
+#: accounts/admin.py:22
 msgid "members"
 msgstr "miembros"
+
+#: accounts/admin.py:36 accounts/admin.py:42
+msgid "Permissions"
+msgstr "Permisos"
 
 #: accounts/apps.py:8
 msgid "Accounts"
@@ -52,25 +53,21 @@ msgid ""
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 
-#: accounts/models.py:24
+#: accounts/models.py:25
 msgid "The Email must be set"
 msgstr ""
 
-#: accounts/models.py:37
+#: accounts/models.py:38
 msgid "Superuser must have is_staff=True."
 msgstr ""
 
-#: accounts/models.py:39
+#: accounts/models.py:40
 msgid "Superuser must have is_superuser=True."
 msgstr ""
 
-#: accounts/models.py:50 accounts/models.py:117
+#: accounts/models.py:51 accounts/models.py:117
 msgid "email"
 msgstr "email"
-
-#: accounts/models.py:51
-msgid "user type"
-msgstr "Tipo de usuario"
 
 #: accounts/models.py:53
 msgid "First name"
@@ -85,7 +82,7 @@ msgid "profile picture"
 msgstr "Foto de perfil"
 
 #: accounts/models.py:66 accounts/models.py:71 accounts/models.py:119
-#: accounts/models.py:133
+#: accounts/models.py:151
 msgid "user"
 msgstr "usuario"
 
@@ -109,14 +106,32 @@ msgstr "número de teléfono"
 msgid "URL"
 msgstr ""
 
-#: accounts/models.py:122 accounts/models.py:135
+#: accounts/models.py:122 accounts/models.py:135 accounts/models.py:154
 msgid "active"
 msgstr "activo"
 
-#: accounts/models.py:142
+#: accounts/models.py:133 accounts/models.py:153 accounts/models.py:168
+msgid "user type"
+msgstr "Tipo de usuario"
+
+#: accounts/models.py:146
+msgid "Lab User Type"
+msgstr "Tipo de Usuario"
+
+#: accounts/models.py:147
+msgid "Lab User Types"
+msgstr "Tipos de Usuario"
+
+#: accounts/models.py:159
+#, python-brace-format
+msgid ""
+"You must choose a user type existing in '{self.laboratory.name}' laboratory"
+msgstr "Debe elegir un Tipo de Usuario existente en el laboratorio '{self.laboratory.name}'"
+
+#: accounts/models.py:172
 msgid "Laboratory Member"
 msgstr "Miembro de Laboratorios"
 
-#: accounts/models.py:143
+#: accounts/models.py:173
 msgid "Laboratory Members"
 msgstr "Miembros de Laboratorios"

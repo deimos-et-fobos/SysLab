@@ -54,9 +54,14 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['email', 'password', 'first_name', 'last_name', 'type', 'profile_pic',
-                  'is_superuser', 'is_staff', 'is_active', 'user_permissions',
-                  ]
+        if User.USERNAME_FIELD == 'email':
+            fields = [User.USERNAME_FIELD, 'password', 'first_name', 'last_name', 'profile_pic',
+                      'is_superuser', 'is_staff', 'is_active', 'user_permissions',
+                      ]
+        else:
+            fields = [User.USERNAME_FIELD, 'password', 'first_name', 'last_name', 'email', 'profile_pic',
+                      'is_superuser', 'is_staff', 'is_active', 'user_permissions',
+                      ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

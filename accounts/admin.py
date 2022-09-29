@@ -1,22 +1,22 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import Laboratory, LabMembers
+from accounts.models import Laboratory, LabMember, LabUserType
 from accounts.forms import UserChangeForm, UserCreationForm
 
 User = get_user_model()
 
 class LabInline(admin.TabularInline):
-    model = LabMembers
+    model = LabMember
     extra = 1
     verbose_name = _('laboratory')
     verbose_name_plural = _('laboratories')
     # show_change_link = True
 
 class MemberInline(admin.TabularInline):
-    model = LabMembers
+    model = LabMember
     extra = 1
     verbose_name = _('member')
     verbose_name_plural = _('members')
@@ -29,16 +29,16 @@ class CustomUserAdmin(UserAdmin):
     add_form = UserCreationForm
 
 
-    list_display = ('__str__', 'name', 'type', 'is_active')
+    list_display = ('__str__', 'name', 'is_active')
     if User.USERNAME_FIELD == 'email':
         fieldsets = (
-            (None, {'fields': (User.USERNAME_FIELD,'password', 'first_name', 'last_name', 'type', 'profile_pic')}),
+            (None, {'fields': (User.USERNAME_FIELD,'password', 'first_name', 'last_name', 'profile_pic')}),
             (_('Permissions'), {'fields': ('is_superuser','is_staff','is_active','user_permissions')}),
             #('Grupos',{'fields': ('groups',)}),
         )
     else:
         fieldsets = (
-            (None, {'fields': (User.USERNAME_FIELD,'password', 'first_name', 'last_name', 'email', 'type', 'profile_pic')}),
+            (None, {'fields': (User.USERNAME_FIELD,'password', 'first_name', 'last_name', 'email', 'profile_pic')}),
             (_('Permissions'), {'fields': ('is_superuser','is_staff','is_active','user_permissions')}),
             #('Grupos',{'fields': ('groups',)}),
         )
@@ -49,11 +49,11 @@ class CustomUserAdmin(UserAdmin):
         }),
     )
     # list_filter = ()
-    search_fields = ('email',)
+    search_fields = (User.USERNAME_FIELD,)
     ordering = (User.USERNAME_FIELD,)
     filter_horizontal = ()
     inlines = [LabInline]
-    
+
 
 class LaboratoryAdmin(admin.ModelAdmin):
     model = Laboratory
@@ -61,11 +61,29 @@ class LaboratoryAdmin(admin.ModelAdmin):
     inlines = [MemberInline]
 
 
-class LabMembersAdmin(admin.ModelAdmin):
-    model = LabMembers
-    list_display = ('user', 'laboratory', 'is_active')
+class LabMemberAdmin(admin.ModelAdmin):
+    model = LabMember
+    list_display = ('user', 'laboratory', 'user_type_name', 'is_active')
+    ordering = ('user', 'laboratory', 'user_type_name')
+    search_fields = ('user', 'laboratory__name', 'type')
+    list_filter = ('is_active',)
 
+class LabUserTypeAdmin(GroupAdmin):
+    model = LabUserType
+    list_display = ('laboratory', 'type', 'name', 'is_active')
+    fieldsets = (
+        (None, {'fields': ('laboratory', 'type', 'is_active', 'permissions')}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('laboratory', 'type', 'is_active', 'permissions')}),
+    )
+    ordering = ('laboratory', 'type')
+    search_fields = ('laboratory__name', 'type')
+    list_filter = ('is_active',)
 
-admin.site.register(User, CustomUserAdmin)
 admin.site.register(Laboratory, LaboratoryAdmin)
-admin.site.register(LabMembers, LabMembersAdmin)
+admin.site.register(LabMember, LabMemberAdmin)
+admin.site.register(LabUserType, LabUserTypeAdmin)
+admin.site.register(User, CustomUserAdmin)

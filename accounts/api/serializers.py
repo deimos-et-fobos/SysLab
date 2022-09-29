@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from accounts.models import Laboratory, LabMembers
+from accounts.models import Laboratory, LabMember
 
 User = get_user_model()
 
@@ -15,7 +15,7 @@ class LaboratorySerializer(serializers.ModelSerializer):
         model = Laboratory
         fields = ('id', 'name', 'address', 'email', 'phone', 'user', 'url', 'is_active')
 
-class LabMembersSerializer(serializers.ModelSerializer):
+class LabMemberSerializer(serializers.ModelSerializer):
     class Meta:
-        model = LabMembers
+        model = LabMember
         fields = ('id', 'user', 'laboratory', 'is_active')

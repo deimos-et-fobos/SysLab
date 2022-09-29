@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.shortcuts import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
@@ -48,7 +49,6 @@ class ActiveCustomUserManager(CustomUserManager):
 class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(_('email'), max_length=255, unique=True)
-    type = models.ForeignKey(Group, verbose_name=_('user type'), on_delete=models.SET_NULL, null=True, blank=True)
     # type = models.CharField(verbose_name='tipo', choices=USER_TYPE, max_length=1, default='T')
     first_name = models.CharField(_('First name'), max_length=150)
     last_name = models.CharField(_('Last name'), max_length=150)
@@ -90,25 +90,25 @@ class CustomUser(AbstractUser):
     #         )
     #     return objects
 
-def save_user_type(sender, instance, *args, **kwargs):
-    user = instance
-    type = user.type
-    if type and type != user.groups.all().first():
-        user.groups.set([type])
-    else:
-        user.groups.clear()
-
-def sync_type_to_group(sender, instance, action, *args, **kwargs):
-    user = instance
-    type = user.type
-    if action == 'post_add' or action == 'post_remove':
-        if type:
-            user.groups.set([type])
-        else:
-            user.groups.clear()
-
-post_save.connect(save_user_type, sender=CustomUser)
-m2m_changed.connect(sync_type_to_group, sender=CustomUser.groups.through)
+# def save_user_type(sender, instance, *args, **kwargs):
+#     user = instance
+#     type = user.type
+#     if type and type != user.groups.all().first():
+#         user.groups.set([type])
+#     else:
+#         user.groups.clear()
+#
+# def sync_type_to_group(sender, instance, action, *args, **kwargs):
+#     user = instance
+#     type = user.type
+#     if action == 'post_add' or action == 'post_remove':
+#         if type:
+#             user.groups.set([type])
+#         else:
+#             user.groups.clear()
+#
+# post_save.connect(save_user_type, sender=CustomUser)
+# m2m_changed.connect(sync_type_to_group, sender=CustomUser.groups.through)
 
 
 class Laboratory(models.Model):
@@ -116,7 +116,7 @@ class Laboratory(models.Model):
     address = models.CharField(_('address'), max_length=100)
     email = models.EmailField(_('email'), max_length=100)
     phone = models.CharField(_('phone number'), max_length=30)
-    user = models.ManyToManyField(settings.AUTH_USER_MODEL, _('user'), through='LabMembers')
+    user = models.ManyToManyField(settings.AUTH_USER_MODEL, _('user'), through='LabMember')
     url = models.URLField(_('URL'), max_length=100)
     profile_pic = models.ImageField(verbose_name=_('profile picture'), upload_to=upload_location, blank=True, null=True)
     is_active = models.BooleanField(_('active'), default=True)
@@ -129,15 +129,66 @@ class Laboratory(models.Model):
         verbose_name_plural = _('laboratories')
 
 
-class LabMembers(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), on_delete=models.CASCADE)
+class LabUserType(Group):
+    type = models.CharField(_('user type'), max_length=20)
     laboratory = models.ForeignKey(Laboratory, verbose_name=_('laboratory'), on_delete=models.CASCADE)
     is_active = models.BooleanField(_('active'), default=True)
 
     def __str__(self):
+        return f"{self.laboratory.name} - {self.type}"
+
+    def save(self, *args, **kwargs):
+        self.name = self.type + '.' + self.laboratory.id.__str__()
+        super().save(*args, **kwargs)
+
+    class Meta:
+        unique_together = ['type', 'laboratory']
+        verbose_name = _('Lab User Type')
+        verbose_name_plural = _('Lab User Types')
+
+
+class LabMember(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), on_delete=models.CASCADE)
+    laboratory = models.ForeignKey(Laboratory, verbose_name=_('laboratory'), on_delete=models.CASCADE)
+    user_type = models.ForeignKey(LabUserType, verbose_name=_('user type'), on_delete=models.SET_NULL, null=True, blank=True)
+    is_active = models.BooleanField(_('active'), default=True)
+
+    def save(self, *args, **kwargs):
+        if self.user_type:
+            if self.laboratory != self.user_type.laboratory:
+                raise ValidationError( _(f"You must choose a user type existing in '{self.laboratory.name}' laboratory") )
+        super().save(*args, **kwargs)
+
+    def __str__(self):
         return f"{self.laboratory} - {self.user}"
+
+    def user_type_name(self):
+        if self.user_type:
+            return f"{self.user_type.labusertype.type}"
+    user_type_name.short_description = _('user type')
 
     class Meta:
         unique_together = ['user', 'laboratory']
         verbose_name = _('Laboratory Member')
         verbose_name_plural = _('Laboratory Members')
+
+
+# class LabUserType(models.Model):
+#     type = models.CharField(_('user type'), max_length=20)
+#     laboratory = models.ForeignKey(Laboratory, verbose_name=_('laboratory'), on_delete=models.CASCADE)
+#     group = models.OneToOneField(Group, verbose_name=_('group'), on_delete=models.CASCADE, blank=True)
+#     is_active = models.BooleanField(_('active'), default=True)
+#
+#     def __str__(self):
+#         return f"{self.type}"
+#
+#     def save(self, *args, **kwargs):
+#         group, created = Group.objects.get_or_create(name=self.type+'.'+self.laboratory.id.__str__())
+#         group.save()
+#         self.group = group
+#         super().save(*args, **kwargs)
+#
+#     class Meta:
+#         unique_together = ['type', 'laboratory']
+#         verbose_name = _('Lab User Type')
+#         verbose_name_plural = _('Lab User Types')
