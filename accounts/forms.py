@@ -4,17 +4,33 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import Laboratory
+from accounts.models import Laboratory, LabMember
 
 User = get_user_model()
+
+class LabMemberChangeForm(forms.ModelForm):
+    class Meta:
+        model = LabMember
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        laboratory_id = self.initial.get('laboratory')
+        user_types = self.fields.get('user_type').queryset.filter(laboratory__id=laboratory_id)
+        self.fields.get('user_type').queryset = user_types
+        self.fields.get('user_type').help_text =_(
+            'You will be able to select a "User Type" once you '
+            'create a new "Lab Member". If you change "Laboratory", '
+            'you will have to save before selecting a new "User Type". '
+            'For this click on "Save and keep editing"')
 
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
     # first_name = forms.CharField(max_length=30, required=True, help_text='Required: First Name',widget=forms.TextInput(attrs={'class': 'form-control'}))
     # last_name = forms.CharField(max_length=30, required=True, help_text='Required: Last Name',widget=forms.TextInput(attrs={'class': 'form-control'}))
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+    password1 = forms.CharField(label=_('Password'), widget=forms.PasswordInput)
+    password2 = forms.CharField(label=_('Password confirmation'), widget=forms.PasswordInput)
 
     class Meta:
         model = User

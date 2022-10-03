@@ -23,6 +23,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('api/accounts/', include('accounts.api.urls')),
     path('', include('frontend.urls')),
+    path('rosetta/', include('rosetta.urls')),
 ]
 
 if settings.DEBUG:

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'livereload',
     'rest_framework',
     'knox',
+    'rosetta',
     # Apps,
     'accounts',
     'frontend',
@@ -93,11 +94,11 @@ REST_FRAMEWORK = {
 REST_KNOX = {
   # 'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
   # 'AUTH_TOKEN_CHARACTER_LENGTH': 64,
-  'TOKEN_TTL': timedelta(hours=10),
+  'TOKEN_TTL': timedelta(minutes=1),
   # 'USER_SERIALIZER': 'knox.serializers.UserSerializer',
-  # 'TOKEN_LIMIT_PER_USER': None,
+  'TOKEN_LIMIT_PER_USER': 5, # None,
   # 'AUTO_REFRESH': False,
-  # 'EXPIRY_DATETIME_FORMAT': api_settings.DATETME_FORMAT,
+  # 'EXPIRY_DATETIME_FORMAT': api_settings.DATETIME_FORMAT,
 }
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
@@ -132,7 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'es'
+LANGUAGE_CODE = 'en-US'
 
 TIME_ZONE = 'America/Buenos_Aires'
 
@@ -149,7 +150,7 @@ STATIC_URL = 'static/'
 STATIC_DIR = os.path.join(BASE_DIR,'static')
 STATICFILES_DIRS = [STATIC_DIR,]
 
-LOCALE_PATHS = [os.path.join(BASE_DIR,'locale')]
+LOCALE_PATHS = [os.path.join(BASE_DIR,'accounts/locale'),]
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')

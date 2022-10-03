@@ -1,5 +1,8 @@
-modified and populate accounts.models
+Accounts models and forms
 
-- Modified: LabUserType. It uses Group Class.
-- Installed: django-faker
-- Created populate_accounts.py script
+- Modified: permissions added to LabMember model.
+- Created: get_permissions(), get_usertype_permissions(), get_all_permissions(),
+  has_perm(), and has_perms() methods added.
+- Modified: accounts.api Serializers
+- Django-Rosetta added.
+- LabMemberChangeForm created to control choices for user_type field.

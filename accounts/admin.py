@@ -4,13 +4,14 @@ from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.utils.translation import gettext_lazy as _
 
 from accounts.models import Laboratory, LabMember, LabUserType
-from accounts.forms import UserChangeForm, UserCreationForm
+from accounts.forms import UserChangeForm, UserCreationForm, LabMemberChangeForm
 
 User = get_user_model()
 
 class LabInline(admin.TabularInline):
     model = LabMember
     extra = 1
+    exclude = ('permissions',)
     verbose_name = _('laboratory')
     verbose_name_plural = _('laboratories')
     # show_change_link = True
@@ -18,6 +19,7 @@ class LabInline(admin.TabularInline):
 class MemberInline(admin.TabularInline):
     model = LabMember
     extra = 1
+    exclude = ('permissions',)
     verbose_name = _('member')
     verbose_name_plural = _('members')
 
@@ -28,19 +30,16 @@ class CustomUserAdmin(UserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
 
-
     list_display = ('__str__', 'name', 'is_active')
     if User.USERNAME_FIELD == 'email':
         fieldsets = (
             (None, {'fields': (User.USERNAME_FIELD,'password', 'first_name', 'last_name', 'profile_pic')}),
             (_('Permissions'), {'fields': ('is_superuser','is_staff','is_active','user_permissions')}),
-            #('Grupos',{'fields': ('groups',)}),
         )
     else:
         fieldsets = (
             (None, {'fields': (User.USERNAME_FIELD,'password', 'first_name', 'last_name', 'email', 'profile_pic')}),
             (_('Permissions'), {'fields': ('is_superuser','is_staff','is_active','user_permissions')}),
-            #('Grupos',{'fields': ('groups',)}),
         )
     add_fieldsets = (
         (None, {
@@ -53,6 +52,7 @@ class CustomUserAdmin(UserAdmin):
     ordering = (User.USERNAME_FIELD,)
     filter_horizontal = ()
     inlines = [LabInline]
+    list_filter = ('is_staff', 'is_active', 'is_superuser')
 
 
 class LaboratoryAdmin(admin.ModelAdmin):
@@ -61,24 +61,18 @@ class LaboratoryAdmin(admin.ModelAdmin):
     inlines = [MemberInline]
 
 
-class LabMemberAdmin(admin.ModelAdmin):
+class LabMemberAdmin(GroupAdmin):
     model = LabMember
+    form = LabMemberChangeForm #Both create and change forms
     list_display = ('user', 'laboratory', 'user_type_name', 'is_active')
-    ordering = ('user', 'laboratory', 'user_type_name')
+    ordering = ('user', 'laboratory')
     search_fields = ('user', 'laboratory__name', 'type')
     list_filter = ('is_active',)
 
+
 class LabUserTypeAdmin(GroupAdmin):
     model = LabUserType
-    list_display = ('laboratory', 'type', 'name', 'is_active')
-    fieldsets = (
-        (None, {'fields': ('laboratory', 'type', 'is_active', 'permissions')}),
-    )
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('laboratory', 'type', 'is_active', 'permissions')}),
-    )
+    list_display = ('laboratory', 'type', 'is_active')
     ordering = ('laboratory', 'type')
     search_fields = ('laboratory__name', 'type')
     list_filter = ('is_active',)

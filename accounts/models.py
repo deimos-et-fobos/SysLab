@@ -2,8 +2,7 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save, pre_save, m2m_changed
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import AbstractUser, BaseUserManager, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.shortcuts import reverse
@@ -50,8 +49,8 @@ class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(_('email'), max_length=255, unique=True)
     # type = models.CharField(verbose_name='tipo', choices=USER_TYPE, max_length=1, default='T')
-    first_name = models.CharField(_('First name'), max_length=150)
-    last_name = models.CharField(_('Last name'), max_length=150)
+    first_name = models.CharField(_('first name'), max_length=150, blank=True)
+    last_name = models.CharField(_('last name'), max_length=150, blank=True)
     profile_pic = models.ImageField(verbose_name=_('profile picture'), upload_to=upload_location, blank=True, null=True)
     # Fields from AbstractUser:
     # first_name, last_name, groups, is_staff, is_active, is_superuser, last_login, date_joinded
@@ -113,12 +112,12 @@ class CustomUser(AbstractUser):
 
 class Laboratory(models.Model):
     name = models.CharField(_('name'), max_length=100, unique=True)
-    address = models.CharField(_('address'), max_length=100)
-    email = models.EmailField(_('email'), max_length=100)
-    phone = models.CharField(_('phone number'), max_length=30)
-    user = models.ManyToManyField(settings.AUTH_USER_MODEL, _('user'), through='LabMember')
-    url = models.URLField(_('URL'), max_length=100)
+    address = models.CharField(_('address'), max_length=100, blank=True)
+    email = models.EmailField(_('email'), max_length=100, blank=True)
+    phone = models.CharField(_('phone number'), max_length=30, blank=True)
+    url = models.URLField(_('URL'), max_length=100, blank=True)
     profile_pic = models.ImageField(verbose_name=_('profile picture'), upload_to=upload_location, blank=True, null=True)
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, _('users'), through='LabMember')
     is_active = models.BooleanField(_('active'), default=True)
 
     def __str__(self):
@@ -129,29 +128,56 @@ class Laboratory(models.Model):
         verbose_name_plural = _('laboratories')
 
 
-class LabUserType(Group):
+class LabUserType(models.Model):
     type = models.CharField(_('user type'), max_length=20)
     laboratory = models.ForeignKey(Laboratory, verbose_name=_('laboratory'), on_delete=models.CASCADE)
     is_active = models.BooleanField(_('active'), default=True)
+    permissions = models.ManyToManyField(Permission, verbose_name=_("permissions"), blank=True)
 
     def __str__(self):
         return f"{self.laboratory.name} - {self.type}"
 
-    def save(self, *args, **kwargs):
-        self.name = self.type + '.' + self.laboratory.id.__str__()
-        super().save(*args, **kwargs)
+    def get_permissions(self):
+        permissions = self.permissions.all()
+        _permissions = [ perm.content_type.app_label + '.' + perm.codename for perm in permissions]
+        return set(_permissions)
+
+    def has_perm(self, perm):
+        return perm in self.get_permissions()
+
+    def has_perms(self, perm_list):
+        return all(self.has_perm(perm) for perm in perm_list)
 
     class Meta:
         unique_together = ['type', 'laboratory']
-        verbose_name = _('Lab User Type')
-        verbose_name_plural = _('Lab User Types')
+        verbose_name = _('lab user type')
+        verbose_name_plural = _('lab user types')
 
 
 class LabMember(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), on_delete=models.CASCADE)
     laboratory = models.ForeignKey(Laboratory, verbose_name=_('laboratory'), on_delete=models.CASCADE)
+    # Limit the choices of user_type from LabMemberChangeForm
     user_type = models.ForeignKey(LabUserType, verbose_name=_('user type'), on_delete=models.SET_NULL, null=True, blank=True)
     is_active = models.BooleanField(_('active'), default=True)
+    permissions = models.ManyToManyField(Permission, verbose_name=_("permissions"), blank=True)
+
+    def get_permissions(self):
+        permissions = self.permissions.all()
+        _permissions = [ perm.content_type.app_label + '.' + perm.codename for perm in permissions]
+        return set(_permissions)
+
+    def get_usertype_permissions(self):
+        return self.user_type.get_permissions()
+
+    def get_all_permissions(self):
+        return {*self.get_permissions(), *self.get_usertype_permissions()}
+
+    def has_perm(self, perm):
+        return perm in self.get_all_permissions()
+
+    def has_perms(self, perm_list):
+        return all(self.has_perm(perm) for perm in perm_list)
 
     def save(self, *args, **kwargs):
         if self.user_type:
@@ -164,31 +190,28 @@ class LabMember(models.Model):
 
     def user_type_name(self):
         if self.user_type:
-            return f"{self.user_type.labusertype.type}"
+            return f"{self.user_type.type}"
     user_type_name.short_description = _('user type')
 
     class Meta:
         unique_together = ['user', 'laboratory']
-        verbose_name = _('Laboratory Member')
-        verbose_name_plural = _('Laboratory Members')
+        verbose_name = _('laboratory member')
+        verbose_name_plural = _('laboratory members')
 
+# from accounts.models import LabUserType
+# user = LabUserType.objects.all()[0]
+# user.get_permissions()
+# user.has_perm('accounts.delete_labmember')
+# user.has_perm('accounts.delete_labmembers')
+# user.has_perms(['accounts.add_labmember','accounts.delete_labmember'])
+# user.has_perms(['accounts.add_labmember','accounts.delete_labmembers'])
 
-# class LabUserType(models.Model):
-#     type = models.CharField(_('user type'), max_length=20)
-#     laboratory = models.ForeignKey(Laboratory, verbose_name=_('laboratory'), on_delete=models.CASCADE)
-#     group = models.OneToOneField(Group, verbose_name=_('group'), on_delete=models.CASCADE, blank=True)
-#     is_active = models.BooleanField(_('active'), default=True)
-#
-#     def __str__(self):
-#         return f"{self.type}"
-#
-#     def save(self, *args, **kwargs):
-#         group, created = Group.objects.get_or_create(name=self.type+'.'+self.laboratory.id.__str__())
-#         group.save()
-#         self.group = group
-#         super().save(*args, **kwargs)
-#
-#     class Meta:
-#         unique_together = ['type', 'laboratory']
-#         verbose_name = _('Lab User Type')
-#         verbose_name_plural = _('Lab User Types')
+# from accounts.models import LabMember
+# user = LabMember.objects.all()[0]
+# user.get_permissions()
+# user.get_usertype_permissions()
+# user.get_all_permissions()
+# user.has_perm('knox.add_authtoken')
+# user.has_perm('knox.add_authtokens')
+# user.has_perms(['knox.add_authtokess','accounts.delete_labmember'])
+# user.has_perms(['knox.add_authtoken','sessions.delete_session'])
