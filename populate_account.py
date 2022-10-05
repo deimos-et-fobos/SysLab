@@ -72,9 +72,13 @@ def populate_labmember(N=5):
         member.save()
 
 if __name__ == '__main__':
-    print("populating script!")
+    print("Populating script...")
+    print(" + Populating User")
     populate_user(5)
+    print(" + Populating Laboratory")
     populate_lab(20)
+    print(" + Populating LabUserType")
     populate_labusertype()
+    print(" + Populating LabMember")
     populate_labmember(20)
-    print("populating complete!")
+    print("Populating complete!")

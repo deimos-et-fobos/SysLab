@@ -30,7 +30,7 @@ class CustomUserAdmin(UserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
 
-    list_display = ('__str__', 'name', 'is_active')
+    list_display = ('__str__', 'full_name', 'is_active')
     if User.USERNAME_FIELD == 'email':
         fieldsets = (
             (None, {'fields': (User.USERNAME_FIELD,'password', 'first_name', 'last_name', 'profile_pic')}),
@@ -64,6 +64,12 @@ class LaboratoryAdmin(admin.ModelAdmin):
 class LabMemberAdmin(GroupAdmin):
     model = LabMember
     form = LabMemberChangeForm #Both create and change forms
+
+    @admin.display(description=_('user type'))
+    def user_type_name(self, obj):
+        if obj.user_type:
+            return f"{obj.user_type.type}"
+
     list_display = ('user', 'laboratory', 'user_type_name', 'is_active')
     ordering = ('user', 'laboratory')
     search_fields = ('user', 'laboratory__name', 'type')

@@ -1,8 +1,6 @@
-Accounts models and forms
+Lab App Created
 
-- Modified: permissions added to LabMember model.
-- Created: get_permissions(), get_usertype_permissions(), get_all_permissions(),
-  has_perm(), and has_perms() methods added.
-- Modified: accounts.api Serializers
-- Django-Rosetta added.
-- LabMemberChangeForm created to control choices for user_type field.
+- Lab App created
+- AdminModels customized
+- Populating scripts created
+- Small changes on accounts models.py and admin.py

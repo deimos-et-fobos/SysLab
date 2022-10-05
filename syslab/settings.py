@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rosetta',
     # Apps,
     'accounts',
+    'lab',
     'frontend',
 ]
 
@@ -150,7 +151,10 @@ STATIC_URL = 'static/'
 STATIC_DIR = os.path.join(BASE_DIR,'static')
 STATICFILES_DIRS = [STATIC_DIR,]
 
-LOCALE_PATHS = [os.path.join(BASE_DIR,'accounts/locale'),]
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR,'accounts/locale'),
+    os.path.join(BASE_DIR,'lab/locale'),
+]
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')

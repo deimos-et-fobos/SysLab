@@ -69,9 +69,10 @@ class CustomUser(AbstractUser):
         return self.get_username()
     __str__.short_description = _('user')
 
-    def name(self):
+    def _full_name(self):
         return self.get_full_name()
-    name.short_description = _('name')
+    _full_name.short_description = _('name')
+    full_name = property(_full_name)
 
     # def get_absolute_url(self):
     #     if self.is_active:
@@ -187,11 +188,6 @@ class LabMember(models.Model):
 
     def __str__(self):
         return f"{self.laboratory} - {self.user}"
-
-    def user_type_name(self):
-        if self.user_type:
-            return f"{self.user_type.type}"
-    user_type_name.short_description = _('user type')
 
     class Meta:
         unique_together = ['user', 'laboratory']
