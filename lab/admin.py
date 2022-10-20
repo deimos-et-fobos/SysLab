@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from lab.models import Culture, Doctor, HealthcareProvider, LabTest, LabTestGroup, LabTestResult, Patient, Protocol, Sample
+from lab.models import Antibiogram, Doctor, HealthcareProvider, LabTest, LabTestGroup, LabTestResult, Patient, Protocol, Sample
 
-class CultureAdmin(admin.ModelAdmin):
-    model = Culture
+class AntibiogramAdmin(admin.ModelAdmin):
+    model = Antibiogram
     @admin.display(description=_('protocol'))
     def get_protocol(self, obj):
         return f"#{obj.labtest_result.protocol}"
@@ -58,16 +58,16 @@ class LabTestResultAdmin(admin.ModelAdmin):
     @admin.display(description=_('patient'))
     def get_patient(self, obj):
         return obj.protocol.patient
-    @admin.display(description=_('parent'))
+    @admin.display(description=_('parent test'))
     def get_test_parent(self, obj):
         return obj.parent
-    @admin.display(boolean=True,description=_('culture'))
-    def get_has_cultures(self, obj):
-        return obj.test.is_culture
+    @admin.display(boolean=True,description=_('antibiogram'))
+    def get_has_antibiogram(self, obj):
+        return obj.test.is_antibiogram
 
-    list_filter = ('test__is_culture',)
+    list_filter = ('test__is_antibiogram',)
     # list_display = ['get_patient'] + [field.name for field in LabTestResult._meta.fields if field.name != 'id']
-    list_display = ('protocol', 'get_patient', 'get_test_parent', 'test', 'get_has_cultures', 'value', 'status', 'observations', 'is_active')
+    list_display = ('protocol', 'get_patient', 'get_test_parent', 'test', 'get_has_antibiogram', 'value', 'status', 'observations', 'is_active')
 
 class PatientAdmin(admin.ModelAdmin):
     model = Patient
@@ -91,7 +91,7 @@ class SampleAdmin(admin.ModelAdmin):
     # list_display = ('protocol', 'get_patient', 'type', 'status', 'checkin_time', 'is_active')
 
 
-admin.site.register(Culture, CultureAdmin)
+admin.site.register(Antibiogram, AntibiogramAdmin)
 admin.site.register(Doctor, DoctorAdmin)
 admin.site.register(HealthcareProvider, HealthcareProviderAdmin)
 admin.site.register(LabTest, LabTestAdmin)

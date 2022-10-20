@@ -2,13 +2,19 @@ from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.shortcuts import render
 from knox.views import LoginView as KnoxLoginView
-from rest_framework import generics
+from rest_framework import generics, permissions, views
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.authentication import BasicAuthentication
 
 from .serializers import UserSerializer, LaboratorySerializer, LabMemberSerializer
 from accounts.models import Laboratory, LabMember
 
 User = get_user_model()
+
+class LoginStatus(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response({'auth':True})
 
 class LoginView(KnoxLoginView):
     authentication_classes = [BasicAuthentication]
@@ -20,12 +26,10 @@ class LoginView(KnoxLoginView):
 #   ADD TOKEN TO COOKIE
 #   document.cookie = "token=asdfnysdfhhih; expires=Thu, 18 Dec 2013 12:00:00 UTC";
 
-def index(request):
-    return HttpResponse("<h1>Accounts API</h1>")
-
 class UserView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 class LaboratoryView(generics.ListAPIView):
     queryset = Laboratory.objects.all()

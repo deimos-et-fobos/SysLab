@@ -95,7 +95,7 @@ REST_FRAMEWORK = {
 REST_KNOX = {
   # 'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
   # 'AUTH_TOKEN_CHARACTER_LENGTH': 64,
-  'TOKEN_TTL': timedelta(minutes=1),
+  'TOKEN_TTL': timedelta(hours=1),
   # 'USER_SERIALIZER': 'knox.serializers.UserSerializer',
   'TOKEN_LIMIT_PER_USER': 5, # None,
   # 'AUTO_REFRESH': False,
@@ -134,7 +134,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-US'
+LANGUAGE_CODE = 'es-ES'
 
 TIME_ZONE = 'America/Buenos_Aires'
 

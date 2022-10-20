@@ -8,48 +8,11 @@ from accounts.models import Laboratory
 
 User = get_user_model()
 
-ID_TYPES = (
-    ('0',_('DNI')),
-    ('1',_('LE')),
-    ('2',_('LC')),
-    ('3',_('Passport')),
-    ('4',_('Other')),
-)
-
-GENDERS = (
-    ('0',_('Male')),
-    ('1',_('Female')),
-    ('2',_('Non-Binary')),
-    ('3',_('Other')),
-)
-
 STATUS = (
     ('0',_('Pendent')),
     ('1',_('On process')),
     ('2',_('Finished')),
     ('3',_('Validated')),
-)
-
-LABTEST_TYPES = (
-    ('0',_('Single')),
-    ('1',_('Compound')),
-)
-
-SAMPLE_TYPES = (
-  ('0',_('Blood')),
-  ('1',_('Urine')),
-  ('2',_('Vaginal discharge')),
-  ('3',_('Semen')),
-  ('4',_('Saliva')),
-  ('5',_('Stool')),
-  ('6',_('Other')),
-)
-
-RESISTANCE = (
-  ('0',_('Low')),
-  ('1',_('Medium')),
-  ('2',_('High')),
-  ('3',_('Unknown')),
 )
 
 class ActiveObjectsManager(models.Manager):
@@ -80,13 +43,29 @@ class HealthcareProvider(models.Model):
 
 
 class Patient(models.Model):
+    ID_TYPE = (
+        ('0',_('DNI')),
+        ('1',_('LE')),
+        ('2',_('LC')),
+        ('3',_('Passport')),
+        ('4',_('Other')),
+    )
+    GENDER = (
+        ('',_('')),
+        ('0',_('Male')),
+        ('1',_('Female')),
+        ('2',_('Non-Binary')),
+        ('3',_('Other')),
+    )
+
     first_name = models.CharField(_('first name'), max_length=120)
     last_name = models.CharField(_('last name'), max_length=120)
-    id_type = models.CharField(_('ID type'), choices=ID_TYPES, max_length=1)
-    id_number = models.CharField(_('ID number'), max_length=30, unique=True)
+    id_type = models.CharField(_('ID type'), choices=ID_TYPE, default='0', max_length=1)
+    id_number = models.CharField(_('ID number'), max_length=30)
     birthday = models.DateField(_('date of birth'), blank=True)
     age = models.PositiveIntegerField(_('age'), blank=True)
-    gender = models.CharField(_('gender'), choices=GENDERS, max_length=1, null=True, blank=True)
+    gender = models.CharField(_('gender'), choices=GENDER, default='', max_length=1)
+    # CAMBIAR A ForeignKey
     healthcare_provider = models.CharField(_('healthcare provider'), max_length=100, blank=True)
     phone = models.CharField(_('phone'), max_length=20, blank=True)
     address = models.CharField(_('address'), max_length=150, blank=True)
@@ -109,8 +88,8 @@ class Patient(models.Model):
         objects = self.model.active.all()
         for key in keys:
             objects = objects.filter(
-                Q(name__icontains=key) |
-                Q(surname__icontains=key) |
+                Q(first_name__icontains=key) |
+                Q(last_name__icontains=key) |
                 Q(id_number__icontains=key)
             )
         return objects
@@ -146,8 +125,8 @@ class Doctor(models.Model):
         objects = self.model.active.all()
         for key in keys:
             objects = objects.filter(
-                Q(name__icontains=key) |
-                Q(surname__icontains=key) |
+                Q(first_name__icontains=key) |
+                Q(last_name__icontains=key) |
                 Q(medical_license__icontains=key) |
                 Q(specialty__icontains=key)
             )
@@ -167,7 +146,8 @@ class Protocol(models.Model):
     hc_number = models.CharField(_('healthcare provider number'), max_length=100, blank=True)
     authorization_number = models.CharField(_('authorization number'), max_length=100, blank=True)
     ########
-    has_cultures = models.BooleanField(_('cultures'), default=False)
+    # has_antibiogram = models.BooleanField(_('antibiogram'), default=False)
+    is_urgent = models.BooleanField(_('urgent'), default=False)
     ########
     diagnosis = models.CharField(_('diagnosis'), max_length=255, null=True, blank=True)
     observations = models.CharField(_('observations'), max_length=120, null=True, blank=True)
@@ -190,8 +170,19 @@ class Protocol(models.Model):
 
 
 class Sample(models.Model):
+    SAMPLE_TYPE = (
+        ('',_('')),
+        ('0',_('Blood')),
+        ('1',_('Urine')),
+        ('2',_('Vaginal discharge')),
+        ('3',_('Semen')),
+        ('4',_('Saliva')),
+        ('5',_('Stool')),
+        ('6',_('Other')),
+    )
+
     protocol = models.ForeignKey(Protocol, verbose_name=_('protocol'), on_delete=models.SET_NULL, null=True)
-    type = models.CharField(_('type'), choices=SAMPLE_TYPES, max_length=1)
+    type = models.CharField(_('type'), choices=SAMPLE_TYPE, default='', max_length=1)
     received = models.BooleanField(_('received'), default=True)
     ### Agregar el default=timezone.now
     checkin_time = models.DateTimeField(_('check in time'), blank=True, null=True)
@@ -224,16 +215,21 @@ class LabTestGroup(models.Model):
 
 
 class LabTest(models.Model):
+    LABTEST_TYPE = (
+        ('0',_('Single')),
+        ('1',_('Compound')),
+    )
+
     code = models.CharField(_('code'), max_length=30, unique=True)
     name = models.CharField(_('name'), max_length=30)
-    ub = models.CharField(_('UB'), max_length=10)
+    ub = models.CharField(_('UB'), max_length=10, blank=True)
     method = models.CharField(_('method'), max_length=30, blank=True)
     price = models.CharField(_('price'), max_length=30, blank=True)
     group = models.ForeignKey(LabTestGroup, verbose_name=_('group'), on_delete=models.SET_NULL, null=True, blank=True)
-    sample_type = models.CharField(_('sample type'), choices=SAMPLE_TYPES, max_length=1, blank=True)
-    type = models.CharField(_('type'), choices=LABTEST_TYPES, default='0', max_length=1)
+    sample_type = models.CharField(_('sample type'), choices=Sample.SAMPLE_TYPE, max_length=1, null=True, blank=True)
+    type = models.CharField(_('type'), choices=LABTEST_TYPE, default='0', max_length=1)
     childs = models.ManyToManyField('self', verbose_name=_('childs'), symmetrical=False, related_name='parents', blank=True)
-    is_culture = models.BooleanField(_('culture'), default=False)
+    is_antibiogram = models.BooleanField(_('antibiogram'), default=False)
     reference_value = models.CharField(_('reference value'), max_length=255, blank=True)
     unit = models.CharField(_('unit'), max_length=30, blank=True)
     is_active = models.BooleanField(_('active'), default=True)
@@ -273,12 +269,18 @@ class LabTestResult(models.Model):
         verbose_name_plural = _('lab test results')
 
 
-class Culture(models.Model):
+class Antibiogram(models.Model):
+    RESISTANCE = (
+        ('',_('')),
+        ('0',_('Sensitive')),
+        ('1',_('Intermediate')),
+        ('2',_('Resistant')),
+    )
     ### CAPAZ QUE TENER EL PROTOCOLO ES REDUNDANTE ###
     protocol = models.ForeignKey(Protocol, verbose_name=_('protocol'), on_delete=models.SET_NULL, null=True)
     labtest_result = models.ForeignKey(LabTestResult, verbose_name=_('lab test result'), on_delete=models.SET_NULL, null=True)
     medicine = models.CharField(_('medicine'), max_length=30)
-    resistance = models.CharField(_('resistance'), choices=RESISTANCE, max_length=1)
+    resistance = models.CharField(_('resistance'), choices=RESISTANCE, default=RESISTANCE[0][0], max_length=1)
     is_active = models.BooleanField(_('active'), default=True)
 
     objects = models.Manager()
@@ -288,5 +290,5 @@ class Culture(models.Model):
         return f"{self.labtest_result} - {self.medicine}"
 
     class Meta:
-        verbose_name = _('culture')
-        verbose_name_plural = _('cultures')
+        verbose_name = _('antibiogram')
+        verbose_name_plural = _('antibiograms')

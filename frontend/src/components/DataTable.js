@@ -1,0 +1,123 @@
+import React, { useState, useEffect } from 'react'
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import Pagination from '@mui/material/Pagination';
+import Typography from '@mui/material/Typography';
+import {
+  DataGrid,
+  GridColDef,
+  GridRowsProp,
+  GridToolbarContainer,
+  GridToolbarExport,
+  GridToolbarQuickFilter,
+  gridPageCountSelector,
+  gridPageSelector,
+  useGridApiContext,
+  useGridSelector,
+} from '@mui/x-data-grid';
+
+function getCookie(cname) {
+  let name = `${cname}=`;
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+export default function DataTable(props) {
+  const [rows, setRows] = useState(null)
+  const [query, setQuery] = useState(null)
+  const { columns, fetch_url, sx } = {...props}
+
+  const getList = async () => {
+    const requestOptions = {
+      headers: {
+        'Authorization': 'Token ' + getCookie('token'),
+        // 'X-CSRFToken': getCookie('csrftoken'),
+      },
+    };
+    // fetch(fetch_url + query)
+    await fetch(fetch_url, requestOptions)
+    .then((response) => response.json())
+    .then((data) => {
+      setRows(data)
+    });
+  }
+
+  useEffect(() => {
+    getList()
+  }, [query]);
+
+  function searchQuery(e) {
+    const value = e.target.value
+    setQuery(value)
+  }
+
+  function CustomToolbar(props) {
+    return (
+      <GridToolbarContainer sx={{ justifyContent:'space-between' }} >
+        <GridToolbarExport />
+        <GridToolbarQuickFilter sm={{ width: '50%'}} />
+      </GridToolbarContainer>
+    );
+  }
+
+  function CustomHeader(props) {
+    return (
+      <Box>
+        <Typography variant='h6' sx={props.titleProps}>{props.title}</Typography>
+        {/* <Divider sx={{ borderBottomWidth: 3 }}/> */}
+        <Divider sx={{ bgcolor: 'black' }}/>
+        <CustomToolbar/>
+      </Box>
+    );
+  }
+
+  function CustomPagination() {
+    const apiRef = useGridApiContext();
+    const page = useGridSelector(apiRef, gridPageSelector);
+    const pageCount = useGridSelector(apiRef, gridPageCountSelector);
+
+    return (
+      <Pagination
+        color='primary'
+        count={pageCount}
+        page={page + 1}
+        onChange={(event, value) => apiRef.current.setPage(value - 1)}
+      />
+    );
+  }
+
+  return (
+    <Box>
+      { rows ?
+        <DataGrid
+          sx={sx}
+          rows={rows}
+          columns={columns}
+          density="standard"
+          loading={false}
+          pageSize={20} autoHeight
+          checkboxSelection disableSelectionOnClick
+          components={{
+            Toolbar: CustomToolbar,
+            Pagination: CustomPagination,
+            Header: CustomHeader,
+          }}
+          componentsProps={{
+            header: {...props},
+          }}
+        />
+        : null
+      }
+    </Box>
+  )
+};

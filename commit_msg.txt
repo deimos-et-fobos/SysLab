@@ -1,6 +1,9 @@
-Lab App Created
+Basic SPA and Login/Logout
 
-- Lab App created
-- AdminModels customized
-- Populating scripts created
-- Small changes on accounts models.py and admin.py
+- Backend:
+  - Lab API created.
+  - Lab & Accounts API ListViews created.
+
+- Frontend:
+  - HomePage, LoginPage, Menu, MenuBar
+  - List components.

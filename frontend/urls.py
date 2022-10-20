@@ -6,6 +6,11 @@ from .views import index
 app_name = 'frontend'
 urlpatterns = [
     path('', index, name='index'),
-    path('create/', index),
-    path('info/', index),
+    path('login/', index),
+    path('doctors/', index),
+    path('healthcare/', index),
+    path('patients/', index),
+    path('protocols/', index),
+    path('tests/', index),
+    path('users/', index),
 ]

@@ -1,5 +1,6 @@
 import React from "react";
-import Container from 'react-bootstrap/Container';
+import Box from '@mui/material/Box';
+import { teal } from '@mui/material/colors';
 
 import HomePage from "./HomePage";
 
@@ -10,9 +11,9 @@ export default class App extends React.Component {
 
   render () {
     return (
-      <Container style={{ backgroundColor: 'cyan' }}>
-        <HomePage/>
-      </Container>
+      <Box sx={{ bgcolor: teal['50'] }}>
+        <HomePage />
+      </Box>
     )
   }
 }

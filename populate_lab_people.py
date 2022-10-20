@@ -26,11 +26,11 @@ def populate_patient(N=5):
     for entry in range(N):
         fake_firstname = fakegen.first_name()
         fake_lastname = fakegen.last_name()
-        fake_id_type =  fakegen.pyint(max_value=3)
+        fake_id_type =  random.choice(Patient.ID_TYPE)[0]
         fake_id_number =  fakegen.pystr_format(letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ', string_format='??######')
         fake_birthday = fakegen.date()
         fake_age =  fakegen.pyint(max_value=100)
-        fake_gender =  fakegen.pyint(max_value=3)
+        fake_gender =  random.choice(Patient.GENDER)[0]
         fake_provider = random.choice(providers)
         fake_phone = fakegen.last_name()
         fake_address = fakegen.first_name()

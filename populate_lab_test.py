@@ -9,7 +9,7 @@ from django.utils import timezone
 # FAKE POP SCRIPT
 import random
 from accounts.models import Laboratory, CustomUser
-from lab.models import Culture, Doctor, HealthcareProvider, LabTest, LabTestGroup, LabTestResult, Patient, Protocol, Sample
+from lab.models import Antibiogram, Doctor, HealthcareProvider, LabTest, LabTestGroup, LabTestResult, Patient, Protocol, Sample
 from faker import Faker
 
 fakegen = Faker()
@@ -28,15 +28,14 @@ def populate_protocol(N=5):
         hc_provider = random.choice(providers).name
         hc_number = fakegen.pystr_format(string_format='########')
         authorization_number = fakegen.pystr_format(string_format='########')
-        has_cultures = fakegen.pyint(max_value=9) == 0
+        has_antibiogram = fakegen.pyint(max_value=9) == 0
         diagnosis = 'diagnostico'
         observations = 'observaciones'
         status = fakegen.pyint(max_value=3)
-        protocol = Protocol.objects.get_or_create(user=user,laboratory=lab,doctor=doctor,patient=patient,hc_provider=hc_provider,hc_number=hc_number,authorization_number=authorization_number,has_cultures=has_cultures,diagnosis=diagnosis,observations=observations,status=status)[0]
-
+        protocol = Protocol.objects.get_or_create(user=user,laboratory=lab,doctor=doctor,patient=patient,hc_provider=hc_provider,hc_number=hc_number,authorization_number=authorization_number,has_antibiogram=has_antibiogram,diagnosis=diagnosis,observations=observations,status=status)[0]
 
 def populate_labtestgroup():
-    labtestgroups = ['Hemología','Quimica','Cultures','Cinetica']
+    labtestgroups = ['Hemología','Quimica','Antibiograms','Cinetica']
     for entry in labtestgroups:
         name = entry
         labtestgroup = LabTestGroup.objects.get_or_create(name=name)[0]
@@ -70,10 +69,10 @@ def populate_simple_labtest(N=5):
         group = random.choice(labtestgroups)
         sample_type = fakegen.pyint(max_value=6)
         type = 0
-        is_culture = fakegen.pyint(max_value=30) == 0
+        is_antibiogram = fakegen.pyint(max_value=30) == 0
         reference_value = fakegen.pyint(max_value=1000)
         unit = random.choice(units)
-        labtest = LabTest.objects.get_or_create(code=code,name=name,ub=ub,method=method,price=price,group=group,sample_type=sample_type,type=type,is_culture=is_culture,reference_value=reference_value,unit=unit)[0]
+        labtest = LabTest.objects.get_or_create(code=code,name=name,ub=ub,method=method,price=price,group=group,sample_type=sample_type,type=type,is_antibiogram=is_antibiogram,reference_value=reference_value,unit=unit)[0]
 
 def populate_compuesto_labtest(N=10):
     units = ['']
@@ -94,16 +93,15 @@ def populate_compuesto_labtest(N=10):
         group = random.choice(labtestgroups)
         sample_type = fakegen.pyint(max_value=6)
         type = 1
-        is_culture = False
+        is_antibiogram = False
         reference_value = fakegen.pyint(max_value=1000)
         unit = random.choice(units)
-        labtest = LabTest.objects.get_or_create(code=code,name=name,ub=ub,method=method,price=price,group=group,sample_type=sample_type,type=type,is_culture=is_culture,reference_value=reference_value,unit=unit)[0]
+        labtest = LabTest.objects.get_or_create(code=code,name=name,ub=ub,method=method,price=price,group=group,sample_type=sample_type,type=type,is_antibiogram=is_antibiogram,reference_value=reference_value,unit=unit)[0]
         childs = []
         for i in range(fakegen.pyint(min_value=3,max_value=10)):
             childs += [random.choice(simple_labtests)]
         labtest.childs.add(*childs)
         labtest.save()
-
 
 def populate_labtestresult():
     protocols = Protocol.objects.all()
@@ -125,17 +123,17 @@ def populate_labtestresult():
                 observations = 'observations ' + f'{fakegen.pyint(max_value=100)}'
                 result = LabTestResult.objects.get_or_create(protocol=protocol,test=test,parent=parent,value=value,status=status,observations=observations)[0]
 
-def populate_culture():
+def populate_antibiogram():
     medicines = ['ibu','parecetamol','amoxicilina','iodo','morfina','penicilina','ciprofloxacina','medicamento 1','medicamento 2','medicamento 3','medicamento 4','medicamento 5','medicamento 6','medicamento 7','medicamento 8','medicamento 9']
-    labtest = LabTest.objects.all().filter(is_culture=True)
+    labtest = LabTest.objects.all().filter(is_antibiogram=True)
     labtest_results = LabTestResult.objects.all().filter(test__in=labtest)
     for labtest_result in labtest_results:
         labtest_result = labtest_result
         protocol = labtest_result.protocol
         medicines_sample = random.sample(medicines, random.randint(3,10))
         for medicine in medicines_sample:
-            resistance = random.randint(0,3)
-            culture = Culture.objects.get_or_create(labtest_result=labtest_result,protocol=protocol,medicine=medicine,resistance=resistance)[0]
+            resistance = random.choice(Antibiogram.RESISTANCE)[0]
+            antibiogram = Antibiogram.objects.get_or_create(labtest_result=labtest_result,protocol=protocol,medicine=medicine,resistance=resistance)[0]
 
 
 if __name__ == '__main__':
@@ -151,6 +149,6 @@ if __name__ == '__main__':
     populate_compuesto_labtest(10)
     print(" + Populating LabTestResult")
     populate_labtestresult()
-    print(" + Populating Culture")
-    populate_culture()
+    print(" + Populating Antibiogram")
+    populate_antibiogram()
     print("Populating complete!")
