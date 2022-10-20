@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link, Navigate, useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-
 
 import LoginPage from './LoginPage';
 import RequireAuth from './RequireAuth';
@@ -16,65 +15,24 @@ import LabTestList from './LabTestList'
 import UserList from './UserList'
 import Menu from './Menu'
 import MenuBar from './MenuBar'
+import { userAuthentication } from './AuthServer'
 
 const drawerWidth = 240;
-
-function getCookie(cname) {
-  let name = `${cname}=`;
-  let decodedCookie = decodeURIComponent(document.cookie);
-  let ca = decodedCookie.split(';');
-  for(let i = 0; i <ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
-}
 
 export default function HomePage(props) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logged, setLogged] = useState(false);
 
-  function logout() {
-    const logout_url = '/api/accounts/logout/'
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Token ' + getCookie('token'),
-        // 'X-CSRFToken': getCookie('csrftoken'),
-      },
-    };
-    fetch(logout_url, requestOptions)
-    .then((response) => {
-      if (response.ok) {
-        setLogged(false)
-      }
-    });
-  }
-
-  const _userIsAuthenticated = async () => {
-    const requestOptions = {
-      headers: {
-        'Authorization': 'Token ' + getCookie('token'),
-      },
-    };
-    return await fetch('/api/accounts/login-status/', requestOptions)
-    .then((response) => {
-      return (response.status == 200) ? true : false;
-    })
-  }
-
   useEffect(() => {
     const userIsAuthenticated = async() => {
-      const data = await _userIsAuthenticated();
-      data ? setLogged(true) : setLogged(false);
+      const auth = await userAuthentication();
+      setLogged(auth);
     }
-    userIsAuthenticated()
-  }, []);
+    userIsAuthenticated().catch((err) => {
+      setLogged(false)
+      console.error(err);
+    });
+  });
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -87,7 +45,7 @@ export default function HomePage(props) {
           handleDrawerToggle={() => handleDrawerToggle()}
           drawerWidth={drawerWidth}
           logged={logged}
-          logout={() => logout()}
+          setLogged={() => setLogged()}
         />
         <Box
           component="nav"

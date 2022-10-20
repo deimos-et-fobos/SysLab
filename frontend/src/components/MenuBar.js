@@ -9,7 +9,14 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { teal } from '@mui/material/colors';
 
+import { logout as _logout } from './AuthServer'
+
 export default function MenuBar(props) {
+
+  const logout = async () => {
+    await _logout().catch(console.error)
+    props.setLogged(false)
+  }
 
   return (
     <AppBar
@@ -40,7 +47,7 @@ export default function MenuBar(props) {
             <IconButton onClick={()=>{}} sx={{ p: 1 }}>
               <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
             </IconButton>
-            <IconButton onClick={props.logout} sx={{ p: 0 }}>
+            <IconButton onClick={logout} sx={{ p: 0 }}>
               <LogoutIcon />
             </IconButton>
           </div>

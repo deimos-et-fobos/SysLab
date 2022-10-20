@@ -16,26 +16,29 @@ function getCookie(cname) {
   return "";
 }
 
-function AuthorizationException(message, details=null) {
-  this.name = 'AuthorizationException';
-  this.message = message;
-  this.details = details;
+export class AuthorizationError extends Error {
+  constructor(message, {details} = {}) {
+  	super(message);
+    this.name = 'AUTHORIZATION_ERROR'
+    this.details = details
+  };
 }
 
-export const userIsAuthenticated = async() => {
+export const userAuthentication = async() => {
   const requestOptions = {
     headers: {
       'Authorization': 'Token ' + getCookie('token'),
     },
   };
-  const logged = await fetch(`${API_URL}/login-status/`, requestOptions)
-  .then((response) => {
-    return (response.status == 200) ? true : false;
-  });
-  return logged;
+  const response = await fetch(`${API_URL}/login-status/`, requestOptions)
+  const data = await response.json()
+  if (response.status != 200) {
+    throw new AuthorizationError(data.detail)
+  }
+  return data.auth ? data.auth : false ; //No se si data.auth es siempre true
 }
 
-export const login = async() => {
+export const login = async(username, password) => {
   const requestOptions = {
     method: 'POST',
     headers: {
@@ -44,19 +47,14 @@ export const login = async() => {
       // 'X-CSRFToken': getCookie('csrftoken'),
     },
   };
-  const status = await fetch(`${API_URL}/login/`, requestOptions)
-  .then((response) => {
-    if (response.status != 200){
-      throw new AuthorizationException('Bad Credentials.', details=response)
-    }
-    return response.json()
-  })
-  .then((data) => {
-    console.log(data);
-    // document.cookie = `token=${data.token};domain=${document.domain}`;
-    return data;
-  });
-  return status
+  const response = await fetch(`${API_URL}/login/`, requestOptions)
+  const data = await response.json()
+  if (response.status != 200) {
+    throw new AuthorizationError('Bad Credentials.', {details:data.detail})
+  }
+  document.cookie = `token=;path=/;domain=${document.domain};expires=Thu, 01-Jan-70 00:00:01 GMT;`;
+  document.cookie = `token=${data.token};path=/;domain=${document.domain};`;
+  return data;
 }
 
 export const logout = async() => {
@@ -66,11 +64,10 @@ export const logout = async() => {
       'Authorization': 'Token ' + getCookie('token'),
     },
   };
-  const status = await fetch(`${API_URL}/logout/`, requestOptions)
-  .then((response) => {
-    if (!response.ok) {
-      throw new AuthorizationException('Logout Error', details=response)
-    }
-    return response
-  });
+  const response = await fetch(`${API_URL}/logout/`, requestOptions)
+  if (!response.ok) {
+    const data = await response.json()
+    throw new AuthorizationError(data.detail)
+  }
+  document.cookie = `token=;path=/;domain=${document.domain};expires=Thu, 01-Jan-70 00:00:01 GMT;`;
 }

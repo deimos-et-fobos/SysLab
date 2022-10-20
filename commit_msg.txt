@@ -1,9 +1,3 @@
-Basic SPA and Login/Logout
+AuthServer.js created
 
-- Backend:
-  - Lab API created.
-  - Lab & Accounts API ListViews created.
-
-- Frontend:
-  - HomePage, LoginPage, Menu, MenuBar
-  - List components.
+- login, logout and useAuthentication modified.
