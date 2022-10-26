@@ -7,6 +7,7 @@ export default function ProtocolList(props) {
   const columns = [
     { field: 'id', headerName: 'Protocolo', minWidth: 120, align:'right', headerAlign:'center'},
     { field: 'laboratoryName', headerName: 'Laboratorio', minWidth: 130, flex: 2, align:'center', headerAlign:'center', valueGetter: getLaboratoryName},
+    { field: 'user', headerName: 'Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center'},
     { field: 'patientName', headerName: 'Paciente', minWidth: 200, flex: 2, align:'center', headerAlign:'center', valueGetter: getPatientName},
     { field: 'doctorName', headerName: 'Doctor', minWidth: 200, flex: 2, align:'center', headerAlign:'center', valueGetter: getDoctorName},
     { field: 'hc_provider', headerName: 'Obra Social', minWidth: 130, flex: 2, align:'center', headerAlign:'center'},

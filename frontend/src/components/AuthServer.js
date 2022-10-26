@@ -35,7 +35,7 @@ export const userAuthentication = async() => {
   if (response.status != 200) {
     throw new AuthorizationError(data.detail)
   }
-  return data.auth ? data.auth : false ; //No se si data.auth es siempre true
+  return data.user ? data.user : null ; //No se si data.auth es siempre true
 }
 
 export const login = async(username, password) => {
@@ -43,17 +43,22 @@ export const login = async(username, password) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Basic ' + window.btoa(username + ':' + password),
+      // 'Authorization': 'Basic ' + window.btoa(username + ':' + password),
       // 'X-CSRFToken': getCookie('csrftoken'),
     },
+    body: JSON.stringify({email:username, password: password})
   };
   const response = await fetch(`${API_URL}/login/`, requestOptions)
   const data = await response.json()
-  if (response.status != 200) {
-    throw new AuthorizationError('Bad Credentials.', {details:data.detail})
+  console.log('login response',response);
+  console.log('login data',data);
+  if (response.status == 400) {
+    throw new AuthorizationError('Bad Request.', {details:data})
   }
   document.cookie = `token=;path=/;domain=${document.domain};expires=Thu, 01-Jan-70 00:00:01 GMT;`;
   document.cookie = `token=${data.token};path=/;domain=${document.domain};`;
+  console.log(`token=${data.token};path=/;domain=${document.domain};`)
+  console.log(document.cookie)
   return data;
 }
 

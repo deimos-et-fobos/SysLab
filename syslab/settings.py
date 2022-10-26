@@ -63,6 +63,8 @@ MIDDLEWARE = [
     'livereload.middleware.LiveReloadScript',
 ]
 
+# SESSION_COOKIE_NAME = 'token'
+
 ROOT_URLCONF = 'syslab.urls'
 
 TEMPLATES = [

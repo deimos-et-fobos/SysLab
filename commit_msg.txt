@@ -1,3 +1,1 @@
-AuthServer.js created
-
-- login, logout and useAuthentication modified.
+Use UserContext & LabContext instead of 'local' states

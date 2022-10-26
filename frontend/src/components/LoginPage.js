@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import React, { useState, useEffect, useContext } from 'react'
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
 
 import { login } from './AuthServer'
+import { UserContext } from './HomePage'
+import { LabContext } from './HomePage'
 
 export default function LoginPage(props) {
   const navigate = useNavigate();
@@ -13,12 +15,27 @@ export default function LoginPage(props) {
   const [msg, setMsg] = useState(null)
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [authenticated, setAuthenticated] = useState(props.logged);
+  const { user, setUser } = useContext(UserContext);
+  const { laboratory, setLaboratory } = useContext(LabContext);
   const nextPage = useLocation().pathname
+  let { labName } = useParams()
 
   useEffect(() => {
-    props.logged ? navigate('/') : null;
-  })
+    const getLaboratory = async() => {
+      console.log(`/api/accounts/get-laboratory/${labName}`);
+      const response = await fetch(`/api/accounts/get-laboratory/${labName}`)
+      const data = await response.json()
+      console.log('response',response);
+      console.log('data',data);
+      setLaboratory(data.laboratory)
+    }
+    getLaboratory().catch((err) => {
+      setLaboratory(null)
+      console.error(err);
+    });
+    console.log('labo',laboratory);
+    user ? navigate(`/`) : null;
+  }, [])
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -26,16 +43,17 @@ export default function LoginPage(props) {
       const data = await login(username, password)
       setUsername('');
       setPassword('');
-      props.setLogged(true);
+      setUser(data.user);
       setLoginSuccess(true);
       setError(false);
       navigate(nextPage  || '/')
     } catch(err) {
-      props.setLogged(false);
+      setUser(null);
       setLoginSuccess(false);
       setError(true);
-      setMsg(err.details);
+      setMsg(`${err.name}: ${err.message}`);
       console.error(err);
+      console.error(err.details);
     }
   }
 

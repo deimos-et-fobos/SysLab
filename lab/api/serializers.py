@@ -45,7 +45,7 @@ class PatientSerializer(serializers.ModelSerializer):
 class ProtocolSerializer(serializers.ModelSerializer):
     laboratory = LaboratorySerializer()
     patient = PatientSerializer()
-    user = UserSerializer()
+    user = serializers.SlugRelatedField(read_only=True,slug_field='full_name')
     doctor = DoctorSerializer()
     class Meta:
         model = Protocol

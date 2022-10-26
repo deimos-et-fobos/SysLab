@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import AppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -10,12 +10,16 @@ import Typography from '@mui/material/Typography';
 import { teal } from '@mui/material/colors';
 
 import { logout as _logout } from './AuthServer'
+import { LabContext } from './HomePage'
+import { UserContext } from './HomePage'
 
 export default function MenuBar(props) {
+  const { user, setUser } = useContext(UserContext);
+  const { laboratory, setLaboratory } = useContext(LabContext);
 
   const logout = async () => {
     await _logout().catch(console.error)
-    props.setLogged(false)
+    setUser(null)
   }
 
   return (
@@ -40,12 +44,12 @@ export default function MenuBar(props) {
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          (Laboratorio.nombre)
+          {laboratory.name}
         </Typography>
-        {props.logged ?
+        {user ?
           <div>
             <IconButton onClick={()=>{}} sx={{ p: 1 }}>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+              <Avatar alt="Remy Sharp" src={user.photo_url} />
             </IconButton>
             <IconButton onClick={logout} sx={{ p: 0 }}>
               <LogoutIcon />

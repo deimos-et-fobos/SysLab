@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate, useSearchParams } from 'react-router-dom'
+import React, { useState, useEffect, useContext, createContext, useMemo } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate, useParams, Outlet } from 'react-router-dom'
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,35 +17,29 @@ import Menu from './Menu'
 import MenuBar from './MenuBar'
 import { userAuthentication } from './AuthServer'
 
-const drawerWidth = 240;
+export const LabContext = createContext({
+  laboratory: null,
+  setLaboratory: () => {},
+});
+export const UserContext = createContext({
+  user: null,
+  setUser: () => {},
+});
 
-export default function HomePage(props) {
+
+const Dashboard = (props) => {
+  console.log('hola dashboard');
+  const drawerWidth = 240;
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [logged, setLogged] = useState(false);
-
-  useEffect(() => {
-    const userIsAuthenticated = async() => {
-      const auth = await userAuthentication();
-      setLogged(auth);
-    }
-    userIsAuthenticated().catch((err) => {
-      setLogged(false)
-      console.error(err);
-    });
-  });
-
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-
-  const Dashboard = (
+  return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
         <MenuBar
           handleDrawerToggle={() => handleDrawerToggle()}
           drawerWidth={drawerWidth}
-          logged={logged}
-          setLogged={() => setLogged()}
         />
         <Box
           component="nav"
@@ -64,27 +58,60 @@ export default function HomePage(props) {
         >
           <Toolbar />
           <Box sx={{ mx: 5, my: 10 }} >
-            <Routes>
-              {/* <Route path="/" element={ logged ? <p>Home Page</p> : <LoginPage logged={logged} setLogged={setLogged} />} /> */}
-              <Route element={<RequireAuth logged={logged} />} >
-                <Route path="/" element={<p>Home Page</p>} />
-                <Route path="doctors/" element={<DoctorList/>} />
-                <Route path="healthcare/" element={<HealthcareList/>} />
-                <Route path="patients/" element={<PatientList/>} />
-                <Route path="protocols/" element={<ProtocolList/>} />
-                <Route path="tests/" element={<LabTestList/>} />
-                <Route path="users/" element={<UserList/>} />
-              </Route>
-            </Routes>
+
+            <Outlet/>
+
           </Box>
         </Box>
     </Box>
   )
+}
+
+export default function HomePage(props) {
+  const [user, setUser] = useState(null);
+  const [laboratory, setLaboratory] = useState(null)
+
+  const userContextValue = useMemo(
+    () => ({ user, setUser }),
+    [user]
+  );
+  const labContextValue = useMemo(
+    () => ({ laboratory, setLaboratory }),
+    [laboratory]
+  );
+
+  useEffect(() => {
+    console.log('hola homepage');
+    const userIsAuthenticated = async() => {
+      const auth = await userAuthentication();
+      setUser(auth);
+    }
+    userIsAuthenticated().catch((err) => {
+      setUser(null)
+      console.error(err);
+    });
+    console.log('authenticate',user);
+  }, []);
 
   return (
     <Box>
       <Router>
-        {logged ? Dashboard : <LoginPage logged={logged} setLogged={setLogged} />}
+        <LabContext.Provider value={labContextValue}>
+        <UserContext.Provider value={userContextValue}>
+          <Routes>
+            {/* <Route index element={<LoginPage/>} /> */}
+            <Route path=":labName/" element={user ? <Dashboard/> : <LoginPage/>} >
+              <Route index element={<p>Home Page</p>} />
+              <Route path="doctors/" element={<DoctorList/>} />
+              <Route path="healthcare/" element={<HealthcareList/>} />
+              <Route path="patients/" element={<PatientList/>} />
+              <Route path="protocols/" element={<ProtocolList/>} />
+              <Route path="tests/" element={<LabTestList/>} />
+              <Route path="users/" element={<UserList/>} />
+            </Route>
+          </Routes>
+        </UserContext.Provider>
+        </LabContext.Provider>
       </Router>
     </Box>
   );

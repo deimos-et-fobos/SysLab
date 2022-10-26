@@ -113,6 +113,7 @@ class CustomUser(AbstractUser):
 
 class Laboratory(models.Model):
     name = models.CharField(_('name'), max_length=100, unique=True)
+    slug = models.SlugField(_('slug'), max_length=100, unique=True)
     address = models.CharField(_('address'), max_length=100, blank=True)
     email = models.EmailField(_('email'), max_length=100, blank=True)
     phone = models.CharField(_('phone number'), max_length=30, blank=True)
@@ -123,6 +124,11 @@ class Laboratory(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = _('laboratory')
