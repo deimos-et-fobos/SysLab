@@ -15,7 +15,7 @@ import LabTestList from './LabTestList'
 import UserList from './UserList'
 import Menu from './Menu'
 import MenuBar from './MenuBar'
-import { userAuthentication } from './AuthServer'
+import { login } from './AuthServer'
 
 export const LabContext = createContext({
   laboratory: null,
@@ -28,7 +28,6 @@ export const UserContext = createContext({
 
 
 const Dashboard = (props) => {
-  console.log('hola dashboard');
   const drawerWidth = 240;
   const [mobileOpen, setMobileOpen] = useState(false);
   const handleDrawerToggle = () => {
@@ -58,9 +57,7 @@ const Dashboard = (props) => {
         >
           <Toolbar />
           <Box sx={{ mx: 5, my: 10 }} >
-
             <Outlet/>
-
           </Box>
         </Box>
     </Box>
@@ -70,6 +67,7 @@ const Dashboard = (props) => {
 export default function HomePage(props) {
   const [user, setUser] = useState(null);
   const [laboratory, setLaboratory] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const userContextValue = useMemo(
     () => ({ user, setUser }),
@@ -81,18 +79,24 @@ export default function HomePage(props) {
   );
 
   useEffect(() => {
-    console.log('hola homepage');
     const userIsAuthenticated = async() => {
-      const auth = await userAuthentication();
-      setUser(auth);
+      let data = { user: null, laboratory: null }
+      try {
+        data = await login({method:'GET'});
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setUser(data.user);
+        setLaboratory(data.laboratory);
+        setLoading(false)
+      }
     }
-    userIsAuthenticated().catch((err) => {
-      setUser(null)
-      console.error(err);
-    });
-    console.log('authenticate',user);
+    userIsAuthenticated()
   }, []);
 
+  if (loading) {
+    return <p>Loading...</p>
+  }
   return (
     <Box>
       <Router>

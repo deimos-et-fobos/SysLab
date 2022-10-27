@@ -21,39 +21,26 @@ export default function LoginPage(props) {
   let { labName } = useParams()
 
   useEffect(() => {
-    const getLaboratory = async() => {
-      console.log(`/api/accounts/get-laboratory/${labName}`);
-      const response = await fetch(`/api/accounts/get-laboratory/${labName}`)
-      const data = await response.json()
-      console.log('response',response);
-      console.log('data',data);
-      setLaboratory(data.laboratory)
-    }
-    getLaboratory().catch((err) => {
-      setLaboratory(null)
-      console.error(err);
-    });
-    console.log('labo',laboratory);
-    user ? navigate(`/`) : null;
+    // user ? navigate(`/`) : null;
   }, [])
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    let data = { user: null, laboratory: null }
     try {
-      const data = await login(username, password)
+      data = await login({username, password, labName})
       setUsername('');
       setPassword('');
-      setUser(data.user);
-      setLoginSuccess(true);
-      setError(false);
-      navigate(nextPage  || '/')
-    } catch(err) {
-      setUser(null);
-      setLoginSuccess(false);
-      setError(true);
+    } catch (err) {
       setMsg(`${err.name}: ${err.message}`);
       console.error(err);
       console.error(err.details);
+    } finally {
+      setUser(data.user);
+      setLaboratory(data.laboratory);
+      data.user ? setLoginSuccess(true) : setLoginSuccess(false);
+      data.user ? setError(false) : setError(true);
+      data.user ? navigate(nextPage  || '/') : null;
     }
   }
 

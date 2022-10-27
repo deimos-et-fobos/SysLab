@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     # Third Parties
     'livereload',
     'rest_framework',
-    'knox',
     'rosetta',
     # Apps,
     'accounts',
@@ -62,8 +61,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'livereload.middleware.LiveReloadScript',
 ]
-
-# SESSION_COOKIE_NAME = 'token'
 
 ROOT_URLCONF = 'syslab.urls'
 
@@ -87,22 +84,14 @@ WSGI_APPLICATION = 'syslab.wsgi.application'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'knox.auth.TokenAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
 
-REST_KNOX = {
-  # 'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
-  # 'AUTH_TOKEN_CHARACTER_LENGTH': 64,
-  'TOKEN_TTL': timedelta(hours=1),
-  # 'USER_SERIALIZER': 'knox.serializers.UserSerializer',
-  'TOKEN_LIMIT_PER_USER': 5, # None,
-  # 'AUTO_REFRESH': False,
-  # 'EXPIRY_DATETIME_FORMAT': api_settings.DATETIME_FORMAT,
-}
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 

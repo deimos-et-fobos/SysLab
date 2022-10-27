@@ -1,1 +1,1 @@
-Use UserContext & LabContext instead of 'local' states
+Change TokenAuthentication for SessionAuthentication

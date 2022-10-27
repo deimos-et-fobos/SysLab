@@ -24,55 +24,33 @@ export class AuthorizationError extends Error {
   };
 }
 
-export const userAuthentication = async() => {
-  const requestOptions = {
-    headers: {
-      'Authorization': 'Token ' + getCookie('token'),
-    },
-  };
-  const response = await fetch(`${API_URL}/login-status/`, requestOptions)
-  const data = await response.json()
-  if (response.status != 200) {
-    throw new AuthorizationError(data.detail)
+export const login = async({username, password, labName, method = 'POST'} = {}) => {
+  let requestOptions = {}
+  if (method == 'POST') {
+    requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      body: JSON.stringify({email:username, password: password})
+    };
   }
-  return data.user ? data.user : null ; //No se si data.auth es siempre true
-}
-
-export const login = async(username, password) => {
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // 'Authorization': 'Basic ' + window.btoa(username + ':' + password),
-      // 'X-CSRFToken': getCookie('csrftoken'),
-    },
-    body: JSON.stringify({email:username, password: password})
-  };
-  const response = await fetch(`${API_URL}/login/`, requestOptions)
+  const response = await fetch(`${API_URL}/login/${labName}/`, requestOptions)
+  if (response.status == 403) {
+    throw new AuthorizationError('Forbidden 403.')
+  }
   const data = await response.json()
-  console.log('login response',response);
-  console.log('login data',data);
   if (response.status == 400) {
     throw new AuthorizationError('Bad Request.', {details:data})
   }
-  document.cookie = `token=;path=/;domain=${document.domain};expires=Thu, 01-Jan-70 00:00:01 GMT;`;
-  document.cookie = `token=${data.token};path=/;domain=${document.domain};`;
-  console.log(`token=${data.token};path=/;domain=${document.domain};`)
-  console.log(document.cookie)
   return data;
 }
 
 export const logout = async() => {
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Token ' + getCookie('token'),
-    },
-  };
-  const response = await fetch(`${API_URL}/logout/`, requestOptions)
+  const response = await fetch(`${API_URL}/logout/`)
   if (!response.ok) {
     const data = await response.json()
     throw new AuthorizationError(data.detail)
   }
-  document.cookie = `token=;path=/;domain=${document.domain};expires=Thu, 01-Jan-70 00:00:01 GMT;`;
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import AppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -16,10 +17,12 @@ import { UserContext } from './HomePage'
 export default function MenuBar(props) {
   const { user, setUser } = useContext(UserContext);
   const { laboratory, setLaboratory } = useContext(LabContext);
+  const navigate = useNavigate();
 
   const logout = async () => {
     await _logout().catch(console.error)
     setUser(null)
+    navigate(`/${laboratory.slug}/`)
   }
 
   return (
