@@ -1,0 +1,121 @@
++ Create Heroku Account
+
++ Install Heroku CLI
+
+$ heroku --version
+
++ Login Heroku CLI
+
+$ heroku login
+
++ Create a Heroku App
+
+$ heroku create
+
+When you run the heroku create command inside a Git repository,
+Heroku automatically adds a new remote server. If not:
+
+$ heroku apps
+=== jdoe@company.com Apps
+fathomless-savannah-61591
+polar-island-08305
+sleepy-thicket-59477
+
+$ heroku git:remote --app polar-island-08305
+set git remote heroku to https://git.heroku.com/polar-island-08305.git
+
++ Deploy Your Django Project to Heroku
+- Choose a Buildpack
+You can set one manually when you create a new app or you can let
+Heroku detect it based on the files in your repository.One way for
+Heroku to recognize a Python project is by looking for the
+requirements.txt file in your project root directory. Make sure
+that you’ve created one, which you may have done with
+pip freeze when setting up your virtual environment, and that
+you’ve committed it to the local repository.
+
+- Choose the Python Version (Optional: Check runtime available versions)
+$ echo python-3.10.8 > runtime.txt
+$ git add runtime.txt
+$ git commit -m "Request a specific Python version"
+
+- Specify Processes to Run
+$ echo "web: python manage.py runserver 0.0.0.0:\$PORT" > Procfile
+$ git add Procfile
+$ git commit -m "Specify the command to run your project"
+
+You can now test this configuration by running your Django project
+locally using the Heroku CLI:
+$ heroku local
+URL http://localhost:5000/ in your web browser
+
+- Configure Django
+(venv) $ pip install django-heroku
+(venv) $ pip list --format=freeze > requirements.txt
+Note: The package django-heroku is no longer maintained,
+and the corresponding GitHub repository was archived. It
+might not be an issue if you only want to get your feet wet
+with deploying a Django project to Heroku. However, for a
+production-grade application, you can try a fork called
+django-on-heroku, which Adam suggested in the comments
+section below. Alternatively, you can use an experimental
+buildpack described by Eric Matthes on his blog.
+
+(venv) $ pushd portfolio/
+(venv) $ echo "import django_heroku" >> settings.py
+(venv) $ echo "django_heroku.settings(locals(), staticfiles=False)" >> settings.py
+(venv) $ popd
+
+(venv) $ git commit -am "Automatic configuration with django-heroku"
+
+- Configure the Heroku App
+In settings.py, find the auto-generated line where Django
+defines the SECRET_KEY variable and comment it out.
+Generate a random secret key is to use the OpenSSL command-line tool:
+$ echo "SECRET_KEY=$(openssl rand -base64 32)" > .env
+
+The final step is specifying a Django secret key for the
+remote Heroku app:
+
+$ . .env
+$ heroku config:set SECRET_KEY=\'${SECRET_KEY}\'
+
+Check the SECRET_KEY
+$ heroku config
+=== polar-island-08305 Config Vars
+SECRET_KEY: 6aj9il2xu2vqwvnitsg@!+4-8t3%zwr@$agm7x%o%yb2t9ivt%
+
+$ heroku config:get SECRET_KEY
+6aj9il2xu2vqwvnitsg@!+4-8t3%zwr@$agm7x%o%yb2t9ivt%
+
+- Make an App Release
+Double-check the git status for any uncommitted changes, and add
+them to the local repository as necessary.
+$ git status
+$ git add .
+$ git commit -m "Remove a hardcoded Django secret key"
+
+Add heroku server to ALLOWED_HOSTS in settings.py
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0', 'serene-brook-03665.herokuapp.com']
+
+Making new app releases with Heroku boils down to committing the
+code to your local Git repository and then pushing your branch
+to a remote Heroku server.
+$ git push heroku master
+
+- Set Up a Relational Database. Provision a PostgreSQL Server
+When Heroku detects the Django framework in your project, it
+automatically spins up a free but limited PostgreSQL instance
+$ heroku addons
+$ heroku config
+
+Normally, you’d need to use that variable in portfolio/settings.py
+explicitly, but since you installed the django-heroku module.
+
+- Update Remote Database Schema
+$ heroku run python manage.py migrate
+
+$ git commit -am "Automate remote migrations"
+$ git push heroku master
+
+- Populate the Database
