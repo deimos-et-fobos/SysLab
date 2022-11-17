@@ -28,11 +28,11 @@ def populate_protocol(N=5):
         hc_provider = random.choice(providers).name
         hc_number = fakegen.pystr_format(string_format='########')
         authorization_number = fakegen.pystr_format(string_format='########')
-        has_antibiogram = fakegen.pyint(max_value=9) == 0
+        # has_antibiogram = fakegen.pyint(max_value=9) == 0
         diagnosis = 'diagnostico'
         observations = 'observaciones'
         status = fakegen.pyint(max_value=3)
-        protocol = Protocol.objects.get_or_create(user=user,laboratory=lab,doctor=doctor,patient=patient,hc_provider=hc_provider,hc_number=hc_number,authorization_number=authorization_number,has_antibiogram=has_antibiogram,diagnosis=diagnosis,observations=observations,status=status)[0]
+        protocol = Protocol.objects.get_or_create(user=user,laboratory=lab,doctor=doctor,patient=patient,hc_provider=hc_provider,hc_number=hc_number,authorization_number=authorization_number,diagnosis=diagnosis,observations=observations,status=status)[0]
 
 def populate_labtestgroup():
     labtestgroups = ['Hemología','Quimica','Antibiograms','Cinetica']
