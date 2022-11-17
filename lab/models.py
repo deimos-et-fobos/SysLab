@@ -21,7 +21,7 @@ class ActiveObjectsManager(models.Manager):
 
 
 class HealthcareProvider(models.Model):
-    name = models.CharField(_('name'), max_length=120)
+    name = models.CharField(_('name'), max_length=120, unique=True)
     is_active = models.BooleanField(_('active'), default=True)
 
     objects = models.Manager()
@@ -62,12 +62,13 @@ class Patient(models.Model):
     last_name = models.CharField(_('last name'), max_length=120)
     id_type = models.CharField(_('ID type'), choices=ID_TYPE, default='0', max_length=1)
     id_number = models.CharField(_('ID number'), max_length=30)
-    birthday = models.DateField(_('date of birth'), blank=True)
-    age = models.PositiveIntegerField(_('age'), blank=True)
-    gender = models.CharField(_('gender'), choices=GENDER, default='', max_length=1)
+    birthday = models.DateField(_('date of birth'), blank=True, null=True)
+    age = models.PositiveIntegerField(_('age'), blank=True, null=True)
+    gender = models.CharField(_('gender'), choices=GENDER, default='', max_length=1, blank=True, null=True)
     # CAMBIAR A ForeignKey
-    healthcare_provider = models.CharField(_('healthcare provider'), max_length=100, blank=True)
-    phone = models.CharField(_('phone'), max_length=20, blank=True)
+    # healthcare_provider = models.CharField(_('healthcare provider'), max_length=100, blank=True, null=True)
+    healthcare_provider = models.ForeignKey(HealthcareProvider, verbose_name=_('healthcare provider'), on_delete=models.SET_NULL, null=True, blank=True)
+    phone = models.CharField(_('phone'), max_length=30, blank=True)
     address = models.CharField(_('address'), max_length=150, blank=True)
     email = models.EmailField(_('email'), max_length=150, blank=True)
     is_active = models.BooleanField(_('active'), default=True)

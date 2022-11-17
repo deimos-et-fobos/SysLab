@@ -8,9 +8,11 @@ add 'django.middleware.locale.LocaleMiddleware' to settings.MIDDLEWARE
 django-admin makemessages -l es
 django-admin compilemessages
 
-#### TOKENS con django-rest-knox
-Login con autenticación AllowAny
 
 ## TO DO
-- Agregar al HomePage SelectLaboratory 
+- Agregar al HomePage SelectLaboratory
 - Comenzar con la interfase, la API y la lógica
+- Pacientes
+- Doctores
+- Tests
+- Usuarios

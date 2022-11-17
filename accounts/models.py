@@ -199,21 +199,3 @@ class LabMember(models.Model):
         unique_together = ['user', 'laboratory']
         verbose_name = _('laboratory member')
         verbose_name_plural = _('laboratory members')
-
-# from accounts.models import LabUserType
-# user = LabUserType.objects.all()[0]
-# user.get_permissions()
-# user.has_perm('accounts.delete_labmember')
-# user.has_perm('accounts.delete_labmembers')
-# user.has_perms(['accounts.add_labmember','accounts.delete_labmember'])
-# user.has_perms(['accounts.add_labmember','accounts.delete_labmembers'])
-
-# from accounts.models import LabMember
-# user = LabMember.objects.all()[0]
-# user.get_permissions()
-# user.get_usertype_permissions()
-# user.get_all_permissions()
-# user.has_perm('knox.add_authtoken')
-# user.has_perm('knox.add_authtokens')
-# user.has_perms(['knox.add_authtokess','accounts.delete_labmember'])
-# user.has_perms(['knox.add_authtoken','sessions.delete_session'])

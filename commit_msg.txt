@@ -1,1 +1,9 @@
-Change TokenAuthentication for SessionAuthentication
+Design of first forms
+
+- Created: FormComponents
+- Created: Patient Form
+- Created: Messages Manager
+- Created: Theme, Palette
+- Modified: Login Form
+- Modified: AuthServer
+- Modified: Small changes on lab and accounts APIs

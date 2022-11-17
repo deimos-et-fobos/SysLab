@@ -38,6 +38,8 @@ class LabTestResultSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class PatientSerializer(serializers.ModelSerializer):
+    healthcare_provider = serializers.SlugRelatedField(queryset=HealthcareProvider.active.all(), slug_field='name', allow_null=True, required=False)
+
     class Meta:
         model = Patient
         fields = '__all__'

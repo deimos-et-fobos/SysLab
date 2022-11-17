@@ -19,7 +19,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import ScienceIcon from '@mui/icons-material/Science';
 import LoginIcon from '@mui/icons-material/Login';
 import CloseIcon from '@mui/icons-material/Close';
-import { teal } from '@mui/material/colors';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
 import MenuItem from './MenuItem'
 
@@ -31,42 +31,51 @@ export default function Menu(props) {
 
   const { window } = props;
   const container = window !== undefined ? () => window().document.body : undefined;
-  const menu = ['Login','Informes', 'Pacientes', 'Doctores', 'Obras Sociales', 'Análisis', 'Usuarios']
-  const icons = [<LoginIcon/>,<FeedIcon/>, <PersonIcon/>, <LocalPharmacyIcon/>, <MedicalServicesIcon/>, <BiotechIcon/>, <PeopleAltIcon/>]
-  const urls = ['/', 'protocols/', 'patients/','doctors/','healthcare/','tests/','users/']
+  const menu = [
+    { title:'Informes', icon:<FeedIcon/>, url:'protocols/'},
+    { title:'Pacientes', icon:<PersonIcon/>, url:'patients/'},
+    { title:'Doctores', icon:<LocalPharmacyIcon/>, url:'doctors/'},
+    { title:'Obras Sociales', icon:<MedicalServicesIcon/>, url:'healthcare/'},
+    { title:'Análisis', icon:<BiotechIcon/>, url:'tests/'},
+    { title:'Tipos de Usuarios', icon:<AccountBoxIcon/>, url:'lab-user-types/'},
+    { title:'Usuarios', icon:<PeopleAltIcon/>, url:'users/'},
+  ]
 
-  const drawer = (
-    <div>
-      <Toolbar color={teal['200']} sx={{ justifyContent: 'space-between' }} >
-        <Typography variant="h6" >
-          <ScienceIcon/> SysLab
-        </Typography>
-        <IconButton
-          color="inherit"
-          aria-label="close drawer"
-          edge="start"
-          onClick={props.handleDrawerToggle}
-        >
-          <CloseIcon />
-        </IconButton>
-      </Toolbar>
-      <Divider variant="middle" sx={{ borderBottomWidth: 1 }}/>
-      <List>
-        {menu.map((text, index) => (
-          <MenuItem key={text} disablePadding url={urls[index]} icon={icons[index]} text={text} handleOnClick={props.handleDrawerToggle}/>
-        ))}
-        <Divider />
-        <MenuItem disablePadding url={'users/'} icon={icons[0]} text={'Collapsable'} collapsable handleOnClick={handleClick1}/>
-        <Collapse in={open1} timeout="auto" unmountOnExit>
-          <List>
-            {menu.map((text, index) => (
-              <MenuItem key={text} nestedItem disablePadding url={urls[index]} icon={icons[index]} text={text} handleOnClick={props.handleDrawerToggle}/>
-            ))}
-          </List>
-        </Collapse>
-      </List>
-    </div>
-  );
+  function drawer(mobileOpen) {
+    return (
+      <div>
+        <Toolbar color='menu.side' sx={{ justifyContent: 'space-between' }} >
+          <Typography variant="h6" >
+            <ScienceIcon/> SysLab
+          </Typography>
+          { mobileOpen &&
+            <IconButton
+              color="inherit"
+              aria-label="close drawer"
+              edge="start"
+              onClick={props.handleDrawerToggle}
+              children=<CloseIcon/>
+            />
+          }
+        </Toolbar>
+        <Divider variant="middle" sx={{ borderBottomWidth: 1 }}/>
+        <List>
+          {menu.map((item, index) => (
+            <MenuItem key={index} disablePadding url={item.url} icon={item.icon} title={item.title} handleOnClick={mobileOpen ? props.handleDrawerToggle : null}/>
+          ))}
+          <Divider />
+          <MenuItem disablePadding url={'#'} icon={menu[0].icon} title={'Collapsable'} collapsable handleOnClick={handleClick1}/>
+          <Collapse in={open1} timeout="auto" unmountOnExit>
+            <List>
+              {menu.map((item, index) => (
+                <MenuItem key={index} nestedItem disablePadding url={item.url} icon={item.icon} title={item.title} handleOnClick={mobileOpen ? props.handleDrawerToggle : null}/>
+              ))}
+            </List>
+          </Collapse>
+        </List>
+      </div>
+    )
+  };
 
   return (
     <Box
@@ -91,11 +100,11 @@ export default function Menu(props) {
         PaperProps={{
           sx: {
             // bgcolor: 'text.secondary',
-            bgcolor: teal['200'],
+            bgcolor: 'menu.side',
           }
         }}
       >
-        {drawer}
+        {drawer(props.mobileOpen)}
       </Drawer>
       <Drawer
         variant="permanent"
@@ -106,13 +115,13 @@ export default function Menu(props) {
         PaperProps={{
           sx: {
             // bgcolor: 'text.secondary',
-            bgcolor: teal['200'],
+            bgcolor: 'menu.side',
             // bgcolor: '#f8ffb8',
           }
         }}
         open
       >
-        {drawer}
+        {drawer(props.mobileOpen)}
       </Drawer>
     </Box>
   )

@@ -16,43 +16,25 @@ import {
   useGridSelector,
 } from '@mui/x-data-grid';
 
-function getCookie(cname) {
-  let name = `${cname}=`;
-  let decodedCookie = decodeURIComponent(document.cookie);
-  let ca = decodedCookie.split(';');
-  for(let i = 0; i <ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
-}
+import { fetchServer } from './AuthServer';
 
 export default function DataTable(props) {
-  const [rows, setRows] = useState(null)
   const [query, setQuery] = useState(null)
+  const [loading, setLoading] = useState(true)
   const { columns, fetch_url, sx } = {...props}
 
-  const getList = async () => {
-    const requestOptions = {
-      headers: {
-        'Authorization': 'Token ' + getCookie('token'),
-        // 'X-CSRFToken': getCookie('csrftoken'),
-      },
-    };
-    // fetch(fetch_url + query)
-    await fetch(fetch_url, requestOptions)
-    .then((response) => response.json())
-    .then((data) => {
-      setRows(data)
-    });
-  }
-
   useEffect(() => {
+    const getList = async () => {
+      let data = {}
+      try {
+        data = await fetchServer(fetch_url, {action:'list'});
+        props.setRows(data);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        console.error(err.detail);
+      }
+    }
     getList()
   }, [query]);
 
@@ -73,7 +55,10 @@ export default function DataTable(props) {
   function CustomHeader(props) {
     return (
       <Box>
-        <Typography variant='h6' sx={props.titleProps}>{props.title}</Typography>
+        <Box sx={{ display: 'flex', justifyContent:'space-between', align:'center', ...props.titleProps}}>
+          <Typography variant='h6'>{props.title}</Typography>
+          { true && props.addButton }
+        </Box>
         {/* <Divider sx={{ borderBottomWidth: 3 }}/> */}
         <Divider sx={{ bgcolor: 'black' }}/>
         <CustomToolbar/>
@@ -96,12 +81,15 @@ export default function DataTable(props) {
     );
   }
 
+  if (loading) {
+    return (<p>Loading...</p>)
+  }
   return (
     <Box>
-      { rows ?
+      { props.rows ?
         <DataGrid
           sx={sx}
-          rows={rows}
+          rows={props.rows}
           columns={columns}
           density="standard"
           loading={false}

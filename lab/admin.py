@@ -73,7 +73,8 @@ class PatientAdmin(admin.ModelAdmin):
     model = Patient
     @admin.display(description=_('Birthday'))
     def admin_birthday(self, obj):
-        return obj.birthday.strftime('%d/%m/%Y')
+        if obj.birthday:
+            return obj.birthday.strftime('%d/%m/%Y')
     list_display = ('full_name', 'id_number', 'healthcare_provider', 'admin_birthday', 'is_active')
 
 class ProtocolAdmin(admin.ModelAdmin):

@@ -11,7 +11,7 @@ from faker import Faker
 
 fakegen = Faker()
 
-providers = ['OSDE','OSPE','IOSEP','SANCOR','DFAK','FADUC','IB','UNSE']
+# providers = ['OSDE','OSPE','IOSEP','SANCOR','DFAK','FADUC','IB','UNSE']
 specialties = ['Urologo','Cardiologo','Cirujano','Dermatologo','Clinico','Pediatra','Neurologo','Hepatologo']
 
 def populate_doctor(N=5):
@@ -23,6 +23,7 @@ def populate_doctor(N=5):
         doctor = Doctor.objects.get_or_create(first_name=fake_firstname, last_name=fake_lastname, medical_license=fake_license, specialty=fake_specialty)[0]
 
 def populate_patient(N=5):
+    providers = HealthcareProvider.objects.all()
     for entry in range(N):
         fake_firstname = fakegen.first_name()
         fake_lastname = fakegen.last_name()

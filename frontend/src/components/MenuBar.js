@@ -7,8 +7,8 @@ import IconButton from '@mui/material/IconButton';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { teal } from '@mui/material/colors';
 
 import { logout as _logout } from './AuthServer'
 import { LabContext } from './HomePage'
@@ -22,6 +22,7 @@ export default function MenuBar(props) {
   const logout = async () => {
     await _logout().catch(console.error)
     setUser(null)
+    setLaboratory(null)
     navigate(`/${laboratory.slug}/`)
   }
 
@@ -32,7 +33,7 @@ export default function MenuBar(props) {
         width: { lg: `calc(100% - ${props.drawerWidth}px)` },
         ml: { lg: `${props.drawerWidth}px` },
         // bgcolor: 'secondary.main',
-        bgcolor: teal['700'],
+        bgcolor: 'menu.top',
       }}
       // color={teal[800]}
     >
@@ -51,12 +52,16 @@ export default function MenuBar(props) {
         </Typography>
         {user ?
           <div>
-            <IconButton onClick={()=>{}} sx={{ p: 1 }}>
-              <Avatar alt="Remy Sharp" src={user.photo_url} />
-            </IconButton>
-            <IconButton onClick={logout} sx={{ p: 0 }}>
-              <LogoutIcon />
-            </IconButton>
+            <Tooltip title={`${user.first_name} ${user.last_name}`}>
+              <IconButton color="inherit" onClick={null} sx={{ px: 2 }}>
+                <Avatar alt="Remy Sharp" src={user.photo_url} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Logout">
+              <IconButton color="inherit" onClick={logout} sx={{ p: 0 }}>
+                <LogoutIcon />
+              </IconButton>
+            </Tooltip>
           </div>
         : null }
       </Toolbar>

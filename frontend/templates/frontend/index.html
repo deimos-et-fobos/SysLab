@@ -17,6 +17,12 @@
       <div id="app"> </div>
     </div>
 
+    <!-- Pasar datos del context de Django a REACT -->
+    {{ context|json_script:"session-data" }}
+    <script type="text/javascript">
+      let sessionData = JSON.parse(document.getElementById('session-data').textContent);
+    </script>
+
     <script src="{% static 'frontend/main.js' %}"></script>
   </body>
 </html>

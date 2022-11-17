@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 
+import AddButton from './AddButton';
 import DataTable from "./DataTable";
+import BiotechIcon from '@mui/icons-material/Biotech';
 
 export default function LabTestList(props) {
   const fetch_url = '/api/lab/tests/'
@@ -26,6 +28,7 @@ export default function LabTestList(props) {
       fetch_url={fetch_url}
       title='Listado de Análisis'
       titleProps={{ pb: 1 }}
+      addButton={<AddButton msg={'Redireccionando a NewLabTest.'} icon={<BiotechIcon/>} />}
       sx={{
         p: 2,
         boxShadow: 2,

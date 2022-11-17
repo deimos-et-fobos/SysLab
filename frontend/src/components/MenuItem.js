@@ -20,7 +20,7 @@ export default function MenuItem(props) {
           <ListItemIcon>
             {props.icon}
           </ListItemIcon>
-          <ListItemText primary={props.text} />
+          <ListItemText primary={props.title} />
           {props.collapsable ? props.open ? <ExpandLess /> : <ExpandMore /> : null}
         </ListItemButton>
     </ListItem>

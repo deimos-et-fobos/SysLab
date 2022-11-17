@@ -59,6 +59,8 @@ class LabMemberSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'laboratory', 'user_type', 'is_active')
 
 class LabUserTypeSerializer(serializers.ModelSerializer):
+    laboratory = LaboratorySerializer()
+
     class Meta:
         model = LabUserType
         fields = '__all__'
