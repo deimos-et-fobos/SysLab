@@ -119,3 +119,4 @@ $ git commit -am "Automate remote migrations"
 $ git push heroku master
 
 - Populate the Database
+$ heroku run python manage.py migrate
