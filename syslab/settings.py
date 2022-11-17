@@ -15,9 +15,10 @@ import os
 from pathlib import Path
 from datetime import timedelta
 from rest_framework.settings import api_settings
-import django_heroku
 
+import django_heroku
 django_heroku.settings(locals())
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
@@ -26,7 +27,7 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8#2h#zg8zfmt@9n3n_7+0p=%i1t=10hvo9xrap6-t7v$mt1yat'
+# SECRET_KEY = 'django-insecure-8#2h#zg8zfmt@9n3n_7+0p=%i1t=10hvo9xrap6-t7v$mt1yat'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
