@@ -19,7 +19,7 @@ from rest_framework.settings import api_settings
 # import dj_database_url
 # from decouple import config
 import django_on_heroku
-django_on_heroku.settings(locals())
+django_on_heroku.settings(locals(), staticfiles=False)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -35,7 +35,7 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 HEROKU = True
 
 if HEROKU:
-    DEBUG = True
+    DEBUG = False
 else:
     DEBUG = False
 
