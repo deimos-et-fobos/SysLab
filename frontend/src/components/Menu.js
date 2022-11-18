@@ -8,18 +8,18 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import BiotechIcon from '@mui/icons-material/Biotech';
+import CloseIcon from '@mui/icons-material/Close';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import FeedIcon from '@mui/icons-material/Feed';
+import LocalPharmacyIcon from '@mui/icons-material/LocalPharmacy';
+import LoginIcon from '@mui/icons-material/Login';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import PersonIcon from '@mui/icons-material/Person';
-import LocalPharmacyIcon from '@mui/icons-material/LocalPharmacy';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import ScienceIcon from '@mui/icons-material/Science';
-import LoginIcon from '@mui/icons-material/Login';
-import CloseIcon from '@mui/icons-material/Close';
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
 import MenuItem from './MenuItem'
 

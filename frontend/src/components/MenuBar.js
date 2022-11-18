@@ -21,9 +21,10 @@ export default function MenuBar(props) {
 
   const logout = async () => {
     await _logout().catch(console.error)
+    const labName = laboratory.slug
     setUser(null)
     setLaboratory(null)
-    navigate(`/${laboratory.slug}/`)
+    navigate(`/${labName}/`)
   }
 
   return (

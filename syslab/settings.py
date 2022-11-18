@@ -30,10 +30,15 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-8#2h#zg8zfmt@9n3n_7+0p=%i1t=10hvo9xrap6-t7v$mt1yat'
+SECRET_KEY = 'django-insecure-8#2h#zg8zfmt@9n3n_7+0p=%i1t=10hvo9xrap6-t7v$mt1yat'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+HEROKU = False
+
+if HEROKU:
+    DEBUG = True
+else:
+    DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0', 'serene-brook-03665.herokuapp.com']
 
@@ -102,15 +107,19 @@ REST_FRAMEWORK = {
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # },
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL')
-    )
-}
+if HEROKU:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=config('DATABASE_URL')
+        )
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

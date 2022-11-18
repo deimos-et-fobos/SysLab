@@ -56,7 +56,7 @@ export default function DataTable(props) {
     return (
       <Box>
         <Box sx={{ display: 'flex', justifyContent:'space-between', align:'center', ...props.titleProps}}>
-          <Typography variant='h6'>{props.title}</Typography>
+          <Typography color='secondary' variant='h6'>{props.title}</Typography>
           { true && props.addButton }
         </Box>
         {/* <Divider sx={{ borderBottomWidth: 3 }}/> */}

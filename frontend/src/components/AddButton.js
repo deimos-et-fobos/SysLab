@@ -10,7 +10,7 @@ export default function AddButton(props) {
   }
   return (
     <Button
-      color='primary'
+      color='secondary'
       variant="contained"
       size='small'
       onClick={handleOnClick}

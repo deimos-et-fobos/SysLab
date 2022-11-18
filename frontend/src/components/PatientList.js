@@ -1,8 +1,6 @@
 import React, { useState, useContext } from 'react'
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
-import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
-import { teal } from '@mui/material/colors';
 import PersonIcon from '@mui/icons-material/Person';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -30,12 +28,12 @@ export default function PatientList(props) {
       const data = await fetchServer(API_URL + `${id}/`, {action: 'destroy'});
       setRows(rows.filter(row => row.id !== id));
       setMsg({msg:'Successfully deleted!', severity:'success'});
-      setOpen({status: false});
     } catch (err) {
       setMsg({msg:'Could not delete!', severity:'error'});
       console.error(err);
       console.error(err.detail);
     }
+    setOpen({status: false});
   }
 
   const columns = [
@@ -88,7 +86,7 @@ export default function PatientList(props) {
         fetch_url={API_URL}
         title='Pacientes'
         titleProps={{ pb: 1 }}
-        addButton={<AddButton msg={'Redireccionando a NewPatient.'} icon={<PersonIcon/>} />}
+        addButton={<AddButton icon={<PersonIcon/>} />}
         sx={{
           p: 2,
           boxShadow: 2,

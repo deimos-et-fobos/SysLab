@@ -102,13 +102,13 @@ export default function HomePage(props) {
         console.error(err);
         console.error(err.detail)
       } finally {
-        setUser(data.user);
-        setLaboratory(data.laboratory);
+        JSON.stringify(data.user) !== JSON.stringify(user) ? setUser(data.user) : null;
+        JSON.stringify(data.laboratory) !== JSON.stringify(laboratory) ? setLaboratory(data.laboratory) : null;
         setLoading(false)
       }
     }
     userIsAuthenticated()
-  }, []);
+  }, [user, laboratory]);
 
   if (loading) {
     return <p>Loading...</p>
