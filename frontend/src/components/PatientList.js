@@ -13,6 +13,7 @@ const API_URL = '/api/lab/patients/';
 export default function PatientList(props) {
   const [open, setOpen] = useState({status: false, id: null});
   const columns = [
+    { field: null, headerName: '', maxWidth: 0, align:'center', headerAlign:'center'},
     { field: 'full_name', headerName: 'Nombre', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getFullName},
     { field: 'id_type', headerName: 'Tipo de ID', minWidth: 150, flex: 1, align:'center', headerAlign:'center'},
     { field: 'id_number', headerName: 'ID', minWidth: 150, flex: 1, align:'center', headerAlign:'center'},
@@ -27,8 +28,8 @@ export default function PatientList(props) {
     return  <Link
       component={RouterLink}
       to={`${params.row.id}/`}
-      sx={{ '&:hover': {color: 'primary.main'} }}
-      color='primary'
+      sx={{ '&:hover': {color: 'secondary.main'} }}
+      color='secondary'
       underline='hover'
       children={fullName}
     />

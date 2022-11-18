@@ -27,8 +27,8 @@ export default function LabUserTypeList(props) {
     return  <Link
       component={RouterLink}
       to={`${params.row.id}/`}
-      sx={{ '&:hover': {color: 'primary.main'} }}
-      color='primary'
+      sx={{ '&:hover': {color: 'secondary.main'} }}
+      color='secondary'
       underline='hover'
       children={type}
     />

@@ -45,9 +45,9 @@ export default function DataTable(props) {
 
   function CustomToolbar(props) {
     return (
-      <GridToolbarContainer sx={{ justifyContent:'space-between' }} >
+      <GridToolbarContainer sx={{ px:2, justifyContent:'space-between' }} >
         <GridToolbarExport color='secondary'/>
-        <GridToolbarQuickFilter sm={{ width: '50%'}} />
+        <GridToolbarQuickFilter color='secondary' sm={{ width: '50%'}} />
       </GridToolbarContainer>
     );
   }
@@ -62,6 +62,7 @@ export default function DataTable(props) {
         {/* <Divider sx={{ borderBottomWidth: 3 }}/> */}
         <Divider sx={{ bgcolor: 'secondary.dark' }}/>
         <CustomToolbar/>
+        <Divider sx={{ bgcolor: 'secondary.dark' }}/>
       </Box>
     );
   }
@@ -74,6 +75,7 @@ export default function DataTable(props) {
     return (
       <Pagination
         color='secondary'
+        sx={{ p:2 }}
         count={pageCount}
         page={page + 1}
         onChange={(event, value) => apiRef.current.setPage(value - 1)}
@@ -94,7 +96,7 @@ export default function DataTable(props) {
           density="standard"
           loading={false}
           pageSize={20} autoHeight
-          checkboxSelection SelectionOnClick
+          // checkboxSelection disableSelectionOnClick
           components={{
             Toolbar: CustomToolbar,
             Pagination: CustomPagination,

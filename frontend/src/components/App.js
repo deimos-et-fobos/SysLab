@@ -34,7 +34,7 @@ const theme = createTheme({
 export default function App(props) {
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ bgcolor: 'background' }}>
+      <Box sx={{ bgcolor: 'background.default' }}>
         <HomePage {...props} />
       </Box>
     </ThemeProvider>

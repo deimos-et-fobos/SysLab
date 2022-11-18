@@ -114,7 +114,7 @@ export default function HomePage(props) {
     return <p>Loading...</p>
   }
   return (
-    <Box>
+    <Box sx={{ bgcolor: 'background' }}>
       <Router>
         <MsgContext.Provider value={msgContextValue}>
         <LabContext.Provider value={labContextValue}>

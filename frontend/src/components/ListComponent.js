@@ -36,10 +36,9 @@ export default function ListComponent(props) {
         setRows={setRows}
         api_url={props.api_url}
         title={props.title}
-        titleProps={{ pb: 1 }}
+        titleProps={{ p: 2 }}
         addButton={<AddButton icon={props.icon} />}
         sx={{
-          p: 2,
           boxShadow: 2,
           bgcolor: 'white',
           borderColor:  'secondary.dark',
