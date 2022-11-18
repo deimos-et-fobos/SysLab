@@ -12,6 +12,7 @@ const API_URL = '/api/lab/healthcare/'
 
 export default function HealthcareList(props) {
   const [open, setOpen] = useState({status: false, id: null});
+  const navigate = useNavigate()
   const columns = [
     // { field: 'id', headerName: 'ID', width: 80 , align:'right'},
     { field: 'name', headerName: 'Nombre', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getName},

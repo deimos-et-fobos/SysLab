@@ -12,6 +12,7 @@ const API_URL = '/api/accounts/users/'
 
 export default function UserList(props) {
   const [open, setOpen] = useState({status: false, id: null});
+  const navigate = useNavigate()
   const columns = [
     { field: 'email', headerName: 'Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getEmail},
     { field: 'full_name', headerName: 'Nombre', minWidth: 200, flex: 2, align:'center', headerAlign:'center', valueGetter: getFullName },

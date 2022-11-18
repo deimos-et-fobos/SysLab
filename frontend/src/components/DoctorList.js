@@ -12,6 +12,7 @@ const API_URL = '/api/lab/doctors/'
 
 export default function DoctorList(props) {
   const [open, setOpen] = useState({status: false, id: null});
+  const navigate = useNavigate()
   const columns = [
     { field: 'full_name', headerName: 'Nombre', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getFullName },
     { field: 'specialty', headerName: 'Especialidad', minWidth: 200, flex: 2, align:'center', headerAlign:'center'},

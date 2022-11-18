@@ -12,6 +12,7 @@ const API_URL = '/api/lab/tests/'
 
 export default function LabTestList(props) {
   const [open, setOpen] = useState({status: false, id: null});
+  const navigate = useNavigate()
   const columns = [
     { field: 'code', headerName: 'Código', minWidth: 150, flex: 1, align:'center', headerAlign:'center', renderCell: getCode},
     { field: 'name', headerName: 'Nombre', minWidth: 300, flex: 2, align:'center', headerAlign:'center'},

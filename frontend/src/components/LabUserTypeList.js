@@ -12,6 +12,7 @@ const API_URL = '/api/accounts/lab-user-types/'
 
 export default function LabUserTypeList(props) {
   const [open, setOpen] = useState({status: false, id: null});
+  const navigate = useNavigate()
   const columns = [
     { field: 'type', headerName: 'Tipo de Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getType},
     { field: 'laboratoryName', headerName: 'Laboratorio', minWidth: 130, flex: 2, align:'center', headerAlign:'center', valueGetter: getLaboratoryName},

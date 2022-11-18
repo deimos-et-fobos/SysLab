@@ -12,6 +12,7 @@ const API_URL = '/api/lab/protocols/'
 
 export default function ProtocolList(props) {
   const [open, setOpen] = useState({status: false, id: null});
+  const navigate = useNavigate()
   const columns = [
     { field: 'id', headerName: 'Protocolo', minWidth: 120, align:'center', headerAlign:'center', renderCell: getId},
     { field: 'laboratoryName', headerName: 'Laboratorio', minWidth: 130, flex: 2, align:'center', headerAlign:'center', valueGetter: getLaboratoryName},
@@ -66,7 +67,7 @@ export default function ProtocolList(props) {
   return (
     <ListComponent
       open={open}
-      setOpen={setOpen}  
+      setOpen={setOpen}
       columns={columns}
       api_url={API_URL}
       title='Listados de Informes'

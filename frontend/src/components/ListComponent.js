@@ -11,8 +11,6 @@ import { fetchServer } from './AuthServer'
 export default function ListComponent(props) {
   const [rows, setRows] = useState(null);
   const { msg, setMsg } = useContext(MsgContext);
-  const navigate = useNavigate()
-  const pathname = useLocation().pathname
 
   const handleDelete = async () => {
     const id = props.open.id;
