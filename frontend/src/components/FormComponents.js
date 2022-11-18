@@ -66,7 +66,6 @@ export function FormSaveCancelButton(props) {
       <Box className='px-2 row justify-content-end'>
         <Box className='col-6 col-sm-4 col-lg-3 col-xl-2'>
           <Button
-            autoFocus
             variant="contained"
             sx={{ width:'100%' }}
             type='submit'

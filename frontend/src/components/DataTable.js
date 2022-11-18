@@ -21,13 +21,13 @@ import { fetchServer } from './AuthServer';
 export default function DataTable(props) {
   const [query, setQuery] = useState(null)
   const [loading, setLoading] = useState(true)
-  const { columns, fetch_url, sx } = {...props}
+  const { columns, api_url, sx } = {...props}
 
   useEffect(() => {
     const getList = async () => {
       let data = {}
       try {
-        data = await fetchServer(fetch_url, {action:'list'});
+        data = await fetchServer(api_url, {action:'list'});
         props.setRows(data);
         setLoading(false);
       } catch (err) {
@@ -46,7 +46,7 @@ export default function DataTable(props) {
   function CustomToolbar(props) {
     return (
       <GridToolbarContainer sx={{ justifyContent:'space-between' }} >
-        <GridToolbarExport />
+        <GridToolbarExport color='secondary'/>
         <GridToolbarQuickFilter sm={{ width: '50%'}} />
       </GridToolbarContainer>
     );
@@ -60,7 +60,7 @@ export default function DataTable(props) {
           { true && props.addButton }
         </Box>
         {/* <Divider sx={{ borderBottomWidth: 3 }}/> */}
-        <Divider sx={{ bgcolor: 'black' }}/>
+        <Divider sx={{ bgcolor: 'secondary.dark' }}/>
         <CustomToolbar/>
       </Box>
     );
@@ -73,7 +73,7 @@ export default function DataTable(props) {
 
     return (
       <Pagination
-        color='primary'
+        color='secondary'
         count={pageCount}
         page={page + 1}
         onChange={(event, value) => apiRef.current.setPage(value - 1)}
@@ -94,7 +94,7 @@ export default function DataTable(props) {
           density="standard"
           loading={false}
           pageSize={20} autoHeight
-          checkboxSelection disableSelectionOnClick
+          checkboxSelection SelectionOnClick
           components={{
             Toolbar: CustomToolbar,
             Pagination: CustomPagination,
