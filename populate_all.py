@@ -32,5 +32,5 @@ if __name__ == '__main__':
     print("  + Populating LabTestResult")
     populate_labtestresult()
     print("  + Populating Culture")
-    populate_culture()
+    populate_antibiogram()
     print("Populating complete!!!")

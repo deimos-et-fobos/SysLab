@@ -1,9 +1,4 @@
-Design of first forms
+First commit at Kusa's after stolen PC.
 
-- Created: FormComponents
-- Created: Patient Form
-- Created: Messages Manager
-- Created: Theme, Palette
-- Modified: Login Form
-- Modified: AuthServer
-- Modified: Small changes on lab and accounts APIs
+Fixed lab/admin.py
+Fixed populated_all.py
