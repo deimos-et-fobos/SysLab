@@ -24,18 +24,14 @@ export default function DataTable(props) {
   const { columns, api_url, sx } = {...props}
 
   useEffect(() => {
-    const getList = async () => {
-      let data = {}
-      try {
-        data = await fetchServer(api_url, {action:'list'});
-        props.setRows(data);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        console.error(err.detail);
+    fetchServer('GET', api_url, null, (res, status) => {
+      if (status === 200) {
+        props.setRows(res);
+      } else {
+        console.error(res.detail);
       }
-    }
-    getList()
+      setLoading(false);
+    })
   }, [query]);
 
   function searchQuery(e) {

@@ -33,7 +33,19 @@ const GENDER = [
 const API_URL = '/api/lab/patients/';
 const HCP_API_URL = '/api/lab/healthcare/';
 
-
+const INITIAL_VALUES = {
+  first_name: '',
+  last_name: '',
+  id_type: '0',
+  id_number: '',
+  birthday: undefined,
+  age: undefined,
+  gender: undefined,
+  healthcare_provider: '',
+  phone: '',
+  address: '',
+  email: '',
+}
 
 // const getListPage = () => {
 //   let a = window.location.pathname.split('/');
@@ -50,36 +62,30 @@ export default function PatientForm(props) {
   const { id } = useParams();
 
   useEffect(() => {
-    const initialize = async() => {
-      let data={
-        first_name: '',
-        last_name: '',
-        id_type: '0',
-        id_number: '',
-        birthday: undefined,
-        age: undefined,
-        gender: undefined,
-        healthcare_provider: '',
-        phone: '',
-        address: '',
-        email: '',
+    fetchServer('GET', HCP_API_URL, null, (res, status) => {
+      if (status === 200) {
+        setHealthcareProvider(res.map( item => item.name));
+      } else {
+        res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
+        console.error( res.detail ? res.detail : null)
       }
-      if (id) {
-        try {
-          data = await fetchServer(API_URL + `${id}/`, {action: 'retrieve'});
-          Object.keys(data).forEach(
-            (key) => {(data[key] === null) ? data[key] = undefined : data[key];}
+    });
+    if (id) {
+      fetchServer('GET', API_URL + `${id}/`, null, (res, status) => {
+        if (status === 200) {
+          Object.keys(res).forEach(
+            (key) => { (res[key] === null) ? res[key] = INITIAL_VALUES[key] : null; }
           );
-          const hc_providers = await fetchServer(HCP_API_URL, {action: 'list'});
-          setHealthcareProvider(hc_providers.map( item => item.name));
-        } catch (err) {
-          console.error(err);
-          console.error(err.detail);
+          setInitialValues(res);
+        } else {
+          res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
+          console.error( res.detail ? res.detail : null)
+          setInitialValues(INITIAL_VALUES);
         }
-      }
-      setInitialValues(data);
+      });
+    } else {
+      setInitialValues(INITIAL_VALUES);
     }
-    initialize();
   }, []);
 
   const schema = Yup.object().shape({
@@ -98,37 +104,34 @@ export default function PatientForm(props) {
 
   const handleSubmit = async (values, { setErrors }) => {
     let errors = {};
-    try {
-      if (id) {
-        const data = await fetchServer(API_URL + `${id}/`, {action: 'update', values: values})
-        setMsg({msg:'Successfully updated!', severity:'success'});
+    let url = id ? API_URL + `${id}/` : API_URL;
+    let method = id ? 'PUT' : 'POST';
+    fetchServer(method, url, values, (res, status) => {
+      if (status === 200 || status === 201) {
+        console.log(status);
+        setMsg({msg: `Successfully ${ id ? 'updated' : 'created'}!`, severity: 'success'});
+        method === 'POST' ? navigate('../') : null;
       } else {
-        const data = await fetchServer(API_URL, {action: 'create', values: values})
-        setMsg({msg:'Successfully created!', severity:'success'});
-        navigate('../');
+        for (let field in res){
+          errors[field] = res[field][0];
+        }
+        console.error(errors);
+        errors.non_field_errors ? setMsg({msg: errors.non_field_errors , severity:'error'}) : null;
+        setErrors(errors)
       }
-    } catch (err) {
-      console.error(err);
-      console.error(err.detail);
-      for (let field in err.detail){
-        errors[field] = err.detail[field][0];
-      }
-      errors.non_field_errors = 'asdfa'
-      errors.non_field_errors ? setMsg(true && {msg:errors.non_field_errors, severity:'error'}) : null;
-      setErrors(errors)
-    }
+    })
   }
 
   const handleDelete = async () => {
-    try {
-      const data = await fetchServer(API_URL + `${id}/`, {action: 'destroy'})
-      setMsg({msg:'Successfully deleted!', severity:'success'});
-      navigate('../');
-    } catch (err) {
-      setMsg({msg:'Could not delete!', severity:'error'});
-      console.error(err);
-      console.error(err.detail);
-    }
+    fetchServer('DELETE', API_URL + `${id}/`, null, (res, status) => {
+      if (status === 204) {
+        setMsg({msg:'Successfully deleted!', severity:'success'});
+        navigate('../');
+      } else {
+        setMsg({msg: `Could not delete! ${res.detail}`, severity:'error'});
+        console.error(`Could not delete! ${res.detail}`);
+      }
+    });
   }
 
   if (!initialValues) {
@@ -174,6 +177,7 @@ export default function PatientForm(props) {
               <FormSelectInput label='ID Type'
                 className='col-md-4'
                 name='id_type'
+                value={values.id_type}
                 choices={ID_TYPE}
                 onChange={handleChange}
                 error={errors.id_type}
@@ -191,6 +195,7 @@ export default function PatientForm(props) {
               <FormSelectInput label='Gender'
                 className='col-md-4'
                 name='gender'
+                value={values.gender}
                 choices={GENDER}
                 onChange={handleChange}
                 error={errors.gender}

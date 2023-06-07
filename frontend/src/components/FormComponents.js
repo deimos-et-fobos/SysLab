@@ -42,6 +42,7 @@ export function FormSelectInput(props) {
         <Form.Label className='mb-0 mx-1'>{props.label}</Form.Label>
         <Form.Select
           name={props.name}
+          value={props.value}
           onChange={props.onChange}
           isInvalid={!!props.error}
           required={props.required}

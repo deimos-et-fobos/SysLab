@@ -13,16 +13,29 @@ export default function ListComponent(props) {
   const { msg, setMsg } = useContext(MsgContext);
 
   const handleDelete = async () => {
+    // const id = props.open.id;
+    // try {
+    //   const data = await fetchServer(props.api_url + `${id}/`, {action: 'destroy'});
+    //   setRows(rows.filter(row => row.id !== id));
+    //   setMsg({msg:'Successfully deleted!', severity:'success'});
+    // } catch (err) {
+    //   setMsg({msg:'Could not delete!', severity:'error'});
+    //   console.error(err);
+    //   console.error(err.detail);
+    // }
+    // props.setOpen({status: false});
+    
     const id = props.open.id;
-    try {
-      const data = await fetchServer(props.api_url + `${id}/`, {action: 'destroy'});
-      setRows(rows.filter(row => row.id !== id));
-      setMsg({msg:'Successfully deleted!', severity:'success'});
-    } catch (err) {
-      setMsg({msg:'Could not delete!', severity:'error'});
-      console.error(err);
-      console.error(err.detail);
-    }
+    let url = props.api_url + `${id}/`
+    fetchServer('DELETE', url, null, (res, status) => {
+      if (status === 204) {
+        setRows(rows.filter(row => row.id !== id));
+        setMsg({msg:'Successfully deleted!', severity:'success'});
+      } else {
+        setMsg({msg: `Could not delete! ${res.detail}`, severity:'error'});
+        console.error(`Could not delete! ${res.detail}`);
+      }
+    });
     props.setOpen({status: false});
   }
 

@@ -31,23 +31,26 @@ export default function LoginPage(props) {
 
   const handleSubmit = async (values, { setErrors, setSubmitting }) => {
     let errors = {};
-    let data = { user: user, laboratory: laboratory }
-    try {
-      data = await login({email:values.email, password:values.password, labName})
-    } catch (err) {
-      console.error(err);
-      console.error(err.detail);
-      for (let field in err.detail){
-        errors[field] = err.detail[field][0];
-      }
-      setMsg({msg: true && errors.non_field_errors, severity:'error'});
-      setErrors(errors)
-    } finally {
-      setUser(data.user);
-      setLaboratory(data.laboratory);
-      data.user ? navigate(0) : null;
-      setSubmitting(false);
+    // let res = { user: user, laboratory: laboratory }
+    let data = { 
+      email: values.email, 
+      password: values.password,
     }
+    login('POST', data, labName, (res, status) => {
+      if (status === 200) {
+        setUser(res.user);
+        setLaboratory(res.laboratory);
+        res.user ? navigate(0) : null;
+      } else {
+        for (let field in res){
+          errors[field] = res[field][0];
+        }
+        console.error(errors);
+        errors.non_field_errors ? setMsg({msg: errors.non_field_errors , severity:'error'}) : null;
+        setErrors(errors)
+      }
+    })
+    setSubmitting(false);
   }
 
   return (

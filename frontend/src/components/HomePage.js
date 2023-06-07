@@ -94,20 +94,16 @@ export default function HomePage(props) {
   );
 
   useEffect(() => {
-    const userIsAuthenticated = async() => {
-      let data = { user: null, laboratory: null };
-      try {
-        data = await login({ labName, method:'GET'});
-      } catch (err) {
-        console.error(err);
-        console.error(err.detail)
-      } finally {
-        JSON.stringify(data.user) !== JSON.stringify(user) ? setUser(data.user) : null;
-        JSON.stringify(data.laboratory) !== JSON.stringify(laboratory) ? setLaboratory(data.laboratory) : null;
-        setLoading(false)
+    login('GET', null, labName, (res, status) => {
+      if (status === 200) {
+        JSON.stringify(res.user) !== JSON.stringify(user) ? setUser(res.user) : null;
+        JSON.stringify(res.laboratory) !== JSON.stringify(laboratory) ? setLaboratory(res.laboratory) : null;
+      } else {
+        res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
+        console.error( res.detail ? res.detail : null)
       }
-    }
-    userIsAuthenticated()
+      setLoading(false);
+    })
   }, [user, laboratory]);
 
   if (loading) {

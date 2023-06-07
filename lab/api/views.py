@@ -55,7 +55,7 @@ class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         obj = self.get_object()
         obj.is_active = False
         obj.save(update_fields=['is_active'])
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     # def get_object(self):
     #     queryset = self.get_queryset()

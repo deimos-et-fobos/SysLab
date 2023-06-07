@@ -1,4 +1,6 @@
-First commit at Kusa's after stolen PC.
+fetchServer() modified
 
-Fixed lab/admin.py
-Fixed populated_all.py
+Changed fetchServer() and all the calls to it.
+fetchServer() now takes a callback funtion which take as parameters the response data and status.
+
+fetchServer(method, url, data, callback(res, status)) 

@@ -1,95 +1,75 @@
 const API_URL = '/api/accounts'
 
-export function getCookie(cname) {
-  let name = `${cname}=`;
-  let decodedCookie = decodeURIComponent(document.cookie);
-  let ca = decodedCookie.split(';');
-  for(let i = 0; i <ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          // Does this cookie string begin with the name we want?
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+          }
+      }
   }
-  return "";
+  return cookieValue;
 }
 
 export class AuthorizationError extends Error {
-  constructor(message, {detail} = {}) {
+  constructor(message, detail) {
   	super(message);
-    this.name = 'AUTHORIZATION_ERROR'
-    this.detail = detail
+    this.name = 'AUTHORIZATION_ERROR';
+    this.detail = detail ? detail : null;
   };
 }
 
 export class ValidationError extends Error {
-  constructor(message, {detail} = {}) {
+  constructor(message, detail) {
   	super(message);
-    this.name = 'VALIDATION_ERROR'
-    this.detail = detail
+    this.name = 'VALIDATION_ERROR';
+    this.detail = detail ? detail : null;
   };
 }
 
-export const login = async({email, password, labName, method = 'POST'} = {}) => {
-  let data = {}
-  let requestOptions = {}
-  if (method == 'POST') {
-    requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCookie('csrftoken'),
-      },
-      body: JSON.stringify({email:email, password: password})
-    };
-  }
-  const response = await fetch(`${API_URL}/login/${labName}/`, requestOptions)
-  try {
-    data = await response.json()
-  } catch {}
-  if ( !response.ok ) {
-    throw new ValidationError(`${response.status} ${response.statusText}`, {detail:data})
-  }
-  return data;
+export const login = async(method, data, labName, callback) => {
+  const url = `${API_URL}/login/${labName}/`;
+  await fetchServer(method, url, data, callback);
 }
 
 export const logout = async() => {
-  const response = await fetch(`${API_URL}/logout/`)
-  if (!response.ok) {
-    const data = await response.json()
-    throw new AuthorizationError(data.detail)
+  const url = `${API_URL}/logout/`
+  await fetchServer('GET', url, null, (res, status) => { 
+    if (status !== 200 ){
+      throw new AuthorizationError(res)
+    }
+  });
+}
+
+export const fetchServer = async(method, url, data, callback) => {
+  let jsonData;
+  if (data){
+    jsonData = JSON.stringify(data);
   }
-}
-
-const METHODS = {
-  list: 'GET',
-  create: 'POST',
-  retrieve: 'GET',
-  update: 'PUT',
-  destroy: 'DELETE',
-}
-
-export const fetchServer = async(url, {action = 'retrieve', values = null} = {}) => {
-  let data = {};
-  const method = METHODS[action];
-  const body = JSON.stringify(values);
-  const headers = {
-    'Content-Type': 'application/json',
-    'X-CSRFToken': getCookie('csrftoken'),
-  };
+  const csrftoken = getCookie('csrftoken');
+  const headers = { 'Content-Type': 'application/json' }
+  if (csrftoken) {
+    headers['X-CSRFToken'] = csrftoken;
+  }
   const requestOptions = {
     method: method,
-    headers: (method == 'GET') ? {} : headers,
-    body: (method == 'PUT' || method == 'POST') ? body : null,
+    headers: headers,
+    body: jsonData,
   }
-  const response = await fetch(url, requestOptions);
+  let response
   try {
-    data = await response.json()
-  } catch {}
-  if ( !response.ok ) {
-    throw new ValidationError(`${response.status} ${response.statusText}`, {detail:data})
+    response = await fetch(url, requestOptions);
+    if (response.status !== 204) {
+      data = await response.json();
+    }
+    callback(data,response.status);
+  } catch (error) {
+    console.error('There was an error', error);
+    throw new ValidationError('There was an error', error)
   }
-  return data;
 }
