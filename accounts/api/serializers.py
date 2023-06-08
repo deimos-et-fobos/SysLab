@@ -54,9 +54,16 @@ class LaboratorySerializer(serializers.ModelSerializer):
 
 
 class LabMemberSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    laboratory = LaboratorySerializer()
+    permissions = serializers.SerializerMethodField()
+
     class Meta:
         model = LabMember
-        fields = ('id', 'user', 'laboratory', 'user_type', 'is_active')
+        fields = ('id', 'user', 'laboratory', 'permissions', 'user_type', 'is_active')
+
+    def get_permissions(self, lab_member):
+        return list(lab_member.get_all_permissions())
 
 class LabUserTypeSerializer(serializers.ModelSerializer):
     laboratory = LaboratorySerializer()

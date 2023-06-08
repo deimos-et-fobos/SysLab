@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useContext, createContext, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, matchPath, useParams, useLocation, Outlet } from 'react-router-dom'
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import Collapse from '@mui/material/Collapse';
 import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 
 import { login } from './AuthServer';
-import DoctorList from './DoctorList';
+import HealthcareForm from './HealthcareForm';
 import HealthcareList from './HealthcareList';
+
+import DoctorList from './DoctorList';
 import LabUserTypeList from './LabUserTypeList';
 import LabTestList from './LabTestList'
 import LoginPage from './LoginPage';
@@ -19,7 +18,7 @@ import Message from './Message';
 import PatientForm from './PatientForm';
 import PatientList from './PatientList';
 import ProtocolList from './ProtocolList';
-import RequireAuth from './RequireAuth';
+import RequirePerms from './RequirePerms';
 import UserList from './UserList';
 
 export const LabContext = createContext({
@@ -33,6 +32,10 @@ export const UserContext = createContext({
 export const MsgContext = createContext({
   msg: false,
   setMsg: () => {},
+});
+export const PermsContext = createContext({
+  perms: null,
+  setPerms: () => {},
 });
 
 const Dashboard = (props) => {
@@ -77,6 +80,7 @@ const Dashboard = (props) => {
 export default function HomePage(props) {
   const [user, setUser] = useState(null);
   const [laboratory, setLaboratory] = useState(null)
+  const [perms, setPerms] = useState(null)
   const [msg, setMsg] = useState(false)
   const [loading, setLoading] = useState(true)
   const labName = window.location.pathname.split('/').filter((e) => e != '').shift();
@@ -92,15 +96,20 @@ export default function HomePage(props) {
     () => ({ msg, setMsg }),
     [msg]
   );
+  const permsContextValue = useMemo(
+    () => ({ perms, setPerms }),
+    [perms]
+  );
 
   useEffect(() => {
     login('GET', null, labName, (res, status) => {
-      if (status === 200) {
-        JSON.stringify(res.user) !== JSON.stringify(user) ? setUser(res.user) : null;
-        JSON.stringify(res.laboratory) !== JSON.stringify(laboratory) ? setLaboratory(res.laboratory) : null;
+      if (status === 200 && res.lab_member) {
+        JSON.stringify(res.lab_member.user) !== JSON.stringify(user) ? setUser(res.lab_member.user) : null;
+        JSON.stringify(res.lab_member.laboratory) !== JSON.stringify(laboratory) ? setLaboratory(res.lab_member.laboratory) : null;
+        JSON.stringify(res.lab_member.permissions) !== JSON.stringify(perms) ? setPerms(res.lab_member.permissions) : null;
       } else {
         res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
-        console.error( res.detail ? res.detail : null)
+        res.detail ? console.error(res.detail) : null;
       }
       setLoading(false);
     })
@@ -115,12 +124,12 @@ export default function HomePage(props) {
         <MsgContext.Provider value={msgContextValue}>
         <LabContext.Provider value={labContextValue}>
         <UserContext.Provider value={userContextValue}>
+        <PermsContext.Provider value={permsContextValue}>
           <Routes>
             <Route index element=<LoginPage/> />
             <Route path=":labName/" element={user ? <Dashboard/> : <LoginPage/>} >
               <Route index element={<p>Home Page</p>} />
               <Route path="doctors/" element={<DoctorList/>} />
-              <Route path="healthcare/" element={<HealthcareList/>} />
               <Route path="lab-user-types/" element={<LabUserTypeList/>} />
               <Route path="lab-user-types/new/" element={<LoginPage/>} />
               <Route path="patients/" element={<Outlet/>} >
@@ -128,12 +137,18 @@ export default function HomePage(props) {
                 <Route path=":id/" element={<PatientForm/>} />
                 <Route path="new/" element={<PatientForm/>} />
               </Route>
+              <Route path="healthcare/" element={<Outlet/>} >
+                <Route index element={<RequirePerms req_perms={['lab.list_healthcareprovider']} children=<HealthcareList/>/>} />
+                <Route path=":id/" element={<RequirePerms req_perms={['lab.view_healthcareprovider']} children=<HealthcareForm/>/>} />
+                <Route path="new/" element={<RequirePerms req_perms={['lab.add_healthcareprovider']} children=<HealthcareForm/>/>} />
+              </Route>
               <Route path="protocols/" element={<ProtocolList/>} />
               <Route path="tests/" element={<LabTestList/>} />
               <Route path="tests/new/" element={<h1>New Test</h1>} />
               <Route path="users/" element={<UserList/>} />
             </Route>
           </Routes>
+        </PermsContext.Provider>
         </UserContext.Provider>
         </LabContext.Provider>
         </MsgContext.Provider>

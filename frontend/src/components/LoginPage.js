@@ -13,7 +13,7 @@ import * as Yup from 'yup';
 
 import { login } from './AuthServer'
 import { FormInput } from './FormComponents'
-import { LabContext, MsgContext, UserContext } from './HomePage'
+import { LabContext, MsgContext, PermsContext, UserContext } from './HomePage'
 import Message from './Message'
 
 const schema = Yup.object().shape({
@@ -25,22 +25,24 @@ export default function LoginPage(props) {
   const { msg, setMsg } = useContext(MsgContext);
   const { user, setUser } = useContext(UserContext);
   const { laboratory, setLaboratory } = useContext(LabContext);
+  const { perms, setPerms } = useContext(PermsContext);
   const navigate = useNavigate();
   const nextPage = useLocation().pathname
   let { labName } = useParams()
 
   const handleSubmit = async (values, { setErrors, setSubmitting }) => {
     let errors = {};
-    // let res = { user: user, laboratory: laboratory }
     let data = { 
       email: values.email, 
       password: values.password,
     }
     login('POST', data, labName, (res, status) => {
       if (status === 200) {
-        setUser(res.user);
-        setLaboratory(res.laboratory);
-        res.user ? navigate(0) : null;
+        setUser(res.lab_member.user);
+        setLaboratory(res.lab_member.laboratory);
+        setPerms(res.lab_member.permissions);
+        navigate(0)
+        // res.lab_member ? navigate(0) : null;
       } else {
         for (let field in res){
           errors[field] = res[field][0];

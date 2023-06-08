@@ -1,5 +1,4 @@
 import React, { useState, useContext } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom';
 
 import AddButton from "./AddButton";
 import DataTable from "./DataTable";
@@ -13,18 +12,6 @@ export default function ListComponent(props) {
   const { msg, setMsg } = useContext(MsgContext);
 
   const handleDelete = async () => {
-    // const id = props.open.id;
-    // try {
-    //   const data = await fetchServer(props.api_url + `${id}/`, {action: 'destroy'});
-    //   setRows(rows.filter(row => row.id !== id));
-    //   setMsg({msg:'Successfully deleted!', severity:'success'});
-    // } catch (err) {
-    //   setMsg({msg:'Could not delete!', severity:'error'});
-    //   console.error(err);
-    //   console.error(err.detail);
-    // }
-    // props.setOpen({status: false});
-    
     const id = props.open.id;
     let url = props.api_url + `${id}/`
     fetchServer('DELETE', url, null, (res, status) => {
@@ -48,7 +35,8 @@ export default function ListComponent(props) {
         api_url={props.api_url}
         title={props.title}
         titleProps={{ p: 2 }}
-        addButton={<AddButton icon={props.icon} />}
+        // addButton={props.addPerm ? <AddButton icon={props.icon} /> : null}
+        addButton={props.addButton}
         sx={{
           boxShadow: 2,
           bgcolor: 'white',

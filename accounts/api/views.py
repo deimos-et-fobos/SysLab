@@ -36,24 +36,20 @@ class LoginView(APIView):
     @method_decorator(never_cache)
     @method_decorator(ensure_csrf_cookie)
     def get(self, request, *args, **kwargs):
-        user = request.user if request.user.is_authenticated else None
-        if user:
-            user = UserSerializer(user, context={"request": request}).data
-            # return Response({'user': None, "laboratory": None}, status=status.HTTP_200_OK)
+        if not request.user.is_authenticated:
+            return Response({'lab_member': None}, status=status.HTTP_200_OK)
         labName = kwargs.get('labName')
         laboratory = Laboratory.objects.filter(slug=labName).first()
         if not laboratory:
             return Response({'detail': _(f'Laboratory "{labName}" not found.')}, status=status.HTTP_404_NOT_FOUND)
-        if user:
-            if laboratory.slug != request.session['laboratory'].get('slug'):
-                return Response({
-                'user': user,
-                "laboratory": request.session['laboratory'],
-                'detail': _(f"You are logged in {request.session['laboratory'].get('name')} laboratory not in {laboratory.name}.")
-                }, status=status.HTTP_403_FORBIDDEN)
+        if laboratory.slug != request.session['lab_member'].get('laboratory').get('slug'):
+            return Response({
+                'lab_member': request.session['lab_member'],
+                'detail': _(f"You are logged in {request.session['lab_member'].get('laboratory').get('name')} laboratory not in {laboratory.name}.")
+            }, status=status.HTTP_403_FORBIDDEN)
+        lab_member = LabMember.active.filter(user__id=request.user.id, laboratory__id=laboratory.id).first()
         return Response({
-            'user': user,
-            "laboratory": LaboratorySerializer(laboratory, context={"request": request}).data,
+            'lab_member': LabMemberSerializer(lab_member, context={"request": request}).data,
         }, status=status.HTTP_200_OK)
 
     # CALL LOGIN WITH GET METHOD BEFORE POST TO GET A CSRFToken
@@ -69,19 +65,12 @@ class LoginView(APIView):
         # if serializer.errors:
         #     raise serializers.ValidationError(serializer.errors)
         user = serializer.validated_data
-        lab_member = LabMember.objects.filter(user=user, laboratory=laboratory).first()
-        if user:
-            if not lab_member or not lab_member.is_active:
-                return Response({'detail': _('User not registered or active.')}, status=status.HTTP_403_FORBIDDEN)
-            login(request, user)
-            request.session['user'] = UserSerializer(user, context={"request": request}).data
-            request.session['laboratory'] = LaboratorySerializer(laboratory, context={"request": request}).data
-        else:
-            raise serializers.ValidationError('Could not Login, try again.')
-        return Response({
-            "user": UserSerializer(user, context={"request": request}).data,
-            "laboratory": LaboratorySerializer(laboratory, context={"request": request}).data,
-        }, status=status.HTTP_200_OK)
+        lab_member = LabMember.active.filter(user=user, laboratory=laboratory).first()
+        if not lab_member:
+            return Response({'detail': _('User not registered or active.')}, status=status.HTTP_403_FORBIDDEN)
+        login(request, user)
+        request.session['lab_member'] = LabMemberSerializer(lab_member, context={"request": request}).data
+        return Response({'lab_member': request.session['lab_member']}, status=status.HTTP_200_OK)
 
 class LogoutView(APIView):
     def get(self, request, *args, **kwargs):
@@ -94,7 +83,7 @@ class UserView(generics.ListAPIView):
 
     def get_queryset(self):
         print(self.kwargs)
-        lab_id = self.request.session['laboratory'].get('id')
+        lab_id = self.request.session['lab_member'].get('laboratory').get('id')
         laboratory = Laboratory.objects.filter(id=lab_id).first()
         queryset = User.objects.filter(labmember__laboratory=laboratory)
         return queryset
@@ -103,7 +92,7 @@ class LabUserTypeView(generics.ListAPIView):
     serializer_class = LabUserTypeSerializer
 
     def get_queryset(self):
-        lab_id = self.request.session['laboratory'].get('id')
+        lab_id = self.request.session['lab_member'].get('laboraory').get('id')
         laboratory = Laboratory.objects.filter(id=lab_id).first()
         queryset = LabUserType.objects.filter(laboratory=laboratory)
         return queryset

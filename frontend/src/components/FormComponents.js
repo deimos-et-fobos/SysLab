@@ -2,15 +2,12 @@ import React from 'react'
 import { useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Form from 'react-bootstrap/Form';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
-import { orange, grey, indigo, red, teal } from '@mui/material/colors';
 
 
 export function FormInput(props) {
@@ -65,15 +62,18 @@ export function FormSaveCancelButton(props) {
   return (
     <Box className='pt-3 container-fluid' >
       <Box className='px-2 row justify-content-end'>
-        <Box className='col-6 col-sm-4 col-lg-3 col-xl-2'>
-          <Button
-            variant="contained"
-            sx={{ width:'100%' }}
-            type='submit'
-            children='Save'
-          />
-        </Box>
-        { id
+        { (id && props.hasPerms.change) || (!id && props.hasPerms.add)
+          ? <Box className='col-6 col-sm-4 col-lg-3 col-xl-2'>
+              <Button
+                variant="contained"
+                sx={{ width:'100%' }}
+                type='submit'
+                children='Save'
+              />
+            </Box>
+          : null  
+        }
+        { id && props.hasPerms.delete
           ? <Box className='col-6 col-sm-4 col-lg-3 col-xl-2'>
               <Button
                 variant="contained"

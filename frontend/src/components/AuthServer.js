@@ -37,13 +37,9 @@ export const login = async(method, data, labName, callback) => {
   await fetchServer(method, url, data, callback);
 }
 
-export const logout = async() => {
+export const logout = async(callback) => {
   const url = `${API_URL}/logout/`
-  await fetchServer('GET', url, null, (res, status) => { 
-    if (status !== 200 ){
-      throw new AuthorizationError(res)
-    }
-  });
+  await fetchServer('GET', url, null, callback);
 }
 
 export const fetchServer = async(method, url, data, callback) => {
@@ -69,6 +65,7 @@ export const fetchServer = async(method, url, data, callback) => {
     }
     callback(data,response.status);
   } catch (error) {
+    console.log('sdfg');
     console.error('There was an error', error);
     throw new ValidationError('There was an error', error)
   }

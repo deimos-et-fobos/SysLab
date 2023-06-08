@@ -4,52 +4,54 @@ from django.shortcuts import render
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
-from .serializers import *
-from lab.models import *
+from accounts.api.permissions import ListCreatePermission, RetrieveUpdateDestroyPermission
+from lab.models import HealthcareProvider, Patient
+from lab.api.serializers import HealthcareProviderSerializer, PatientSerializer
 
 # User = get_user_model()
 def index(request):
     return HttpResponse("<h1>Lab API</h1>")
 
-class AntibiogramView(generics.ListAPIView):
-    queryset = Antibiogram.active.all()
-    serializer_class = AntibiogramSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+# class AntibiogramView(generics.ListAPIView):
+#     queryset = Antibiogram.active.all()
+#     serializer_class = AntibiogramSerializer
+#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-class DoctorView(generics.ListAPIView):
-    queryset = Doctor.active.all()
-    serializer_class = DoctorSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+# class DoctorView(generics.ListAPIView):
+#     queryset = Doctor.active.all()
+#     serializer_class = DoctorSerializer
+#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-class HealthcareView(generics.ListAPIView):
-    queryset = HealthcareProvider.active.all()
-    serializer_class = HealthcareProviderSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+# class HealthcareView(generics.ListAPIView):
+#     queryset = HealthcareProvider.active.all()
+#     serializer_class = HealthcareProviderSerializer
+#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-class ProtocolView(generics.ListAPIView):
-    queryset = Protocol.active.all()
-    serializer_class = ProtocolSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+# class ProtocolView(generics.ListAPIView):
+#     queryset = Protocol.active.all()
+#     serializer_class = ProtocolSerializer
+#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-class LabTestView(generics.ListAPIView):
-    queryset = LabTest.active.all()
-    serializer_class = LabTestSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+# class LabTestView(generics.ListAPIView):
+#     queryset = LabTest.active.all()
+#     serializer_class = LabTestSerializer
+#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-class ListCreatePatientView(generics.ListCreateAPIView):
+class ListCreateView(generics.ListCreateAPIView):
     queryset = Patient.active.all().order_by('-id')
     serializer_class = PatientSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [ListCreatePermission]
 
-    # def get_queryset(self, *args, **kwargs):
-    #     queryset = Patient.active.all().order_by('-id')
-    #     return queryset
+    # def get_object(self, request, *args, **kwargs):
+    #     self.check_permissions(request)
+    #     self.check_object_permissions(request, obj)
+    #     return super().get_object(request, args, kwargs)
 
 class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Patient.active.all()
     lookup_field = 'id'
     serializer_class = PatientSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [RetrieveUpdateDestroyPermission]
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -68,3 +70,7 @@ class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     #     # obj = get_object_or_404(queryset, id=self.lookup_field)
     #     # self.check_object_permissions(self.request, obj)
     #     return obj
+
+
+
+    

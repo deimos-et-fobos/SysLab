@@ -38,6 +38,7 @@ class HealthcareProvider(models.Model):
         return objects
 
     class Meta:
+        permissions = (('list_healthcareprovider', "Can list healthcare provider"),)
         verbose_name = _('healthcare provider')
         verbose_name_plural = _('healthcare providers')
 
@@ -96,6 +97,7 @@ class Patient(models.Model):
         return objects
 
     class Meta:
+        permissions = (('list_patient', "Can list patient"),)
         verbose_name = _('patient')
         verbose_name_plural = _('patients')
 
@@ -134,6 +136,7 @@ class Doctor(models.Model):
         return objects
 
     class Meta:
+        permissions = (('list_doctor', "Can list doctor"),)
         verbose_name = _('doctor')
         verbose_name_plural = _('doctors')
 

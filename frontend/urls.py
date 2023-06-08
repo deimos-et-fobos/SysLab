@@ -7,11 +7,13 @@ app_name = 'frontend'
 urlpatterns = [
     path('', index, name='index'),
     # path('login/', index),
+    path('<slug:labName>/healthcare/', index),
+    path('<slug:labName>/healthcare/new/', index),
+    path('<slug:labName>/healthcare/<int:id>/', index),
+    
     path('<slug:labName>/', index),
     path('<slug:labName>/doctors/', index),
     path('<slug:labName>/doctors/new/', index),
-    path('<slug:labName>/healthcare/', index),
-    path('<slug:labName>/healthcare/new/', index),
     path('<slug:labName>/lab-user-types/', index),
     path('<slug:labName>/lab-user-types/new/', index),
     path('<slug:labName>/patients/', index),

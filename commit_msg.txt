@@ -1,6 +1,15 @@
-fetchServer() modified
+Permissions and Healthcare Provider List and Form.
 
-Changed fetchServer() and all the calls to it.
-fetchServer() now takes a callback funtion which take as parameters the response data and status.
-
-fetchServer(method, url, data, callback(res, status)) 
+* DJANGO
+ * permissions.py created. Set permissions to use the LabMember permissions instead of User's.
+ * add lab_member(user, laboratory, permissions) to request.session instead of user and laboratory
+ * ListCreatePermission, RetrieveUpdateDestroyPermission
+ * Healthcare provider serializer, views and urls.
+* REACT
+ * add defaultValues to selectInputs
+ * fetchServer() for authentication returns lab_member instead of user and laboratory.
+ * Permissions Context created. Add permissions to frontend. 
+ * RequirePerms component created
+ * Permissions to FormComponents
+ * HealthcareList and HealthcareForm 
+ * utils.js

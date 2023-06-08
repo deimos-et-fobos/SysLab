@@ -10,21 +10,29 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
-import { logout as _logout } from './AuthServer'
-import { LabContext } from './HomePage'
-import { UserContext } from './HomePage'
+import { logout } from './AuthServer'
+import { LabContext, MsgContext, PermsContext, UserContext } from './HomePage'
 
 export default function MenuBar(props) {
   const { user, setUser } = useContext(UserContext);
   const { laboratory, setLaboratory } = useContext(LabContext);
+  const { perms, setPerms } = useContext(PermsContext);
+  const { msg, setMsg } = useContext(MsgContext);
   const navigate = useNavigate();
 
-  const logout = async () => {
-    await _logout().catch(console.error)
-    const labName = laboratory.slug
-    setUser(null)
-    setLaboratory(null)
-    navigate(`/${labName}/`)
+  const handleLogout = async () => {
+    logout((res, status) => {
+      if (status === 200) {
+        const labName = laboratory.slug
+        setUser(null)
+        setLaboratory(null)
+        setPerms(null)
+        navigate(`/${labName}/`)
+      } else {
+        res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
+        res.detail ? console.error(res.detail) : null;
+      }
+    })  
   }
 
   return (
@@ -59,7 +67,7 @@ export default function MenuBar(props) {
               </IconButton>
             </Tooltip>
             <Tooltip title="Logout">
-              <IconButton color="inherit" onClick={logout} sx={{ p: 0 }}>
+              <IconButton color="inherit" onClick={handleLogout} sx={{ p: 0 }}>
                 <LogoutIcon />
               </IconButton>
             </Tooltip>

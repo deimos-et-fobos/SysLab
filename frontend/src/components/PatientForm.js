@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import Collapse from '@mui/material/Collapse';
-import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { teal } from '@mui/material/colors';
-import { Formik, ErrorMessage } from 'formik';
+import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 import { ConfirmDelete, FormDatalist, FormInput, FormSelectInput, FormSaveCancelButton } from './FormComponents'
 import { MsgContext } from './HomePage'
 import { fetchServer } from './AuthServer'
+import { _hasPerms, getInitialValues } from './utils'
+
 
 const ID_TYPE = [
   { value: '0', name: 'DNI' },
@@ -70,22 +69,7 @@ export default function PatientForm(props) {
         console.error( res.detail ? res.detail : null)
       }
     });
-    if (id) {
-      fetchServer('GET', API_URL + `${id}/`, null, (res, status) => {
-        if (status === 200) {
-          Object.keys(res).forEach(
-            (key) => { (res[key] === null) ? res[key] = INITIAL_VALUES[key] : null; }
-          );
-          setInitialValues(res);
-        } else {
-          res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
-          console.error( res.detail ? res.detail : null)
-          setInitialValues(INITIAL_VALUES);
-        }
-      });
-    } else {
-      setInitialValues(INITIAL_VALUES);
-    }
+    getInitialValues(API_URL, id, INITIAL_VALUES, setMsg, setInitialValues)
   }, []);
 
   const schema = Yup.object().shape({
@@ -108,7 +92,6 @@ export default function PatientForm(props) {
     let method = id ? 'PUT' : 'POST';
     fetchServer(method, url, values, (res, status) => {
       if (status === 200 || status === 201) {
-        console.log(status);
         setMsg({msg: `Successfully ${ id ? 'updated' : 'created'}!`, severity: 'success'});
         method === 'POST' ? navigate('../') : null;
       } else {
@@ -130,6 +113,7 @@ export default function PatientForm(props) {
       } else {
         setMsg({msg: `Could not delete! ${res.detail}`, severity:'error'});
         console.error(`Could not delete! ${res.detail}`);
+        setOpen(false);
       }
     });
   }

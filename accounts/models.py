@@ -17,7 +17,10 @@ def upload_location(instance, filename): # id = None when create
         return f"labs/img/{slugify(instance.name)}"
     return f"others/img/{slugify(instance.name)}"
 
-
+class ActiveObjectsManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+    
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         if not email:
@@ -122,6 +125,9 @@ class Laboratory(models.Model):
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, _('users'), through='LabMember')
     is_active = models.BooleanField(_('active'), default=True)
 
+    active = ActiveObjectsManager()
+    objects = models.Manager()
+
     def __str__(self):
         return self.name
 
@@ -140,6 +146,9 @@ class LabUserType(models.Model):
     laboratory = models.ForeignKey(Laboratory, verbose_name=_('laboratory'), on_delete=models.CASCADE)
     is_active = models.BooleanField(_('active'), default=True)
     permissions = models.ManyToManyField(Permission, verbose_name=_("permissions"), blank=True)
+
+    active = ActiveObjectsManager()
+    objects = models.Manager()
 
     def __str__(self):
         return f"{self.laboratory.name} - {self.type}"
@@ -169,13 +178,18 @@ class LabMember(models.Model):
     is_active = models.BooleanField(_('active'), default=True)
     permissions = models.ManyToManyField(Permission, verbose_name=_("permissions"), blank=True)
 
+    active = ActiveObjectsManager()
+    objects = models.Manager()
+
     def get_permissions(self):
         permissions = self.permissions.all()
         _permissions = [ perm.content_type.app_label + '.' + perm.codename for perm in permissions]
         return set(_permissions)
 
     def get_usertype_permissions(self):
-        return self.user_type.get_permissions()
+        if self.user_type:
+            return self.user_type.get_permissions()
+        return {}
 
     def get_all_permissions(self):
         return {*self.get_permissions(), *self.get_usertype_permissions()}
