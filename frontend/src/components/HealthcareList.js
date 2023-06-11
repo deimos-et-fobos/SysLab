@@ -22,8 +22,8 @@ export default function HealthcareList(props) {
   const [open, setOpen] = useState({status: false, id: null});
   const { perms, setPerms } = useContext(PermsContext);
   const hasPerms = _hasPerms(perms, REQ_PERMS);
-
   const navigate = useNavigate()
+  
   const columns = [
     { field: 'name', headerName: 'Nombre', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getName},
     { field: 'actions', type: 'actions', getActions: getActions}

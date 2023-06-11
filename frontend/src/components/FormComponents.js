@@ -23,6 +23,7 @@ export function FormInput(props) {
           onChange={props.onChange}
           isInvalid={!!props.error}
           required={props.required}
+          disabled={props.disabled}
         />
         <Form.Control.Feedback className='px-1' type='invalid'>
           {props.error}
@@ -43,10 +44,11 @@ export function FormSelectInput(props) {
           onChange={props.onChange}
           isInvalid={!!props.error}
           required={props.required}
+          disabled={props.disabled}
         >
         {/* <option value='' disabled>{props.label}</option> */}
         { props.choices.map( (item, index) => (
-          <option key={index} value={item.value}>{item.name}</option>
+          <option key={index}>{item}</option>
         ))}
         </Form.Select>
         <Form.Control.Feedback className='px-1' type='invalid'>
@@ -61,37 +63,39 @@ export function FormSaveCancelButton(props) {
   const { id } = useParams()
   return (
     <Box className='pt-3 container-fluid' >
-      <Box className='px-2 row justify-content-end'>
-        { (id && props.hasPerms.change) || (!id && props.hasPerms.add)
-          ? <Box className='col-6 col-sm-4 col-lg-3 col-xl-2'>
+      <Box className='px-2 row justify-content-end pb-2'>
+        { true
+          ? <Box className='col col-sm-4 col-lg-3 col-xl-2 mb-2'>
               <Button
                 variant="contained"
                 sx={{ width:'100%' }}
                 type='submit'
-                children='Save'
+                disabled={(id && !props.hasPerms.change) || (!id && !props.hasPerms.add)}
+                children={ id ? 'Guardar' : 'Crear' }
               />
             </Box>
           : null  
         }
-        { id && props.hasPerms.delete
-          ? <Box className='col-6 col-sm-4 col-lg-3 col-xl-2'>
+        { id 
+          ? <Box className='col col-sm-4 col-lg-3 col-xl-2 mb-2'>
               <Button
                 variant="contained"
                 color='danger'
                 sx={{ width:'100%' }}
                 onClick={props.handleDelete}
-                children='Delete'
+                disabled={!props.hasPerms.delete}
+                children='Eliminar'
               />
             </Box>
           : null
         }
-        <Box className='col-6 col-sm-4 col-lg-3 col-xl-2'>
+        <Box className='col col-sm-4 col-lg-3 col-xl-2 mb-2'>
           <Button
             variant="contained"
             color='neutral'
             sx={{ width:'100%' }}
             onClick={props.handleCancel}
-            children='Cancel'
+            children='Atrás'
           />
         </Box>
       </Box>
@@ -108,11 +112,11 @@ export function ConfirmDelete(props) {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Delete confirmation"}
+          {"Confirmar eliminación"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete it?
+            ¿Está seguro que desea continuar?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -121,13 +125,13 @@ export function ConfirmDelete(props) {
             variant="contained"
             color='neutral'
             onClick={props.handleCancel}
-            children='Cancel'
+            children='Cancelar'
           />
           <Button
             variant="contained"
             color='danger'
             onClick={props.handleDelete}
-            children='Delete'
+            children='Eliminar'
           />
         </DialogActions>
       </Dialog>
@@ -148,6 +152,7 @@ export function FormDatalist(props) {
           isInvalid={!!props.error}
           required={props.required}
           defaultValue={props.value}
+          disabled={props.disabled}
         />
         <datalist id='data'>
           { props.choices.map( (item, index) => (

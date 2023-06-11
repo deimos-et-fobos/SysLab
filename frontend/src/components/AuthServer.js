@@ -43,10 +43,7 @@ export const logout = async(callback) => {
 }
 
 export const fetchServer = async(method, url, data, callback) => {
-  let jsonData;
-  if (data){
-    jsonData = JSON.stringify(data);
-  }
+  const jsonData = data ? JSON.stringify(data) : null;
   const csrftoken = getCookie('csrftoken');
   const headers = { 'Content-Type': 'application/json' }
   if (csrftoken) {
@@ -65,7 +62,6 @@ export const fetchServer = async(method, url, data, callback) => {
     }
     callback(data,response.status);
   } catch (error) {
-    console.log('sdfg');
     console.error('There was an error', error);
     throw new ValidationError('There was an error', error)
   }

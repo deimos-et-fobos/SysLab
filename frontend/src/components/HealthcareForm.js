@@ -31,6 +31,7 @@ export default function PatientForm(props) {
   const navigate = useNavigate();
   const { id } = useParams();
   const hasPerms = _hasPerms(perms, REQ_PERMS);
+  const noEditable = (id && !hasPerms.change) || (!id && !hasPerms.add)
 
   useEffect(() => {
     getInitialValues(API_URL, id, INITIAL_VALUES, setMsg, setInitialValues)
@@ -67,9 +68,9 @@ export default function PatientForm(props) {
       } else {
         setMsg({msg: `Could not delete! ${res.detail}`, severity:'error'});
         console.error(`Could not delete! ${res.detail}`);
-        setOpen(false);
       }
     });
+    setOpen(false);
   }
 
   if (!initialValues) {
@@ -78,7 +79,7 @@ export default function PatientForm(props) {
   return (
     <Box>
       <Paper variant="outlined" sx={{ borderColor: teal['700'], p:5}}>
-        <Typography variant='h4'>{ id ? 'Edit Healthcare Provider' : 'Create New Healthcare Provider'}</Typography>
+        <Typography variant='h4'>{ id ? 'Editar Obra Social' : 'Nueva Obra Social'}</Typography>
         <Formik
           validationSchema={schema}
           onSubmit={handleSubmit}
@@ -101,6 +102,7 @@ export default function PatientForm(props) {
                 value={values.name}
                 onChange={handleChange}
                 error={errors.name}
+                disabled={noEditable}
                 required
               />
               <FormSaveCancelButton

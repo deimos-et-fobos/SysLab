@@ -9,6 +9,7 @@ import HealthcareForm from './HealthcareForm';
 import HealthcareList from './HealthcareList';
 
 import DoctorList from './DoctorList';
+import DoctorForm from './DoctorForm';
 import LabUserTypeList from './LabUserTypeList';
 import LabTestList from './LabTestList'
 import LoginPage from './LoginPage';
@@ -129,18 +130,22 @@ export default function HomePage(props) {
             <Route index element=<LoginPage/> />
             <Route path=":labName/" element={user ? <Dashboard/> : <LoginPage/>} >
               <Route index element={<p>Home Page</p>} />
-              <Route path="doctors/" element={<DoctorList/>} />
               <Route path="lab-user-types/" element={<LabUserTypeList/>} />
               <Route path="lab-user-types/new/" element={<LoginPage/>} />
-              <Route path="patients/" element={<Outlet/>} >
-                <Route index element={<PatientList/>} />
-                <Route path=":id/" element={<PatientForm/>} />
-                <Route path="new/" element={<PatientForm/>} />
+              <Route path="doctors/" element={<Outlet/>} >
+                <Route index element={<RequirePerms req_perms={['lab.list_doctor']} children=<DoctorList/>/>} />
+                <Route path="new/" element={<RequirePerms req_perms={['lab.add_doctor']} children=<DoctorForm/>/>} />
+                <Route path=":id/" element={<RequirePerms req_perms={['lab.view_doctor']} children=<DoctorForm/>/>} />
               </Route>
               <Route path="healthcare/" element={<Outlet/>} >
                 <Route index element={<RequirePerms req_perms={['lab.list_healthcareprovider']} children=<HealthcareList/>/>} />
-                <Route path=":id/" element={<RequirePerms req_perms={['lab.view_healthcareprovider']} children=<HealthcareForm/>/>} />
                 <Route path="new/" element={<RequirePerms req_perms={['lab.add_healthcareprovider']} children=<HealthcareForm/>/>} />
+                <Route path=":id/" element={<RequirePerms req_perms={['lab.view_healthcareprovider']} children=<HealthcareForm/>/>} />
+              </Route>
+              <Route path="patients/" element={<Outlet/>} >
+                <Route index element={<RequirePerms req_perms={['lab.list_patient']} children=<PatientList/>/>} />
+                <Route path="new/" element={<RequirePerms req_perms={['lab.add_patient','lab.list_healthcareprovider']} children=<PatientForm/>/>} />
+                <Route path=":id/" element={<RequirePerms req_perms={['lab.view_patient']} children=<PatientForm/>/>} />
               </Route>
               <Route path="protocols/" element={<ProtocolList/>} />
               <Route path="tests/" element={<LabTestList/>} />

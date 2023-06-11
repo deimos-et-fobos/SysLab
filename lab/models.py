@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Q
+from django.db.models.functions import Lower
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -21,7 +22,7 @@ class ActiveObjectsManager(models.Manager):
 
 
 class HealthcareProvider(models.Model):
-    name = models.CharField(_('name'), max_length=120, unique=True)
+    name = models.CharField(_('name'), max_length=120)
     is_active = models.BooleanField(_('active'), default=True)
 
     objects = models.Manager()
@@ -38,13 +39,16 @@ class HealthcareProvider(models.Model):
         return objects
 
     class Meta:
+        ordering = [Lower('name')]
         permissions = (('list_healthcareprovider', "Can list healthcare provider"),)
         verbose_name = _('healthcare provider')
         verbose_name_plural = _('healthcare providers')
+        constraints = [models.UniqueConstraint(Lower('name'),name='unique_iexact_name',violation_error_message=_('There is already another health provider with this name.'))]
 
 
 class Patient(models.Model):
     ID_TYPE = (
+        ('',_('')),
         ('0',_('DNI')),
         ('1',_('LE')),
         ('2',_('LC')),
@@ -61,13 +65,11 @@ class Patient(models.Model):
 
     first_name = models.CharField(_('first name'), max_length=120)
     last_name = models.CharField(_('last name'), max_length=120)
-    id_type = models.CharField(_('ID type'), choices=ID_TYPE, default='0', max_length=1)
+    id_type = models.CharField(_('ID type'), choices=ID_TYPE, default='', max_length=1, blank=True, null=True)
     id_number = models.CharField(_('ID number'), max_length=30)
     birthday = models.DateField(_('date of birth'), blank=True, null=True)
     age = models.PositiveIntegerField(_('age'), blank=True, null=True)
     gender = models.CharField(_('gender'), choices=GENDER, default='', max_length=1, blank=True, null=True)
-    # CAMBIAR A ForeignKey
-    # healthcare_provider = models.CharField(_('healthcare provider'), max_length=100, blank=True, null=True)
     healthcare_provider = models.ForeignKey(HealthcareProvider, verbose_name=_('healthcare provider'), on_delete=models.SET_NULL, null=True, blank=True)
     phone = models.CharField(_('phone'), max_length=30, blank=True)
     address = models.CharField(_('address'), max_length=150, blank=True)

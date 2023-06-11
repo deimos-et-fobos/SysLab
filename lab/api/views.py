@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.shortcuts import render
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, serializers
 from rest_framework.response import Response
 
 from accounts.api.permissions import ListCreatePermission, RetrieveUpdateDestroyPermission
@@ -71,6 +71,34 @@ class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     #     # self.check_object_permissions(self.request, obj)
     #     return obj
 
+# class ListCreatePatientView(generics.ListCreateAPIView):
+#     queryset = Patient.active.all().order_by('-id')
+#     permission_classes = [ListCreatePermission]
 
+#     def get_serializer_class(self):
+#         if self.request.method == 'POST' :
+#             return PatientSerializer
+#         return PatientListSerializer
+
+
+class TestView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Patient.active.all()
+    lookup_field = 'id'
+    serializer_class = PatientSerializer
+
+    def get(self, request, *args, **kwargs):
+        obj = self.get_object()
+        data = PatientSerializer(obj).data
+        del(data['id'])
+        # data['gender'] = '3'
+        # data['id_type'] = '1'
+        # data['healthcare_provider'] = ''
+        print(data)
+        pat = PatientSerializer(data=data)
+        pat.is_valid(raise_exception=False)
+        print(pat.errors)
+        print(pat)
+        # pat.save()
+        return super().get(request, args, kwargs)
 
     

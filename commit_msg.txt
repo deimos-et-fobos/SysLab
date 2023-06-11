@@ -1,15 +1,9 @@
-Permissions and Healthcare Provider List and Form.
+Patients and Doctors List/Form
 
 * DJANGO
- * permissions.py created. Set permissions to use the LabMember permissions instead of User's.
- * add lab_member(user, laboratory, permissions) to request.session instead of user and laboratory
- * ListCreatePermission, RetrieveUpdateDestroyPermission
- * Healthcare provider serializer, views and urls.
+ * CustomChoiceField() returns and reads display_values.
+ * Doctor provider serializer, views and urls.
+ * Patient provider serializer, views and urls.
 * REACT
- * add defaultValues to selectInputs
- * fetchServer() for authentication returns lab_member instead of user and laboratory.
- * Permissions Context created. Add permissions to frontend. 
- * RequirePerms component created
- * Permissions to FormComponents
- * HealthcareList and HealthcareForm 
- * utils.js
+ * DoctorList and DoctorForm 
+ * PatientList and PatientForm 
