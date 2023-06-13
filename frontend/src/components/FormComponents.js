@@ -59,6 +59,59 @@ export function FormSelectInput(props) {
   )
 }
 
+export function FormCheckBox(props) {
+  return (
+    <Box {...props}>
+      <Form.Group className='mb-3' controlId={`${props.name}Input`}>
+        <Form.Check
+          type={'checkbox'}
+          name={props.name}
+          label={props.label}
+          checked={props.value}
+          onChange={props.onChange}
+          isInvalid={!!props.error}
+          required={props.required}
+          disabled={props.disabled}
+        />
+        <Form.Control.Feedback className='px-1' type='invalid'>
+          {props.error}
+        </Form.Control.Feedback>
+      </Form.Group>
+    </Box>
+  )
+}
+
+
+export function FormDatalist(props) {
+  return (
+    <Box {...props}>
+      <Form.Group className='mb-3' controlId={`${props.name}Input`}>
+        <Form.Label className='mb-0 mx-1'>{props.label}</Form.Label>
+        <Form.Control
+          list='data'
+          type={props.type}
+          name={props.name}
+          placeholder={props.label}
+          onChange={props.onChange}
+          isInvalid={!!props.error}
+          required={props.required}
+          defaultValue={props.value}
+          disabled={props.disabled}
+        />
+        <datalist id='data'>
+          { props.choices.map( (item, index) => (
+            <option key={index} value={item}/>
+          ))}
+        </datalist>
+        <Form.Control.Feedback className='px-1' type='invalid'>
+          {props.error}
+        </Form.Control.Feedback>
+      </Form.Group>
+    </Box>
+  )
+}
+
+
 export function FormSaveCancelButton(props) {
   const { id } = useParams()
   return (
@@ -135,34 +188,5 @@ export function ConfirmDelete(props) {
           />
         </DialogActions>
       </Dialog>
-  )
-}
-
-export function FormDatalist(props) {
-  return (
-    <Box {...props}>
-      <Form.Group className='mb-3' controlId={`${props.name}Input`}>
-        <Form.Label className='mb-0 mx-1'>{props.label}</Form.Label>
-        <Form.Control
-          list='data'
-          type={props.type}
-          name={props.name}
-          placeholder={props.label}
-          onChange={props.onChange}
-          isInvalid={!!props.error}
-          required={props.required}
-          defaultValue={props.value}
-          disabled={props.disabled}
-        />
-        <datalist id='data'>
-          { props.choices.map( (item, index) => (
-            <option key={index} value={item}/>
-          ))}
-        </datalist>
-        <Form.Control.Feedback className='px-1' type='invalid'>
-          {props.error}
-        </Form.Control.Feedback>
-      </Form.Group>
-    </Box>
   )
 }

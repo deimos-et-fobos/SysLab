@@ -8,7 +8,7 @@ import { GridActionsCellItem } from '@mui/x-data-grid';
 
 import ListComponent from './ListComponent';
 
-const API_URL = '/api/accounts/users/'
+const API_URL = '/api/accounts/lab-users/'
 
 export default function UserList(props) {
   const [open, setOpen] = useState({status: false, id: null});

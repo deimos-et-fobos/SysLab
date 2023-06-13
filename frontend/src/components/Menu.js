@@ -38,7 +38,7 @@ export default function Menu(props) {
     { title:'Obras Sociales', icon:<MedicalServicesIcon/>, url:'healthcare/'},
     { title:'Análisis', icon:<BiotechIcon/>, url:'tests/'},
     { title:'Tipos de Usuarios', icon:<AccountBoxIcon/>, url:'lab-user-types/'},
-    { title:'Usuarios', icon:<PeopleAltIcon/>, url:'users/'},
+    { title:'Usuarios', icon:<PeopleAltIcon/>, url:'lab-users/'},
   ]
 
   function drawer(mobileOpen) {

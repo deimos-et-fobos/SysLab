@@ -5,21 +5,24 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
 
 import { login } from './AuthServer';
-import HealthcareForm from './HealthcareForm';
-import HealthcareList from './HealthcareList';
-
 import DoctorList from './DoctorList';
 import DoctorForm from './DoctorForm';
-import LabUserTypeList from './LabUserTypeList';
-import LabTestList from './LabTestList'
+import HealthcareForm from './HealthcareForm';
+import HealthcareList from './HealthcareList';
+import LabUserList from './LabUserList';
+import LabUserForm from './LabUserForm';
 import LoginPage from './LoginPage';
 import Menu from './Menu';
 import MenuBar from './MenuBar';
 import Message from './Message';
 import PatientForm from './PatientForm';
 import PatientList from './PatientList';
-import ProtocolList from './ProtocolList';
 import RequirePerms from './RequirePerms';
+
+
+import LabUserTypeList from './LabUserTypeList';
+import LabTestList from './LabTestList'
+import ProtocolList from './ProtocolList';
 import UserList from './UserList';
 
 export const LabContext = createContext({
@@ -130,8 +133,6 @@ export default function HomePage(props) {
             <Route index element=<LoginPage/> />
             <Route path=":labName/" element={user ? <Dashboard/> : <LoginPage/>} >
               <Route index element={<p>Home Page</p>} />
-              <Route path="lab-user-types/" element={<LabUserTypeList/>} />
-              <Route path="lab-user-types/new/" element={<LoginPage/>} />
               <Route path="doctors/" element={<Outlet/>} >
                 <Route index element={<RequirePerms req_perms={['lab.list_doctor']} children=<DoctorList/>/>} />
                 <Route path="new/" element={<RequirePerms req_perms={['lab.add_doctor']} children=<DoctorForm/>/>} />
@@ -147,10 +148,17 @@ export default function HomePage(props) {
                 <Route path="new/" element={<RequirePerms req_perms={['lab.add_patient','lab.list_healthcareprovider']} children=<PatientForm/>/>} />
                 <Route path=":id/" element={<RequirePerms req_perms={['lab.view_patient']} children=<PatientForm/>/>} />
               </Route>
-              <Route path="protocols/" element={<ProtocolList/>} />
-              <Route path="tests/" element={<LabTestList/>} />
-              <Route path="tests/new/" element={<h1>New Test</h1>} />
-              <Route path="users/" element={<UserList/>} />
+              <Route path="lab-users/" element={<Outlet/>} >
+                <Route index element={<RequirePerms req_perms={['accounts.list_labmember']} children=<LabUserList/>/>} />
+                <Route path=":id/" index element={<RequirePerms req_perms={['accounts.view_labmember','accounts.list_labusertype']} children=<LabUserForm/>/>} />
+              </Route>
+
+              // <Route path="lab-user-types/" element={<LabUserTypeList/>} />
+              // <Route path="lab-user-types/new/" element={<LoginPage/>} />
+              // <Route path="protocols/" element={<ProtocolList/>} />
+              // <Route path="tests/" element={<LabTestList/>} />
+              // <Route path="tests/new/" element={<h1>New Test</h1>} />
+              // <Route path="users/" element={<UserList/>} />
             </Route>
           </Routes>
         </PermsContext.Provider>

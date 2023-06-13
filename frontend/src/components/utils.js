@@ -1,3 +1,8 @@
+import React, { useState, useContext } from 'react'
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { GridActionsCellItem } from '@mui/x-data-grid';
+
 import { fetchServer } from "./AuthServer";
 
 export const _hasPerms = (perms, req_perms) => {
@@ -7,6 +12,7 @@ export const _hasPerms = (perms, req_perms) => {
   });
   return hasPerms;
 }
+
 
 export const getInitialValues = async(url, id, initialValues, setMsg, setInitialValues) => {
   if (id) {
@@ -25,4 +31,16 @@ export const getInitialValues = async(url, id, initialValues, setMsg, setInitial
   } else {
     setInitialValues(initialValues);
   }
+}
+
+
+export const getActionButtons = (id, hasPerms) => {
+  let actions = []
+  if (hasPerms.change) {
+    actions.push(<GridActionsCellItem icon=<EditIcon/> onClick={() => navigate(`${id}/`)} label="Editar" />)
+  }
+  if (hasPerms.delete) {
+    actions.push(<GridActionsCellItem icon=<DeleteIcon/> onClick={() => setOpen({status: true, id: id})} label="Eliminar" />)
+  }
+  return actions
 }

@@ -13,17 +13,18 @@ django-admin compilemessages
 - Agregar al HomePage SelectLaboratory
 - Comenzar con la interfase, la API y la lógica
 # (DONE) defaultValues selectInputs.
-- Avatar en userList
+# (DONE) Avatar en userList
 # (DONE) LoginView: session(labmember: (user, laboratory), laboratory_id, permissions). 
 - Views: 
 	# (DONE) delete(self, obj): active=false.
 	* permission_classes. Create permissions.py. IsOwnerOrReadOnly, IsSuperUser, 
 	# (DONE) ListCreatePermission, RetrieveUpdateDestroyPermission.
-- Usuarios. Serializer: delete_pic, superuser: readonly, labusertype
+# (DONE) Usuarios. Serializer: delete_pic, labusertype
 # (DONE) Add permissions to frontend. Perms Context. 
 # (DONE) RequirePerm component.
-- Create FormComponents: checkbox.
+# (DONE) Create FormComponents: checkbox.
 # (DONE) Healthcare Providers. 
-- Pacientes
-- Doctores
+# (DONE) Pacientes
+# (DONE) Doctores
+# (DONE) LabMembers
 - Tests

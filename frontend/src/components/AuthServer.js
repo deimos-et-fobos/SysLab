@@ -16,6 +16,20 @@ function getCookie(name) {
   return cookieValue;
 }
 
+function getFormData(data) {
+  const formData = new FormData();
+  Object.keys(data).forEach(key => { 
+    if (key === 'user' ) {
+      Object.keys(data[key]).forEach(subKey => {
+        formData.append(`user.${subKey}`, data[key][subKey]);
+      });
+    } else {
+      formData.append(key, data[key])
+    }
+  });
+  return formData;
+}
+
 export class AuthorizationError extends Error {
   constructor(message, detail) {
   	super(message);
@@ -43,22 +57,29 @@ export const logout = async(callback) => {
 }
 
 export const fetchServer = async(method, url, data, callback) => {
-  const jsonData = data ? JSON.stringify(data) : null;
+  let body, headers = {}, response;
+  let multipart = data?.multipart ? true : false;
+  if (multipart) {
+    body = data ? getFormData(data) : null;
+  } else {
+    body = data ? JSON.stringify(data) : null;
+    headers['Content-Type'] = 'application/json'
+  }
   const csrftoken = getCookie('csrftoken');
-  const headers = { 'Content-Type': 'application/json' }
   if (csrftoken) {
     headers['X-CSRFToken'] = csrftoken;
   }
   const requestOptions = {
     method: method,
     headers: headers,
-    body: jsonData,
+    body: body,
   }
-  let response
   try {
+    data = {};
     response = await fetch(url, requestOptions);
     if (response.status !== 204) {
       data = await response.json();
+      console.log('Data: ', data);
     }
     callback(data,response.status);
   } catch (error) {

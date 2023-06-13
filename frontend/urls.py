@@ -15,7 +15,11 @@ urlpatterns = [
     path('<slug:labName>/patients/', index),
     path('<slug:labName>/patients/new/', index),
     path('<slug:labName>/patients/<int:id>/', index),
+    path('<slug:labName>/lab-users/', index),
+    path('<slug:labName>/lab-users/<int:id>/', index),
     
+
+
     path('<slug:labName>/test/<int:id>/', index),
     
     path('<slug:labName>/', index),

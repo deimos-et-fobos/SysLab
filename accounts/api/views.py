@@ -9,26 +9,18 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from rest_framework import generics, permissions, serializers, status, views
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authentication import BasicAuthentication
 
-from .serializers import LabUserTypeSerializer, LoginSerializer, UserSerializer, LaboratorySerializer, LabMemberSerializer
 from accounts.models import Laboratory, LabMember, LabUserType
+from accounts.api.permissions import ListCreatePermission, RetrieveUpdateDestroyPermission
+from accounts.api.serializers import ( LabMemberSerializer, LabMemberSessionSerializer, 
+                                       LabUserTypeSerializer, 
+                                       LoginSerializer, 
+                                       UserSerializer )
 
 User = get_user_model()
-
-# class getLaboratory(APIView):
-#     permission_classes = (permissions.AllowAny,)
-#
-#     def get(self, request, labName, *args, **kwargs):
-#         laboratory = Laboratory.objects.filter(slug=labName).first()
-#         if not laboratory:
-#             Response({'detail': 'Laboratory not found.'}, status=status.HTTP_404_NOT_FOUND)
-#         return Response({
-#             'laboratory': LaboratorySerializer(laboratory, context={"request": request}).data,
-#         }, status=status.HTTP_200_OK)
-
 
 class LoginView(APIView):
     permission_classes = (permissions.AllowAny,)
@@ -49,7 +41,7 @@ class LoginView(APIView):
             }, status=status.HTTP_403_FORBIDDEN)
         lab_member = LabMember.active.filter(user__id=request.user.id, laboratory__id=laboratory.id).first()
         return Response({
-            'lab_member': LabMemberSerializer(lab_member, context={"request": request}).data,
+            'lab_member': LabMemberSessionSerializer(lab_member, context={"request": request}).data,
         }, status=status.HTTP_200_OK)
 
     # CALL LOGIN WITH GET METHOD BEFORE POST TO GET A CSRFToken
@@ -69,7 +61,7 @@ class LoginView(APIView):
         if not lab_member:
             return Response({'detail': _('User not registered or active.')}, status=status.HTTP_403_FORBIDDEN)
         login(request, user)
-        request.session['lab_member'] = LabMemberSerializer(lab_member, context={"request": request}).data
+        request.session['lab_member'] = LabMemberSessionSerializer(lab_member, context={"request": request}).data
         return Response({'lab_member': request.session['lab_member']}, status=status.HTTP_200_OK)
 
 class LogoutView(APIView):
@@ -77,30 +69,87 @@ class LogoutView(APIView):
         logout(request)
         return Response({}, status=status.HTTP_200_OK)
 
-class UserView(generics.ListAPIView):
-    # queryset = User.objects.all()
+# class UserView(generics.ListAPIView):
+#     # queryset = User.objects.all()
+#     serializer_class = UserSerializer
+
+#     def get_queryset(self):
+#         print(self.kwargs)
+#         lab_id = self.request.session['lab_member'].get('laboratory').get('id')
+#         laboratory = Laboratory.objects.filter(id=lab_id).first()
+#         queryset = User.objects.filter(labmember__laboratory=laboratory)
+#         return queryset
+
+# class LabUserTypeView(generics.ListAPIView):
+#     serializer_class = LabUserTypeSerializer
+
+#     def get_queryset(self):
+#         lab_id = self.request.session['lab_member'].get('laboraory').get('id')
+#         laboratory = Laboratory.objects.filter(id=lab_id).first()
+#         queryset = LabUserType.objects.filter(laboratory=laboratory)
+#         return queryset
+
+# class LaboratoryView(generics.ListAPIView):
+#     queryset = Laboratory.objects.all()
+#     serializer_class = LaboratorySerializer
+
+# class LabMemberView(generics.ListAPIView):
+#     queryset = LabMember.objects.all()
+#     serializer_class = LabMemberSerializer
+
+class ListCreateView(generics.ListCreateAPIView):
+    queryset = User.active.all()
     serializer_class = UserSerializer
+    permission_classes = [ListCreatePermission]
+
+class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.active.all()
+    lookup_field = 'id'
+    serializer_class = UserSerializer
+    permission_classes = [RetrieveUpdateDestroyPermission]
+
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj.is_active = False
+        obj.save(update_fields=['is_active'])
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class LabMemberListView(generics.ListAPIView):
+    serializer_class = LabMemberSerializer
+    permission_classes = [ListCreatePermission]
 
     def get_queryset(self):
-        print(self.kwargs)
-        lab_id = self.request.session['lab_member'].get('laboratory').get('id')
-        laboratory = Laboratory.objects.filter(id=lab_id).first()
-        queryset = User.objects.filter(labmember__laboratory=laboratory)
+        laboratory_id = self.request.session.get('lab_member').get('laboratory').get('id')
+        queryset = LabMember.objects.filter(laboratory__id=laboratory_id)
         return queryset
+    
 
-class LabUserTypeView(generics.ListAPIView):
+class LabMemberDetailView(generics.RetrieveUpdateAPIView):
+    lookup_field = 'id'
+    serializer_class = LabMemberSerializer
+    permission_classes = [RetrieveUpdateDestroyPermission]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_queryset(self):
+        laboratory_id = self.request.session.get('lab_member').get('laboratory').get('id')
+        queryset = LabMember.objects.filter(laboratory__id=laboratory_id)
+        return queryset
+    
+    def get_serializer_context(self):
+        laboratory_id = self.request.session.get('lab_member').get('laboratory').get('id')
+        context = super().get_serializer_context()
+        context.update({"laboratory_id": laboratory_id})
+        return context
+    
+    # def put(self, request, *args, **kwargs):
+    #     print('PUT METHOD', request.data)
+    #     return super().put(request, args, kwargs)
+
+
+class LabUserTypeListView(generics.ListAPIView):
     serializer_class = LabUserTypeSerializer
 
     def get_queryset(self):
-        lab_id = self.request.session['lab_member'].get('laboraory').get('id')
-        laboratory = Laboratory.objects.filter(id=lab_id).first()
-        queryset = LabUserType.objects.filter(laboratory=laboratory)
+        laboratory_id = self.request.session.get('lab_member').get('laboratory').get('id')
+        queryset = LabUserType.objects.filter(laboratory__id=laboratory_id)
         return queryset
-
-class LaboratoryView(generics.ListAPIView):
-    queryset = Laboratory.objects.all()
-    serializer_class = LaboratorySerializer
-
-class LabMemberView(generics.ListAPIView):
-    queryset = LabMember.objects.all()
-    serializer_class = LabMemberSerializer

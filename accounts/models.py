@@ -65,6 +65,7 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
     class Meta:
+        permissions = (('list_customuser', "Can list CustomUser"),)
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
@@ -165,6 +166,7 @@ class LabUserType(models.Model):
         return all(self.has_perm(perm) for perm in perm_list)
 
     class Meta:
+        permissions = (('list_labusertype', "Can list lab user type"),)
         unique_together = ['type', 'laboratory']
         verbose_name = _('lab user type')
         verbose_name_plural = _('lab user types')
@@ -210,6 +212,7 @@ class LabMember(models.Model):
         return f"{self.laboratory} - {self.user}"
 
     class Meta:
+        permissions = (('list_labmember', "Can list lab member"),)
         unique_together = ['user', 'laboratory']
         verbose_name = _('laboratory member')
         verbose_name_plural = _('laboratory members')

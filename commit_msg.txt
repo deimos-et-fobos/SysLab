@@ -1,9 +1,18 @@
-Patients and Doctors List/Form
+LabUser List/Form
 
 * DJANGO
- * CustomChoiceField() returns and reads display_values.
- * Doctor provider serializer, views and urls.
- * Patient provider serializer, views and urls.
+ * Change LabMemberSerializer --> LabMemberSessionSerializer
+ * Create a new LabMemberSerializer
+ * LabUserTypeSerializer, UserUpdateSerializer
+ * UserTypeSlugRelatedField
+ * LabMemberListView, LabMemberDetailView, LabUserTypeListView
+ * LabMember serializer, views and urls.
+ * LabMemberSerializer and UserUpdateSerializer update method and validations.
+
 * REACT
- * DoctorList and DoctorForm 
- * PatientList and PatientForm 
+ * LabUserList and LabUserForm 
+ * FormCheckBox
+ * UserAvatar
+ * getActionButtons
+ * getFormData and prepare fetchServer to send files
+

@@ -44,9 +44,7 @@ export default function LoginPage(props) {
         navigate(0)
         // res.lab_member ? navigate(0) : null;
       } else {
-        for (let field in res){
-          errors[field] = res[field][0];
-        }
+        errors = {...res}
         console.error(errors);
         errors.non_field_errors ? setMsg({msg: errors.non_field_errors , severity:'error'}) : null;
         setErrors(errors)

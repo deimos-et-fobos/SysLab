@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from accounts.api.serializers import UserSerializer, LaboratorySerializer, LabMemberSerializer, LabUserTypeSerializer
+from accounts.api.serializers import UserSerializer, LaboratorySerializer, LabUserTypeSerializer
 from lab.models import Antibiogram, Doctor, HealthcareProvider, LabTest, LabTestGroup, LabTestResult, Patient, Protocol, Sample
 
 User = get_user_model()

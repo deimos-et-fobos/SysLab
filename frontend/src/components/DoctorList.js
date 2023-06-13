@@ -2,14 +2,11 @@ import React, { useState, useContext } from 'react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import LocalPharmacyIcon from '@mui/icons-material/LocalPharmacy';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { GridActionsCellItem } from '@mui/x-data-grid';
 
 import AddButton from './AddButton';
 import ListComponent from './ListComponent';
 import { PermsContext } from './HomePage';
-import { _hasPerms } from './utils';
+import { _hasPerms, getActionButtons } from './utils';
 
 const API_URL = '/api/lab/doctors/'
 const REQ_PERMS = {
@@ -45,14 +42,7 @@ export default function DoctorList(props) {
   }
 
   function getActions(params) {
-    let actions = []
-    if (hasPerms.change) {
-      actions.push(<GridActionsCellItem icon=<EditIcon/> onClick={() => navigate(`${params.row.id}/`)} label="Edit" />)
-    }
-    if (hasPerms.delete) {
-      actions.push(<GridActionsCellItem icon=<DeleteIcon/> onClick={() => setOpen({status: true, id: params.row.id})} label="Delete" />)
-    }
-    return actions
+    return getActionButtons(params.row.id, hasPerms);
   }
 
   return (
