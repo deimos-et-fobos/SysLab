@@ -72,7 +72,7 @@ export default function LabUserForm(props) {
     is_active: Yup.boolean(),
   });
 
-  const handleSubmit = async (values, { setErrors }) => {
+  const handleSubmit = async (values, { setFieldValue, setErrors }) => {
     let errors = {};
     let url = id ? API_URL + `${id}/` : API_URL;
     let method = id ? 'PUT' : 'POST';
@@ -81,6 +81,11 @@ export default function LabUserForm(props) {
     fetchServer(method, url, data, (res, status) => {
       if (status === 200 || status === 201) {
         setMsg({msg: `Successfully ${ id ? 'updated' : 'created'}!`, severity: 'success'});
+        if (data.user.delete_pic) { 
+          setInitialValues({...initialValues, user:{...initialValues.user, photo_url:''}});
+          setFieldValue('user.delete_pic', false);
+          setAvatarPreview('');
+        }
         // This will force to fetch the server from Homepage component
         if ( user.id === initialValues.user.id ) {setUser({...user, values})}
         method === 'POST' ? navigate('../') : null;
@@ -158,7 +163,7 @@ export default function LabUserForm(props) {
                 disabled={disabled}
               />
               <div className='col-md-4 d-flex justify-content-center'>
-                <UserAvatar sx={{width: 200, height: 200}} src={avatarPreview ? avatarPreview : initialValues?.user.photo_url }></UserAvatar>
+                <UserAvatar sx={{width: 200, height: 200}} src={avatarPreview || initialValues?.user.photo_url }></UserAvatar>
               </div>
               <div className='col-md-8'>
                 <FormInput label='Profile Picture'

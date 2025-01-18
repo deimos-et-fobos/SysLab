@@ -9,6 +9,8 @@ import DoctorList from './DoctorList';
 import DoctorForm from './DoctorForm';
 import HealthcareForm from './HealthcareForm';
 import HealthcareList from './HealthcareList';
+import LabTestForm from './LabTestForm';
+import LabTestList from './LabTestList';
 import LabUserList from './LabUserList';
 import LabUserForm from './LabUserForm';
 import LoginPage from './LoginPage';
@@ -21,7 +23,6 @@ import RequirePerms from './RequirePerms';
 
 
 import LabUserTypeList from './LabUserTypeList';
-import LabTestList from './LabTestList'
 import ProtocolList from './ProtocolList';
 import UserList from './UserList';
 
@@ -143,22 +144,25 @@ export default function HomePage(props) {
                 <Route path="new/" element={<RequirePerms req_perms={['lab.add_healthcareprovider']} children=<HealthcareForm/>/>} />
                 <Route path=":id/" element={<RequirePerms req_perms={['lab.view_healthcareprovider']} children=<HealthcareForm/>/>} />
               </Route>
+              <Route path="lab-users/" element={<Outlet/>} >
+                <Route index element={<RequirePerms req_perms={['accounts.list_labmember']} children=<LabUserList/>/>} />
+                <Route path=":id/" index element={<RequirePerms req_perms={['accounts.view_labmember','accounts.list_labusertype']} children=<LabUserForm/>/>} />
+              </Route>
               <Route path="patients/" element={<Outlet/>} >
                 <Route index element={<RequirePerms req_perms={['lab.list_patient']} children=<PatientList/>/>} />
                 <Route path="new/" element={<RequirePerms req_perms={['lab.add_patient','lab.list_healthcareprovider']} children=<PatientForm/>/>} />
                 <Route path=":id/" element={<RequirePerms req_perms={['lab.view_patient']} children=<PatientForm/>/>} />
               </Route>
-              <Route path="lab-users/" element={<Outlet/>} >
-                <Route index element={<RequirePerms req_perms={['accounts.list_labmember']} children=<LabUserList/>/>} />
-                <Route path=":id/" index element={<RequirePerms req_perms={['accounts.view_labmember','accounts.list_labusertype']} children=<LabUserForm/>/>} />
+
+              <Route path="lab-tests/" element={<Outlet/>} >
+                <Route index element={<RequirePerms req_perms={['lab.list_labtest']} children=<LabTestList/>/>} />
+                <Route path="new/" element={<RequirePerms req_perms={['lab.add_labtest','lab.list_labtest','lab.list_labtestgroup']} children=<LabTestForm/>/>} />
+                <Route path=":id/" element={<RequirePerms req_perms={['lab.view_labtest']} children=<LabTestForm/>/>} />
               </Route>
 
               // <Route path="lab-user-types/" element={<LabUserTypeList/>} />
               // <Route path="lab-user-types/new/" element={<LoginPage/>} />
               // <Route path="protocols/" element={<ProtocolList/>} />
-              // <Route path="tests/" element={<LabTestList/>} />
-              // <Route path="tests/new/" element={<h1>New Test</h1>} />
-              // <Route path="users/" element={<UserList/>} />
             </Route>
           </Routes>
         </PermsContext.Provider>

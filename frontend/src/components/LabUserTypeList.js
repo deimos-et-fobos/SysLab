@@ -2,17 +2,24 @@ import React, { useState, useContext } from 'react'
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { GridActionsCellItem } from '@mui/x-data-grid';
 
+import AddButton from './AddButton';
 import ListComponent from './ListComponent';
+import { PermsContext } from './HomePage';
+import { _hasPerms, getActionButtons } from './utils';
 
 const API_URL = '/api/accounts/lab-user-types/'
+const REQ_PERMS = {
+  add: ['lab.add_labusertype'],
+  change: ['lab.change_labusertype'],
+  delete: ['lab.delete_labusertype'],
+}
 
 export default function LabUserTypeList(props) {
   const [open, setOpen] = useState({status: false, id: null});
-  const navigate = useNavigate()
+  const { perms, setPerms } = useContext(PermsContext);
+  const hasPerms = _hasPerms(perms, REQ_PERMS);
+
   const columns = [
     { field: 'type', headerName: 'Tipo de Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getType},
     { field: 'laboratoryName', headerName: 'Laboratorio', minWidth: 130, flex: 2, align:'center', headerAlign:'center', valueGetter: getLaboratoryName},
@@ -36,11 +43,9 @@ export default function LabUserTypeList(props) {
   }
 
   function getActions(params) {
-    return [
-      <GridActionsCellItem icon=<EditIcon/> onClick={() => navigate(`${params.row.id}/`)} label="Edit" />,
-      <GridActionsCellItem icon=<DeleteIcon/> onClick={() => setOpen({status: true, id: params.row.id})} label="Delete" />,
-    ]
+    return getActionButtons(params.row.id, hasPerms, setOpen);
   }
+
 
   return (
     <ListComponent
@@ -49,7 +54,7 @@ export default function LabUserTypeList(props) {
       columns={columns}
       api_url={API_URL}
       title='Tipos de Usuarios'
-      icon=<AccountBoxIcon/>
+      addButton={hasPerms.add ? <AddButton icon={<AccountBoxIcon/>} /> : null}
     />
   )
 };

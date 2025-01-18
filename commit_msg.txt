@@ -1,18 +1,17 @@
-LabUser List/Form
+LabTest List/Form
 
 * DJANGO
- * Change LabMemberSerializer --> LabMemberSessionSerializer
- * Create a new LabMemberSerializer
- * LabUserTypeSerializer, UserUpdateSerializer
- * UserTypeSlugRelatedField
- * LabMemberListView, LabMemberDetailView, LabUserTypeListView
- * LabMember serializer, views and urls.
- * LabMemberSerializer and UserUpdateSerializer update method and validations.
+ * LabTestChildsSerializer
+ * LabTestListSerializer
+ * LabTestSerializer
+ * LabTestViewSet
+ * Use SimpleRouter(LabTestViewSet)
+
 
 * REACT
- * LabUserList and LabUserForm 
- * FormCheckBox
- * UserAvatar
- * getActionButtons
- * getFormData and prepare fetchServer to send files
+ * Add setOpen to getActionButtons()
+ * Add 'lab-tests' to <Route>
+ * Add 'delete picture' to LabUserForm
+ * LabTest List/Form 
+
 

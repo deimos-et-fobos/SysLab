@@ -6,6 +6,7 @@ charset-normalizer==2.1.1
 cryptography==38.0.1
 dj-database-url==1.0.0
 Django==4.1
+django-bootstrap5==23.3
 django-livereload-server==0.4
 django-on-heroku==1.1.2
 django-rest-framework==0.1.0
@@ -16,10 +17,9 @@ gunicorn==20.1.0
 idna==3.4
 livereload==2.6.3
 Pillow==9.2.0
-pip==22.1.2
+pip==23.1.2
 polib==1.1.1
-#psycopg2==2.9.5
-#psycopg2-binary==2.9.5
+psycopg2-binary==2.9.6
 pycparser==2.21
 python-dateutil==2.8.2
 python-decouple==3.6

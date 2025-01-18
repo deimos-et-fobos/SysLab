@@ -36,8 +36,8 @@ class LabTestAdmin(admin.ModelAdmin):
         exclude = super().get_exclude(request, obj)
         if not exclude:
             exclude = []
-        if not obj or obj.type == '0':
-                exclude += ['childs']
+        # if not obj or obj.type == '0': # Compound
+        #         exclude += ['childs']
         return exclude
 
     def get_inlines(self, request, obj):
@@ -45,7 +45,7 @@ class LabTestAdmin(admin.ModelAdmin):
         if not inlines:
             inlines = []
         if obj:
-            if obj.type == '0':
+            if obj.type == '0': # Single
                 inlines += [LabTestParentInline]
         return inlines
 

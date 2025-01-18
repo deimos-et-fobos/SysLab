@@ -30,7 +30,7 @@ const INITIAL_VALUES = {
   id_number: '',
   birthday: undefined,
   age: undefined,
-  gender: undefined,
+  gender: '',
   healthcare_provider: '',
   phone: '',
   address: '',

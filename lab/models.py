@@ -171,6 +171,7 @@ class Protocol(models.Model):
         return f"{self.id}"
 
     class Meta:
+        permissions = (('list_protocol', "Can list protocol"),)
         verbose_name = _('protocol')
         verbose_name_plural = _('protocols')
 
@@ -191,7 +192,7 @@ class Sample(models.Model):
     type = models.CharField(_('type'), choices=SAMPLE_TYPE, default='', max_length=1)
     received = models.BooleanField(_('received'), default=True)
     ### Agregar el default=timezone.now
-    checkin_time = models.DateTimeField(_('check in time'), blank=True, null=True)
+    checkin_time = models.DateTimeField(_('check in time'), default=timezone.now)
     is_active = models.BooleanField(_('active'), default=True)
 
     objects = models.Manager()
@@ -206,7 +207,7 @@ class Sample(models.Model):
 
 
 class LabTestGroup(models.Model):
-    name = models.CharField(_('name'), max_length=30, unique=True)
+    name = models.CharField(_('name'), max_length=50, unique=True)
     is_active = models.BooleanField(_('active'), default=True)
 
     objects = models.Manager()
@@ -216,6 +217,7 @@ class LabTestGroup(models.Model):
         return f"{self.name}"
 
     class Meta:
+        permissions = (('list_labtestgroup', "Can list lab test group"),)
         verbose_name = _('lab test group')
         verbose_name_plural = _('lab test groups')
 
@@ -227,17 +229,17 @@ class LabTest(models.Model):
     )
 
     code = models.CharField(_('code'), max_length=30, unique=True)
-    name = models.CharField(_('name'), max_length=30)
+    name = models.CharField(_('name'), max_length=50)
     ub = models.CharField(_('UB'), max_length=10, blank=True)
-    method = models.CharField(_('method'), max_length=30, blank=True)
+    method = models.CharField(_('method'), max_length=50, blank=True)
     price = models.CharField(_('price'), max_length=30, blank=True)
     group = models.ForeignKey(LabTestGroup, verbose_name=_('group'), on_delete=models.SET_NULL, null=True, blank=True)
-    sample_type = models.CharField(_('sample type'), choices=Sample.SAMPLE_TYPE, max_length=1, null=True, blank=True)
+    sample_type = models.CharField(_('sample type'), choices=Sample.SAMPLE_TYPE, default='', max_length=1, null=True, blank=True)
     type = models.CharField(_('type'), choices=LABTEST_TYPE, default='0', max_length=1)
     childs = models.ManyToManyField('self', verbose_name=_('childs'), symmetrical=False, related_name='parents', blank=True)
     is_antibiogram = models.BooleanField(_('antibiogram'), default=False)
     reference_value = models.CharField(_('reference value'), max_length=255, blank=True)
-    unit = models.CharField(_('unit'), max_length=30, blank=True)
+    unit = models.CharField(_('unit'), max_length=50, blank=True)
     is_active = models.BooleanField(_('active'), default=True)
 
     objects = models.Manager()
@@ -247,6 +249,7 @@ class LabTest(models.Model):
         return f"{self.name}"
 
     class Meta:
+        permissions = (('list_labtest', "Can list lab test"),)
         verbose_name = _('lab test')
         verbose_name_plural = _('lab tests')
 
@@ -271,11 +274,17 @@ class LabTestResult(models.Model):
         return f"{self.id} - Test: {self.test}"
 
     class Meta:
+        permissions = (('list_labtestresult', "Can list lab test result"),)
         verbose_name = _('lab test result')
         verbose_name_plural = _('lab test results')
 
 
 class Antibiogram(models.Model):
+    DEFAULT_MEDICINES = (
+        'PENICILINA',
+        'ACITROMICINA',
+        'IBUPROFENO'
+    )
     RESISTANCE = (
         ('',_('')),
         ('0',_('Sensitive')),
@@ -296,5 +305,6 @@ class Antibiogram(models.Model):
         return f"{self.labtest_result} - {self.medicine}"
 
     class Meta:
+        permissions = (('list_antibiogram', "Can list antibiogram"),)
         verbose_name = _('antibiogram')
         verbose_name_plural = _('antibiograms')

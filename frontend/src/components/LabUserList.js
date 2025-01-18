@@ -20,7 +20,6 @@ export default function PatientList(props) {
   const [open, setOpen] = useState({status: false, id: null});
   const { perms, setPerms } = useContext(PermsContext);
   const hasPerms = _hasPerms(perms, REQ_PERMS);
-  const navigate = useNavigate()
 
   const columns = [
     { field: 'avatar', headerName: '', minWidth: 50, flex: 1, align:'center', headerAlign:'center', renderCell: getAvatar },
@@ -59,7 +58,7 @@ export default function PatientList(props) {
 
 
   function getActions(params) {
-    return getActionButtons(params.row.id, hasPerms);
+    return getActionButtons(params.row.id, hasPerms, setOpen);
   }
 
   return (

@@ -2,13 +2,16 @@ import React from 'react'
 import { useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import { Table, TableBody, TableCell, TableRow } from '@mui/material';
 import Form from 'react-bootstrap/Form';
-
+import InputGroup from 'react-bootstrap/InputGroup'
 
 export function FormInput(props) {
   return (
@@ -88,7 +91,7 @@ export function FormDatalist(props) {
       <Form.Group className='mb-3' controlId={`${props.name}Input`}>
         <Form.Label className='mb-0 mx-1'>{props.label}</Form.Label>
         <Form.Control
-          list='data'
+          list={`data-${props.name}`}
           type={props.type}
           name={props.name}
           placeholder={props.label}
@@ -98,7 +101,7 @@ export function FormDatalist(props) {
           defaultValue={props.value}
           disabled={props.disabled}
         />
-        <datalist id='data'>
+        <datalist id={`data-${props.name}`}>
           { props.choices.map( (item, index) => (
             <option key={index} value={item}/>
           ))}
@@ -107,6 +110,82 @@ export function FormDatalist(props) {
           {props.error}
         </Form.Control.Feedback>
       </Form.Group>
+    </Box>
+  )
+}
+
+export function FormAddItem(props) {
+  const { id } = useParams()
+  return (
+    <Box {...props}>
+      <Form.Group className='mb-3' controlId={`${props.name}Input`}>
+        <Form.Label className='mb-0 mx-1'>{props.label}</Form.Label>
+        <InputGroup className="">
+          <Form.Control 
+            list={`data-${props.name}`}
+            type={props.type}
+            name={props.name}
+            placeholder={props.label}
+            onChange={null}
+            isInvalid={!!props.error || !!props.error_childs}
+            required={props.required}
+            disabled={props.disabled}
+          />
+          <Button
+            className='col-2'
+            variant="contained"
+            onClick={ (e) => {
+              if ( !!props.error || props.value == '' ) { return }
+              for (let key in props.choices) {
+                if (props.choices[key] == props.value) {
+                  var childsIds = props.childs.map( (x) => x.id )
+                  if ( id && Number(key) == id ) {
+                    props.handleAddItemErrors({[props.name]: 'No se puede agregar el análisis que se está editando.'})
+                    return
+                  }
+                  if ( childsIds.includes(Number(key)) ) {
+                    props.handleAddItemErrors({[props.name]: 'No se puede agregar 2 veces el mismo análisis.'})
+                    return
+                  }
+                  props.handleAddItem('childs', [...props.childs, {id: Number(key)}])
+                  props.handleAddItem(props.name, '')
+                  document.getElementById(`${props.name}Input`).value ='' 
+                  break
+                } 
+              }
+            }}
+            disabled={props.disabled || !!props.error}
+            children='+'
+          />  
+          <Form.Control.Feedback className='px-1' type='invalid'>
+            {props.error}
+            {props.error_childs}
+          </Form.Control.Feedback>
+        </InputGroup>
+        <datalist id={`data-${props.name}`}>
+          { Object.keys(props.choices).map( key => (
+            <option key={key} value={props.choices[key]}/>
+          ))}
+        </datalist>
+      </Form.Group>
+      <Table className="table table-striped">
+        <TableBody>
+          {props.childs.map(item => (
+            <TableRow key={item.id}>
+              <TableCell>
+                <IconButton 
+                  color='neutral'
+                  onClick={ (e) => {
+                    props.handleAddItem('childs', props.childs.filter( (child) => child.id != item.id))
+                  }}
+                  children={<DeleteIcon/>}
+                />
+                {props.choices[item.id]}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </Box>
   )
 }

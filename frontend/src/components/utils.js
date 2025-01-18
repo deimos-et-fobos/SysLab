@@ -1,4 +1,5 @@
-import React, { useState, useContext } from 'react'
+import React from 'react'
+import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { GridActionsCellItem } from '@mui/x-data-grid';
@@ -34,8 +35,9 @@ export const getInitialValues = async(url, id, initialValues, setMsg, setInitial
 }
 
 
-export const getActionButtons = (id, hasPerms) => {
+export const getActionButtons = (id, hasPerms, setOpen) => {
   let actions = []
+  const navigate = useNavigate()
   if (hasPerms.change) {
     actions.push(<GridActionsCellItem icon=<EditIcon/> onClick={() => navigate(`${id}/`)} label="Editar" />)
   }

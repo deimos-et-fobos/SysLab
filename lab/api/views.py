@@ -1,12 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.shortcuts import render
-from rest_framework import generics, permissions, status, serializers
+from rest_framework import generics, permissions, status, viewsets
 from rest_framework.response import Response
 
 from accounts.api.permissions import ListCreatePermission, RetrieveUpdateDestroyPermission
-from lab.models import HealthcareProvider, Patient
-from lab.api.serializers import HealthcareProviderSerializer, PatientSerializer
+from lab.models import LabTest, Patient
+from lab.api.serializers import LabTestSerializer, LabTestListSerializer,  PatientSerializer
 
 # User = get_user_model()
 def index(request):
@@ -37,6 +37,44 @@ def index(request):
 #     serializer_class = LabTestSerializer
 #     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+class LabTestViewSet(viewsets.ModelViewSet):
+    queryset = LabTest.active.all().order_by('-id')
+    serializer_class = LabTestSerializer
+
+    # permission_classes = [ListCreatePermission]
+
+    def get_permissions(self):
+        if self.action == 'list' or self.action == 'create':
+            permission_classes = [ListCreatePermission]
+        else:
+            permission_classes = [RetrieveUpdateDestroyPermission]
+        return [permission() for permission in permission_classes]
+
+    def list(self, request):
+        self.serializer_class = LabTestListSerializer
+        return super().list(request)
+    
+    def destroy(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj.is_active = False
+        obj.save(update_fields=['is_active'])
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # def create(self, request):
+    #     self.serializer_class = LabTestSerializer
+    #     return super().create(request)
+
+    # def retrieve(self, request, *args, **kwargs):
+    #     return super().retrieve(request, args, kwargs)
+
+
+
+    # def partial_update(self, request, pk=None):
+    #     pass
+
+    # def destroy(self, request, pk=None):
+    #     pass
+
 class ListCreateView(generics.ListCreateAPIView):
     queryset = Patient.active.all().order_by('-id')
     serializer_class = PatientSerializer
@@ -57,28 +95,7 @@ class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         obj = self.get_object()
         obj.is_active = False
         obj.save(update_fields=['is_active'])
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    # def get_object(self):
-    #     queryset = self.get_queryset()
-    #     obj = queryset.first()
-    #     print('asd')
-    #     # filter = {}
-    #     # for field in self.multiple_lookup_fields:
-    #     #     filter[field] = self.kwargs[field]
-    #     #
-    #     # obj = get_object_or_404(queryset, id=self.lookup_field)
-    #     # self.check_object_permissions(self.request, obj)
-    #     return obj
-
-# class ListCreatePatientView(generics.ListCreateAPIView):
-#     queryset = Patient.active.all().order_by('-id')
-#     permission_classes = [ListCreatePermission]
-
-#     def get_serializer_class(self):
-#         if self.request.method == 'POST' :
-#             return PatientSerializer
-#         return PatientListSerializer
+        return Response(status=status.HTTP_204_NO_CONTENT)    
 
 
 class TestView(generics.RetrieveUpdateDestroyAPIView):

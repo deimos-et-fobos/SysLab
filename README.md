@@ -17,8 +17,9 @@ django-admin compilemessages
 # (DONE) LoginView: session(labmember: (user, laboratory), laboratory_id, permissions). 
 - Views: 
 	# (DONE) delete(self, obj): active=false.
-	* permission_classes. Create permissions.py. IsOwnerOrReadOnly, IsSuperUser, 
+	# (DONE) Create permissions.py.
 	# (DONE) ListCreatePermission, RetrieveUpdateDestroyPermission.
+	* permission_classes. IsOwnerOrReadOnly, IsSuperUser, 
 # (DONE) Usuarios. Serializer: delete_pic, labusertype
 # (DONE) Add permissions to frontend. Perms Context. 
 # (DONE) RequirePerm component.
@@ -27,4 +28,6 @@ django-admin compilemessages
 # (DONE) Pacientes
 # (DONE) Doctores
 # (DONE) LabMembers
+# (DONE) LabTests
+- LabUserTypes
 - Tests
