@@ -65,7 +65,7 @@ class LabTestViewSet(viewsets.ModelViewSet):
     #     return super().create(request)
 
     # def retrieve(self, request, *args, **kwargs):
-    #     return super().retrieve(request, args, kwargs)
+    #     return super().retrieve(request, *args, **kwargs)
 
 
 
@@ -83,7 +83,7 @@ class ListCreateView(generics.ListCreateAPIView):
     # def get_object(self, request, *args, **kwargs):
     #     self.check_permissions(request)
     #     self.check_object_permissions(request, obj)
-    #     return super().get_object(request, args, kwargs)
+    #     return super().get_object(request, *args, **kwargs)
 
 class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Patient.active.all()
@@ -116,6 +116,6 @@ class TestView(generics.RetrieveUpdateDestroyAPIView):
         print(pat.errors)
         print(pat)
         # pat.save()
-        return super().get(request, args, kwargs)
+        return super().get(request, *args, **kwargs)
 
     

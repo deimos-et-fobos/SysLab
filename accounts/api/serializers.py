@@ -112,7 +112,7 @@ class LabMemberSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-        user_data = validated_data.pop('childs')
+        user_data = validated_data.pop('user')
         user = instance.user
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

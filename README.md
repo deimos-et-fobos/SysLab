@@ -1,5 +1,11 @@
 ﻿# SysLab
 
+# Versions
+ - python 3.11.2
+ - nvm 0.39.3
+ - node v18.15.0
+ - npm 9.5.0
+
 #### TUTORIAL Django + React:
 https://www.youtube.com/playlist?list=PLzMcBGfZo4-kCLWnGmK0jUBmGLaJxvi4j
 

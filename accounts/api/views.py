@@ -143,7 +143,7 @@ class LabMemberDetailView(generics.RetrieveUpdateAPIView):
     
     # def put(self, request, *args, **kwargs):
     #     print('PUT METHOD', request.data)
-    #     return super().put(request, args, kwargs)
+    #     return super().put(request, *args, **kwargs)
 
 
 class LabUserTypeListView(generics.ListAPIView):
