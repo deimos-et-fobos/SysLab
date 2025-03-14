@@ -9,7 +9,9 @@
 # https://github.com/docker/awesome-compose
 services:
   backend:
-    image: deimosetfobos/syslab-backend:latest
+    build: ./backend
+    container_name: syslab-django
+    image: syslab-backend:latest
     ports:
       - 8000:8000
       - 35729:35729
@@ -31,7 +33,9 @@ services:
         condition: service_healthy  # Espera a que PostgreSQL esté listo
     
   frontend:
-    image: deimosetfobos/syslab-frontend:latest
+    build: ./frontend
+    container_name: syslab-react
+    image: syslab-frontend:latest
     volumes:
       - ./frontend:/app
       - frontend-dist:/app/dist
