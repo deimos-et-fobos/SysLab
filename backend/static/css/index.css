@@ -1,0 +1,17 @@
+body, html {
+  background-color: #e0f2f1;
+}
+/*
+:root {
+  --mui-indigo: #3f51b5;
+}
+
+.listEditLink {
+  color: var(--mui-indigo) !important;
+  text-decoration: none !important;
+}
+.listEditLink:hover {
+  color: var(--mui-indigo) !important;
+  text-decoration: underline !important;
+  text-decoration-color: var(--mui-indigo) !important;
+} */

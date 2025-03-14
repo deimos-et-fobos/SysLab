@@ -1,0 +1,165 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-10-05 15:03-0300\n"
+"PO-Revision-Date: 2022-10-05 15:05-0300\n"
+"Last-Translator: Christopher Ryan <richi@gmail.com>\n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.1.1\n"
+"X-Translated-Using: django-rosetta 0.9.8\n"
+
+#: accounts/admin.py:15 accounts/models.py:128 accounts/models.py:134
+#: accounts/models.py:160
+msgid "laboratory"
+msgstr "laboratorio"
+
+#: accounts/admin.py:16 accounts/models.py:129
+msgid "laboratories"
+msgstr "laboratorios"
+
+#: accounts/admin.py:23
+msgid "member"
+msgstr "miembro"
+
+#: accounts/admin.py:24
+msgid "members"
+msgstr "miembros"
+
+#: accounts/admin.py:37 accounts/admin.py:42
+msgid "Permissions"
+msgstr "Permisos"
+
+#: accounts/admin.py:68 accounts/models.py:133 accounts/models.py:162
+msgid "user type"
+msgstr "tipo de usuario"
+
+#: accounts/apps.py:8
+msgid "Accounts"
+msgstr "Cuentas"
+
+#: accounts/forms.py:22
+msgid ""
+"You will be able to select a \"User Type\" once you create a new \"Lab "
+"Member\". If you change \"Laboratory\", you will have to save before "
+"selecting a new \"User Type\". For this click on \"Save and keep editing\""
+msgstr ""
+"Podrá seleccionar un \"Tipo de Usuario\" una vez que cree el nuevo "
+"\"Miembro\". Si cambia el \"Laboratorio\", deberá guardar antes de "
+"seleccionar un nuevo \"Tipo de Usuario\". Para ello haga click en \"Guardar "
+"y continuar editando\"."
+
+#: accounts/forms.py:32 accounts/forms.py:63
+msgid "Password"
+msgstr "Contraseña"
+
+#: accounts/forms.py:33
+msgid "Password confirmation"
+msgstr "Confirmar contraseña"
+
+#: accounts/forms.py:65
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this "
+"form</a>."
+msgstr ""
+"Las contraseñas no se almacenan en bruto, así que no hay manera de ver la "
+"contraseña del usuario, pero se puede cambiar la contraseña mediante <a "
+"href=\"{}\">este formulario</a>."
+
+#: accounts/models.py:24
+msgid "The Email must be set"
+msgstr "El correo electrónico debe estar configurado"
+
+#: accounts/models.py:37
+msgid "Superuser must have is_staff=True."
+msgstr "La opción \"is_staff\" debe ser verdadera para Superuser."
+
+#: accounts/models.py:39
+msgid "Superuser must have is_superuser=True."
+msgstr "La opción \"is_superuser\" debe ser verdadera para Superuser."
+
+#: accounts/models.py:50 accounts/models.py:117
+msgid "email"
+msgstr "email"
+
+#: accounts/models.py:52
+msgid "first name"
+msgstr "nombre"
+
+#: accounts/models.py:53
+msgid "last name"
+msgstr "apellido"
+
+#: accounts/models.py:54 accounts/models.py:120
+msgid "profile picture"
+msgstr "foto de perfil"
+
+#: accounts/models.py:65 accounts/models.py:70 accounts/models.py:159
+msgid "user"
+msgstr "usuario"
+
+#: accounts/models.py:66 accounts/models.py:121
+msgid "users"
+msgstr "usuarios"
+
+#: accounts/models.py:74 accounts/models.py:115
+msgid "name"
+msgstr "nombre"
+
+#: accounts/models.py:116
+msgid "address"
+msgstr "dirección"
+
+#: accounts/models.py:118
+msgid "phone number"
+msgstr "número de teléfono"
+
+#: accounts/models.py:119
+msgid "URL"
+msgstr "URL"
+
+#: accounts/models.py:122 accounts/models.py:135 accounts/models.py:163
+msgid "active"
+msgstr "activo"
+
+#: accounts/models.py:136 accounts/models.py:164
+msgid "permissions"
+msgstr "permisos"
+
+#: accounts/models.py:154
+msgid "lab user type"
+msgstr "tipo de usuario"
+
+#: accounts/models.py:155
+msgid "lab user types"
+msgstr "tipos de usuario"
+
+#: accounts/models.py:186
+#, python-brace-format
+msgid ""
+"You must choose a user type existing in '{self.laboratory.name}' laboratory"
+msgstr ""
+"Debe elegir un Tipo de Usuario existente en el laboratorio "
+"'{self.laboratory.name}'"
+
+#: accounts/models.py:194
+msgid "laboratory member"
+msgstr "miembro de laboratorios"
+
+#: accounts/models.py:195
+msgid "laboratory members"
+msgstr "miembros de laboratorios"
+
+#~ msgid "Lab User Type"
+#~ msgstr "Tipo de usuario"
