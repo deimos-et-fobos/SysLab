@@ -58,7 +58,7 @@ export default function PatientForm(props) {
       } else {
         errors = {...res}
         console.error(errors);
-        errors.non_field_errors ? setMsg({msg: errors.non_field_errors , severity:'error'}) : null;
+        setMsg({msg: errors.non_field_errors || '' + errors.detail || '', severity:'error'});
         setErrors(errors)
       }
     })

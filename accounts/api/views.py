@@ -23,7 +23,7 @@ from accounts.api.serializers import ( LabMemberSerializer, LabMemberSessionSeri
 User = get_user_model()
 
 class LoginView(APIView):
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = [permissions.AllowAny]
 
     @method_decorator(never_cache)
     @method_decorator(ensure_csrf_cookie)

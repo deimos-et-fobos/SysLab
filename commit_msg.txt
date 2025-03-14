@@ -1,17 +1,2 @@
-LabTest List/Form
-
-* DJANGO
- * LabTestChildsSerializer
- * LabTestListSerializer
- * LabTestSerializer
- * LabTestViewSet
- * Use SimpleRouter(LabTestViewSet)
-
-
-* REACT
- * Add setOpen to getActionButtons()
- * Add 'lab-tests' to <Route>
- * Add 'delete picture' to LabUserForm
- * LabTest List/Form 
 
 

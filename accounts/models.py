@@ -42,11 +42,9 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_('Superuser must have is_superuser=True.'))
         return self.create_user(email, password, **extra_fields)
 
-
 class ActiveCustomUserManager(CustomUserManager):
     def get_queryset(self):
         return super().get_queryset().filter(is_active=True)
-
 
 class CustomUser(AbstractUser):
     username = None
