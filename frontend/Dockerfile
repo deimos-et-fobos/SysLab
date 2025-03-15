@@ -8,4 +8,4 @@ COPY . /app/
 RUN npm install
 
 # Ejecuta Webpack Dev Server
-CMD ["npm", "dev"]
+CMD ["npm", "run", "dev"]
