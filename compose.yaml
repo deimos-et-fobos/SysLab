@@ -27,7 +27,8 @@ services:
       - ./backend:/app
       - frontend-dist:/app/static/frontend
       - syslab-staticfiles:/app/staticfiles
-    command: bash -c "python manage.py livereload & python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python manage.py migrate --noinput & python manage.py runserver 0.0.0.0:8000"
+    # command: bash -c "python manage.py livereload & python manage.py runserver 0.0.0.0:8000"
     depends_on:
       db:
         condition: service_healthy  # Espera a que PostgreSQL esté listo

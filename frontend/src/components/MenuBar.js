@@ -23,6 +23,9 @@ export default function MenuBar(props) {
     logout((res, status) => {
       if (status === 200) {
         const labName = laboratory.slug
+        sessionStorage.removeItem("access_token");
+        sessionStorage.removeItem("refresh_token");
+        sessionStorage.removeItem("lab_member");
         setUser(null)
         setLaboratory(null)
         setPerms(null)

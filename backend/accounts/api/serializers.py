@@ -2,10 +2,19 @@ from django.contrib.auth import authenticate, get_user_model
 from django.core.validators import EmailValidator
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from accounts.models import Laboratory, LabMember, LabUserType
 
 User = get_user_model()
+
+class CustomTokenObtainPairSerializer(TokenObtainSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # token['lab_member'] = 
+        return token
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.CharField()
@@ -20,7 +29,7 @@ class LoginSerializer(serializers.Serializer):
         user = authenticate(**data)
         if user and user.is_active:
             return user
-        raise serializers.ValidationError(_('Bad Credentials.'))
+        raise serializers.ValidationError(_('Bad Credentials or User is not active.'))
 
 
 class UserSerializer(serializers.ModelSerializer):

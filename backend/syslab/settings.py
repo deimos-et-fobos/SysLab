@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'livereload',
     'rest_framework',
     'rosetta',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     # Apps,
     'accounts',
     'lab',
@@ -83,7 +85,8 @@ WSGI_APPLICATION = 'syslab.wsgi.application'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # 'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -92,7 +95,6 @@ REST_FRAMEWORK = {
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.{}'.format(

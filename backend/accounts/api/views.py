@@ -1,3 +1,4 @@
+import json
 from django.conf import settings
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.models import AnonymousUser
@@ -12,21 +13,26 @@ from rest_framework import generics, permissions, serializers, status, views
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from accounts.models import Laboratory, LabMember, LabUserType
 from accounts.api.permissions import ListCreatePermission, RetrieveUpdateDestroyPermission
 from accounts.api.serializers import ( LabMemberSerializer, LabMemberSessionSerializer, 
-                                       LabUserTypeSerializer, 
-                                       LoginSerializer, 
-                                       UserSerializer )
+                                        LabUserTypeSerializer, 
+                                        LoginSerializer, 
+                                        UserSerializer,
+                                        CustomTokenObtainPairSerializer )
 
 User = get_user_model()
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
 
 class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
-    @method_decorator(never_cache)
-    @method_decorator(ensure_csrf_cookie)
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return Response({'lab_member': None}, status=status.HTTP_200_OK)
@@ -34,19 +40,17 @@ class LoginView(APIView):
         laboratory = Laboratory.objects.filter(slug=labName).first()
         if not laboratory:
             return Response({'detail': _(f'Laboratory "{labName}" not found.')}, status=status.HTTP_404_NOT_FOUND)
-        if laboratory.slug != request.session['lab_member'].get('laboratory').get('slug'):
+        X_Lab_Member = json.loads(request.headers.get('X-Lab-Member'))
+        if laboratory.slug != X_Lab_Member.get('laboratory').get('slug'):
             return Response({
-                'lab_member': request.session['lab_member'],
-                'detail': _(f"You are logged in {request.session['lab_member'].get('laboratory').get('name')} laboratory not in {laboratory.name}.")
-            }, status=status.HTTP_403_FORBIDDEN)
+                'lab_member': X_Lab_Member,
+                'detail': _(f"You are logged in {X_Lab_Member.get('laboratory').get('name')} laboratory not in {laboratory.name}.")
+                }, status=status.HTTP_403_FORBIDDEN)
         lab_member = LabMember.active.filter(user__id=request.user.id, laboratory__id=laboratory.id).first()
         return Response({
             'lab_member': LabMemberSessionSerializer(lab_member, context={"request": request}).data,
-        }, status=status.HTTP_200_OK)
+            }, status=status.HTTP_200_OK)
 
-    # CALL LOGIN WITH GET METHOD BEFORE POST TO GET A CSRFToken
-    @method_decorator(never_cache)
-    @method_decorator(csrf_protect)
     def post(self, request, *args, **kwargs):
         labName = kwargs.get('labName')
         laboratory = Laboratory.objects.filter(slug=labName).first()
@@ -54,20 +58,30 @@ class LoginView(APIView):
             return Response({'detail': _(f'Laboratory "{labName}" not found.')}, status=status.HTTP_404_NOT_FOUND)
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # if serializer.errors:
-        #     raise serializers.ValidationError(serializer.errors)
-        user = serializer.validated_data
+        user = serializer.validated_data # Authenticated in serilizer.validate()
         lab_member = LabMember.active.filter(user=user, laboratory=laboratory).first()
         if not lab_member:
             return Response({'detail': _('User not registered or active.')}, status=status.HTTP_403_FORBIDDEN)
-        login(request, user)
-        request.session['lab_member'] = LabMemberSessionSerializer(lab_member, context={"request": request}).data
-        return Response({'lab_member': request.session['lab_member']}, status=status.HTTP_200_OK)
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "access_token": str(refresh.access_token),
+            "refresh_token": str(refresh),
+            "lab_member": LabMemberSessionSerializer(lab_member, context={"request": request}).data,
+            }, status=status.HTTP_200_OK)
 
 class LogoutView(APIView):
-    def get(self, request, *args, **kwargs):
-        logout(request)
-        return Response({}, status=status.HTTP_200_OK)
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request):
+        try:
+            refresh_token = request.headers.get("X-Refresh")  
+            if not refresh_token:
+                return Response({"detail": "No refresh token provided"}, status=status.HTTP_400_BAD_REQUEST)
+            token = RefreshToken(refresh_token)
+            token.blacklist()  
+            return Response({"detail": "Logged out successfully"}, status=status.HTTP_200_OK)
+        except Exception:
+            return Response({"detail": "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        
 
 # class UserView(generics.ListAPIView):
 #     # queryset = User.objects.all()

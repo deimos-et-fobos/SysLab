@@ -27,7 +27,7 @@ class LabTestParentInline(admin.TabularInline):
 
 class LabTestAdmin(admin.ModelAdmin):
     model = LabTest
-    list_display = [field.name for field in LabTest._meta.fields if field.name != 'id'] + ['parents']
+    list_display = [field.name for field in LabTest._meta.fields if field.name != 'id']
     # list_display = ('code', 'doctor', 'laboratory', 'user', 'status', 'is_active')
     list_filter = ('type',)
     filter_horizontal = ('childs',)

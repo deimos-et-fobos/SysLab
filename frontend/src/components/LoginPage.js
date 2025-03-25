@@ -38,10 +38,13 @@ export default function LoginPage(props) {
     }
     login('POST', data, labName, (res, status) => {
       if (status === 200) {
-        setUser(res.lab_member.user);
-        setLaboratory(res.lab_member.laboratory);
-        setPerms(res.lab_member.permissions);
-        navigate(0)
+        sessionStorage.setItem("access_token", res.access_token);
+        sessionStorage.setItem("refresh_token", res.refresh_token);
+        sessionStorage.setItem("lab_member", JSON.stringify(res.lab_member));
+        setUser(res.lab_member?.user ?? null);
+        setLaboratory(res.lab_member?.laboratory ?? null);
+        setPerms(res?.lab_member?.permissions ?? []);
+        // navigate(0)
         // res.lab_member ? navigate(0) : null;
       } else {
         errors = {...res}
