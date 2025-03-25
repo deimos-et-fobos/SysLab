@@ -1,45 +1,64 @@
 import React, { useState, useContext } from 'react'
-import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { GridActionsCellItem } from '@mui/x-data-grid';
 
+import AddButton from './AddButton';
 import ListComponent from './ListComponent';
+import { PermsContext } from './HomePage';
+import UserAvatar from './UserAvatar';
+import { _hasPerms, getActionButtons } from './utils';
 
-const API_URL = '/api/accounts/lab-users/'
+const API_URL = '/api/accounts/lab-users/';
+const REQ_PERMS = {
+  add: ['accounts.add_labmember'],
+  change: ['accounts.change_labmember'],
+  delete: ['accounts.delete_labmember'],
+}
 
-export default function UserList(props) {
+export default function PatientList(props) {
   const [open, setOpen] = useState({status: false, id: null});
-  const navigate = useNavigate()
+  const { perms, setPerms } = useContext(PermsContext);
+  const hasPerms = _hasPerms(perms, REQ_PERMS);
+
   const columns = [
-    { field: 'email', headerName: 'Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getEmail},
+    { field: 'avatar', headerName: '', minWidth: 50, flex: 1, align:'center', headerAlign:'center', renderCell: getAvatar },
+    { field: 'email', headerName: 'Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getEmail },
     { field: 'full_name', headerName: 'Nombre', minWidth: 200, flex: 2, align:'center', headerAlign:'center', valueGetter: getFullName },
+    { field: 'user_type', headerName: 'Tipo de Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', valueGetter: getUserType },
     { field: 'is_active', headerName: 'Activo', minWidth: 100, flex: 1, align:'center', headerAlign:'center', type:'boolean', editable:'true'},
-    { field: 'is_superuser', headerName: 'Superusuario', minWidth: 150, flex: 1, align:'center', headerAlign:'center', type:'boolean'},
     { field: 'actions', type: 'actions', getActions: getActions}
   ];
 
+  function getAvatar(params) {
+    const fullName = `${params.row.user.first_name || ''} ${params.row.user.last_name || ''}`;
+    return <UserAvatar sx={{}} alt={fullName} src={params.row.user.photo_url}>{fullName}</UserAvatar>
+  }
+
   function getEmail(params) {
-    const email = `${params.row.email}`;
-    return  <Link
-      component={RouterLink}
-      to={`${params.row.id}/`}
-      sx={{ '&:hover': {color: 'secondary.main'} }}
-      color='secondary'
-      underline='hover'
-      children={email}
-    />
+    const email = `${params.row.user.email}`;
+    return (!hasPerms.change) ? email :
+      <Link
+        component={RouterLink}
+        to={ `${params.row.id}/` }
+        sx={{ '&:hover': {color: 'secondary.main'} }}
+        color='secondary'
+        underline='hover'
+        children={email}
+      />
   }
+
   function getFullName(params) {
-    return `${params.row.first_name || ''} ${params.row.last_name || ''}`;
+    return `${params.row.user.first_name || ''} ${params.row.user.last_name || ''}`;
   }
+
+  function getUserType(params) {
+    return params.row.user_type ? params.row.user_type : '- - -';
+  }
+
+
   function getActions(params) {
-    return [
-      <GridActionsCellItem icon=<EditIcon/> onClick={() => navigate(`${params.row.id}/`)} label="Edit" />,
-      <GridActionsCellItem icon=<DeleteIcon/> onClick={() => setOpen({status: true, id: params.row.id})} label="Delete" />,
-    ]
+    return getActionButtons(params.row.id, hasPerms, setOpen);
   }
 
   return (
@@ -49,7 +68,7 @@ export default function UserList(props) {
       columns={columns}
       api_url={API_URL}
       title='Usuarios'
-      icon=<PeopleAltIcon/>
+      addButton={hasPerms.add ? <AddButton icon={<PeopleAltIcon/>} /> : null}
     />
   )
 };

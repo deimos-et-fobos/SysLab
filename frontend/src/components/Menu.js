@@ -37,8 +37,8 @@ export default function Menu(props) {
     { title:'Doctores', icon:<LocalPharmacyIcon/>, url:'doctors/'},
     { title:'Obras Sociales', icon:<MedicalServicesIcon/>, url:'healthcare/'},
     { title:'Análisis', icon:<BiotechIcon/>, url:'lab-tests/'},
-    { title:'Tipos de Usuarios', icon:<AccountBoxIcon/>, url:'lab-user-types/'},
-    { title:'Usuarios', icon:<PeopleAltIcon/>, url:'lab-users/'},
+    { title:'Tipos de Usuarios', icon:<AccountBoxIcon/>, url:'user-types/'},
+    { title:'Usuarios', icon:<PeopleAltIcon/>, url:'users/'},
   ]
 
   function drawer(mobileOpen) {

@@ -5,16 +5,16 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from accounts.models import Laboratory, LabMember, LabUserType
+from accounts.models import Laboratory, UserType
 
 User = get_user_model()
 
-class CustomTokenObtainPairSerializer(TokenObtainSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        # token['lab_member'] = 
-        return token
+# class CustomTokenObtainPairSerializer(TokenObtainSerializer):
+#     @classmethod
+#     def get_token(cls, user):
+#         token = super().get_token(user)
+#         # token['lab_member'] = 
+#         return token
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.CharField()
@@ -31,13 +31,18 @@ class LoginSerializer(serializers.Serializer):
             return user
         raise serializers.ValidationError(_('Bad Credentials or User is not active.'))
 
+class UserTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserType
+        fields = ('type')
 
 class UserSerializer(serializers.ModelSerializer):
     photo_url = serializers.SerializerMethodField()
-
+    type = UserTypeSerializer
+    
     class Meta:
         model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'photo_url')
+        fields = ('id', 'email', 'first_name', 'last_name', 'photo_url', 'type')
 
     def get_photo_url(self, user):
         request = self.context.get('request')
@@ -91,48 +96,3 @@ class LaboratorySerializer(serializers.ModelSerializer):
         else:
             return None
 
-
-class LabMemberSessionSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    laboratory = LaboratorySerializer()
-    permissions = serializers.SerializerMethodField()
-
-    class Meta:
-        model = LabMember
-        fields = ('id', 'user', 'laboratory', 'permissions', 'user_type', 'is_active')
-
-    def get_permissions(self, lab_member):
-        return list(lab_member.get_all_permissions())
-
-
-class UserTypeSlugRelatedField(serializers.SlugRelatedField):
-    def get_queryset(self):
-        laboratory_id = self.context.get('laboratory_id')
-        queryset = LabUserType.active.filter(laboratory__id=laboratory_id)
-        return queryset
-    
-class LabMemberSerializer(serializers.ModelSerializer):
-    user = UserUpdateSerializer()
-    user_type = UserTypeSlugRelatedField(slug_field='type', allow_null=True, required=False)
-
-    class Meta:
-        model = LabMember
-        fields = ('id', 'user', 'user_type', 'is_active')
-
-
-    def update(self, instance, validated_data):
-        user_data = validated_data.pop('user')
-        user = instance.user
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        serializer = UserUpdateSerializer(user, user_data)
-        serializer.is_valid()
-        serializer.save()
-        return instance
-
-
-class LabUserTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LabUserType
-        fields = ('id', 'type')

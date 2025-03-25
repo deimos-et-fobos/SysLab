@@ -1,10 +1,8 @@
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import post_save, pre_save, m2m_changed
-from django.conf import settings
+from django.db.models.signals import post_save
 from django.contrib.auth.models import AbstractUser, BaseUserManager, Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
+from django.dispatch import receiver
 from django.shortcuts import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
@@ -46,6 +44,13 @@ class ActiveCustomUserManager(CustomUserManager):
     def get_queryset(self):
         return super().get_queryset().filter(is_active=True)
 
+class UserType(models.Model):
+    type = models.CharField(_('user type'), max_length=100, unique=True)
+    group = models.OneToOneField(Group, verbose_name=_('group'), on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return self.name
+
 class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(_('email'), max_length=255, unique=True)
@@ -53,6 +58,7 @@ class CustomUser(AbstractUser):
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
     profile_pic = models.ImageField(verbose_name=_('profile picture'), upload_to=upload_location, blank=True, null=True)
+    type = models.ForeignKey(UserType, verbose_name=_('user type'), on_delete=models.SET_NULL)
     # Fields from AbstractUser:
     # first_name, last_name, groups, is_staff, is_active, is_superuser, last_login, date_joinded
 
@@ -76,6 +82,26 @@ class CustomUser(AbstractUser):
     _full_name.short_description = _('name')
     full_name = property(_full_name)
 
+def save_user_type(sender, instance, *args, **kwargs):
+    user = instance
+    user_type = user.type
+    if user_type:
+        # Asignar solo el grupo del UserType
+        user.groups.set([user_type.group])
+    else:
+        # Limpiar los grupos si no hay UserType
+        user.groups.clear()
+
+@receiver(post_save, sender=CustomUser)
+def save_user_type(sender, instance, *args, **kwargs):
+    user = instance
+    user_type = user.type
+    if user_type:
+        user.groups.set([user_type.group])
+    else:
+        user.groups.clear()
+
+
     # def get_absolute_url(self):
     #     if self.is_active:
     #         return reverse('lab:users_edit', kwargs={'pk':self.id})
@@ -92,26 +118,6 @@ class CustomUser(AbstractUser):
     #         )
     #     return objects
 
-# def save_user_type(sender, instance, *args, **kwargs):
-#     user = instance
-#     type = user.type
-#     if type and type != user.groups.all().first():
-#         user.groups.set([type])
-#     else:
-#         user.groups.clear()
-#
-# def sync_type_to_group(sender, instance, action, *args, **kwargs):
-#     user = instance
-#     type = user.type
-#     if action == 'post_add' or action == 'post_remove':
-#         if type:
-#             user.groups.set([type])
-#         else:
-#             user.groups.clear()
-#
-# post_save.connect(save_user_type, sender=CustomUser)
-# m2m_changed.connect(sync_type_to_group, sender=CustomUser.groups.through)
-
 
 class Laboratory(models.Model):
     name = models.CharField(_('name'), max_length=100, unique=True)
@@ -121,7 +127,6 @@ class Laboratory(models.Model):
     phone = models.CharField(_('phone number'), max_length=30, blank=True)
     url = models.URLField(_('URL'), max_length=100, blank=True)
     profile_pic = models.ImageField(verbose_name=_('profile picture'), upload_to=upload_location, blank=True, null=True)
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL, _('users'), through='LabMember')
     is_active = models.BooleanField(_('active'), default=True)
 
     active = ActiveObjectsManager()
@@ -140,77 +145,3 @@ class Laboratory(models.Model):
         verbose_name_plural = _('laboratories')
 
 
-class LabUserType(models.Model):
-    type = models.CharField(_('user type'), max_length=20)
-    laboratory = models.ForeignKey(Laboratory, verbose_name=_('laboratory'), on_delete=models.CASCADE)
-    is_active = models.BooleanField(_('active'), default=True)
-    permissions = models.ManyToManyField(Permission, verbose_name=_("permissions"), blank=True)
-
-    active = ActiveObjectsManager()
-    objects = models.Manager()
-
-    def __str__(self):
-        return f"{self.laboratory.name} - {self.type}"
-
-    def get_permissions(self):
-        permissions = self.permissions.all()
-        _permissions = [ perm.content_type.app_label + '.' + perm.codename for perm in permissions]
-        return set(_permissions)
-
-    def has_perm(self, perm):
-        return perm in self.get_permissions()
-
-    def has_perms(self, perm_list):
-        return all(self.has_perm(perm) for perm in perm_list)
-
-    class Meta:
-        permissions = (('list_labusertype', "Can list lab user type"),)
-        unique_together = ['type', 'laboratory']
-        verbose_name = _('lab user type')
-        verbose_name_plural = _('lab user types')
-
-
-class LabMember(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), on_delete=models.CASCADE)
-    laboratory = models.ForeignKey(Laboratory, verbose_name=_('laboratory'), on_delete=models.CASCADE)
-    # Limit the choices of user_type from LabMemberChangeForm
-    user_type = models.ForeignKey(LabUserType, verbose_name=_('user type'), on_delete=models.SET_NULL, null=True, blank=True)
-    is_active = models.BooleanField(_('active'), default=True)
-    permissions = models.ManyToManyField(Permission, verbose_name=_("permissions"), blank=True)
-
-    active = ActiveObjectsManager()
-    objects = models.Manager()
-
-    def get_permissions(self):
-        permissions = self.permissions.all()
-        _permissions = [ perm.content_type.app_label + '.' + perm.codename for perm in permissions]
-        return set(_permissions)
-
-    def get_usertype_permissions(self):
-        if self.user_type:
-            return self.user_type.get_permissions()
-        return {}
-
-    def get_all_permissions(self):
-        return {*self.get_permissions(), *self.get_usertype_permissions()}
-
-    def has_perm(self, perm):
-        return perm in self.get_all_permissions()
-
-    def has_perms(self, perm_list):
-        return all(self.has_perm(perm) for perm in perm_list)
-
-    def save(self, *args, **kwargs):
-        if self.user_type:
-            if self.laboratory != self.user_type.laboratory:
-                raise ValidationError( _(f"You must choose a user type existing in '{self.laboratory.name}' laboratory") )
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.laboratory} - {self.user}"
-
-    class Meta:
-        permissions = (('list_labmember', "Can list lab member"),)
-        unique_together = ['user', 'laboratory']
-        verbose_name = _('laboratory member')
-        verbose_name_plural = _('laboratory members')

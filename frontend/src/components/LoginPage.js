@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import Alert from '@mui/material/Alert';
 import Form from 'react-bootstrap/Form';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Collapse from '@mui/material/Collapse';
-import Snackbar from '@mui/material/Snackbar';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import { Formik, ErrorMessage } from 'formik';
@@ -23,12 +20,10 @@ const schema = Yup.object().shape({
 
 export default function LoginPage(props) {
   const { msg, setMsg } = useContext(MsgContext);
-  const { user, setUser } = useContext(UserContext);
-  const { laboratory, setLaboratory } = useContext(LabContext);
+  // const { user, setUser } = useContext(UserContext);
   const { perms, setPerms } = useContext(PermsContext);
   const navigate = useNavigate();
   const nextPage = useLocation().pathname
-  let { labName } = useParams()
 
   const handleSubmit = async (values, { setErrors, setSubmitting }) => {
     let errors = {};
@@ -40,12 +35,8 @@ export default function LoginPage(props) {
       if (status === 200) {
         sessionStorage.setItem("access_token", res.access_token);
         sessionStorage.setItem("refresh_token", res.refresh_token);
-        sessionStorage.setItem("lab_member", JSON.stringify(res.lab_member));
-        setUser(res.lab_member?.user ?? null);
-        setLaboratory(res.lab_member?.laboratory ?? null);
-        setPerms(res?.lab_member?.permissions ?? []);
-        // navigate(0)
-        // res.lab_member ? navigate(0) : null;
+        sessionStorage.setItem("perms", JSON.stringify(res.perms));
+        setPerms(res?.perms ?? []);
       } else {
         errors = {...res}
         console.error(errors);
@@ -58,7 +49,7 @@ export default function LoginPage(props) {
 
   return (
     <Container sx={{py:5}}>
-      <Typography variant='h4'>{ laboratory ? laboratory.name : ( labName ? labName.toUpperCase() : 'SysLab') } Login Page</Typography>
+      <Typography variant='h4'>SysLab Login Page</Typography>
       <Formik
         validationSchema={schema}
         onSubmit={handleSubmit}

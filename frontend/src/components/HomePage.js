@@ -22,18 +22,10 @@ import PatientList from './PatientList';
 import RequirePerms from './RequirePerms';
 
 
-import LabUserTypeList from './LabUserTypeList';
+import UserTypeList from './UserTypeList';
 import ProtocolList from './ProtocolList';
 import UserList from './UserList';
 
-export const LabContext = createContext({
-  laboratory: null,
-  setLaboratory: () => {},
-});
-export const UserContext = createContext({
-  user: null,
-  setUser: () => {},
-});
 export const MsgContext = createContext({
   msg: false,
   setMsg: () => {},
@@ -83,20 +75,9 @@ const Dashboard = (props) => {
 }
 
 export default function HomePage(props) {
-  const [user, setUser] = useState(null);
-  const [laboratory, setLaboratory] = useState(null)
   const [perms, setPerms] = useState(null)
   const [msg, setMsg] = useState(false)
   const [loading, setLoading] = useState(true)
-  const labName = window.location.pathname.split('/').filter((e) => e != '').shift();
-  const userContextValue = useMemo(
-    () => ({ user, setUser }),
-    [user]
-  );
-  const labContextValue = useMemo(
-    () => ({ laboratory, setLaboratory }),
-    [laboratory]
-  );
   const msgContextValue = useMemo(
     () => ({ msg, setMsg }),
     [msg]
@@ -107,18 +88,16 @@ export default function HomePage(props) {
   );
 
   useEffect(() => {
-    login('GET', null, labName, (res, status) => {
-      if (status === 200 && res.lab_member) {
-        JSON.stringify(res.lab_member.user) !== JSON.stringify(user) ? setUser(res.lab_member.user) : null;
-        JSON.stringify(res.lab_member.laboratory) !== JSON.stringify(laboratory) ? setLaboratory(res.lab_member.laboratory) : null;
-        JSON.stringify(res.lab_member.permissions) !== JSON.stringify(perms) ? setPerms(res.lab_member.permissions) : null;
+    login('GET', null, (res, status) => {
+      if (status === 200 && res.user) {
+        JSON.stringify(res.perms) !== JSON.stringify(perms) ? setPerms(res.perms) : null;
       } else {
         res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
         res.detail ? console.error(res.detail) : null;
       }
       setLoading(false);
     })
-  }, [user, laboratory]);
+  });
 
   if (loading) {
     return <p>Loading...</p>
@@ -127,12 +106,9 @@ export default function HomePage(props) {
     <Box sx={{ bgcolor: 'background' }}>
       <Router>
         <MsgContext.Provider value={msgContextValue}>
-        <LabContext.Provider value={labContextValue}>
-        <UserContext.Provider value={userContextValue}>
         <PermsContext.Provider value={permsContextValue}>
           <Routes>
-            <Route index element=<LoginPage/> />
-            <Route path=":labName/" element={user ? <Dashboard/> : <LoginPage/>} >
+            <Route index element={user ? <Dashboard/> : <LoginPage/>} >
               <Route index element={<p>Home Page</p>} />
               <Route path="doctors/" element={<Outlet/>} >
                 <Route index element={<RequirePerms req_perms={['lab.list_doctor']} children=<DoctorList/>/>} />
@@ -144,9 +120,9 @@ export default function HomePage(props) {
                 <Route path="new/" element={<RequirePerms req_perms={['lab.add_healthcareprovider']} children=<HealthcareForm/>/>} />
                 <Route path=":id/" element={<RequirePerms req_perms={['lab.view_healthcareprovider']} children=<HealthcareForm/>/>} />
               </Route>
-              <Route path="lab-users/" element={<Outlet/>} >
-                <Route index element={<RequirePerms req_perms={['accounts.list_labmember']} children=<LabUserList/>/>} />
-                <Route path=":id/" index element={<RequirePerms req_perms={['accounts.view_labmember','accounts.list_labusertype']} children=<LabUserForm/>/>} />
+              <Route path="users/" element={<Outlet/>} >
+                <Route index element={<RequirePerms req_perms={['accounts.list_user']} children=<UserList/>/>} />
+                <Route path=":id/" index element={<RequirePerms req_perms={['accounts.view_user','accounts.list_user']} children=<UserForm/>/>} />
               </Route>
               <Route path="patients/" element={<Outlet/>} >
                 <Route index element={<RequirePerms req_perms={['lab.list_patient']} children=<PatientList/>/>} />
@@ -166,8 +142,6 @@ export default function HomePage(props) {
             </Route>
           </Routes>
         </PermsContext.Provider>
-        </UserContext.Provider>
-        </LabContext.Provider>
         </MsgContext.Provider>
       </Router>
     </Box>

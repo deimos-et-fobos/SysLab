@@ -4,25 +4,7 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import Laboratory, LabMember
-
 User = get_user_model()
-
-class LabMemberChangeForm(forms.ModelForm):
-    class Meta:
-        model = LabMember
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        laboratory_id = self.initial.get('laboratory')
-        user_types = self.fields.get('user_type').queryset.filter(laboratory__id=laboratory_id)
-        self.fields.get('user_type').queryset = user_types
-        self.fields.get('user_type').help_text =_(
-            'You will be able to select a "User Type" once you '
-            'create a new "Lab Member". If you change "Laboratory", '
-            'you will have to save before selecting a new "User Type". '
-            'For this click on "Save and keep editing"')
 
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
@@ -71,11 +53,11 @@ class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
         if User.USERNAME_FIELD == 'email':
-            fields = [User.USERNAME_FIELD, 'password', 'first_name', 'last_name', 'profile_pic',
+            fields = [User.USERNAME_FIELD, 'password', 'first_name', 'last_name', 'profile_pic', 'type',
                       'is_superuser', 'is_staff', 'is_active', 'user_permissions',
                       ]
         else:
-            fields = [User.USERNAME_FIELD, 'password', 'first_name', 'last_name', 'email', 'profile_pic',
+            fields = [User.USERNAME_FIELD, 'password', 'first_name', 'last_name', 'email', 'profile_pic', 'type',
                       'is_superuser', 'is_staff', 'is_active', 'user_permissions',
                       ]
 

@@ -19,8 +19,8 @@ from django.urls import include, path
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('', include('lab.urls')),
+    path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('api/lab/', include('lab.api.urls')),
     path('api/accounts/', include('accounts.api.urls')),

@@ -46,8 +46,8 @@ export class ValidationError extends Error {
   };
 }
 
-export const login = async(method, data, labName, callback) => {
-  const url = `${API_URL}/login/${labName}/`;
+export const login = async(method, data, callback) => {
+  const url = `${API_URL}/login/`;
   await fetchServer(method, url, data, callback);
 }
 
@@ -70,11 +70,9 @@ export const fetchServer = async(method, url, data, callback) => {
   //   headers['X-CSRFToken'] = csrftoken;
   // }
   const accessToken = sessionStorage.getItem('access_token');
-  const lab_member = sessionStorage.getItem('lab_member');
   const refreshToken = url.includes('logout') ? sessionStorage.getItem('refresh_token') : ''
   if (accessToken) {
     headers['Authorization'] =  `Bearer ${accessToken}`;
-    headers['X-Lab-Member'] =  lab_member;
     headers['X-Refresh'] =  refreshToken;
   }
   const requestOptions = {
@@ -112,7 +110,6 @@ export const fetchServer = async(method, url, data, callback) => {
       } else if (response.status === 401) {
         sessionStorage.removeItem("access_token");
         sessionStorage.removeItem("refresh_token");
-        sessionStorage.removeItem("lab_member");
         const loginUrl = `${API_URL}/login/`;
         const currentUrl = encodeURIComponent(window.location.href);  // URL actual
         history.push(`${loginUrl}?next=${currentUrl}`);

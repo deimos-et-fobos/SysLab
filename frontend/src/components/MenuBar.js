@@ -13,8 +13,6 @@ import { logout } from './AuthServer'
 import { LabContext, MsgContext, PermsContext, UserContext } from './HomePage'
 
 export default function MenuBar(props) {
-  const { user, setUser } = useContext(UserContext);
-  const { laboratory, setLaboratory } = useContext(LabContext);
   const { perms, setPerms } = useContext(PermsContext);
   const { msg, setMsg } = useContext(MsgContext);
   const navigate = useNavigate();
@@ -25,9 +23,7 @@ export default function MenuBar(props) {
         const labName = laboratory.slug
         sessionStorage.removeItem("access_token");
         sessionStorage.removeItem("refresh_token");
-        sessionStorage.removeItem("lab_member");
-        setUser(null)
-        setLaboratory(null)
+        sessionStorage.removeItem("perms");
         setPerms(null)
         navigate(`/${labName}/`)
       } else {

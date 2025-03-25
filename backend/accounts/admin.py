@@ -1,28 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.contrib.auth.admin import GroupAdmin, UserAdmin
+from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import Laboratory, LabMember, LabUserType
-from accounts.forms import UserChangeForm, UserCreationForm, LabMemberChangeForm
+from accounts.models import Laboratory, UserType
+from accounts.forms import UserChangeForm, UserCreationForm
 
 User = get_user_model()
-
-class LabInline(admin.TabularInline):
-    model = LabMember
-    extra = 1
-    exclude = ('permissions',)
-    verbose_name = _('laboratory')
-    verbose_name_plural = _('laboratories')
-    # show_change_link = True
-
-class MemberInline(admin.TabularInline):
-    model = LabMember
-    extra = 1
-    exclude = ('permissions',)
-    verbose_name = _('member')
-    verbose_name_plural = _('members')
-
 
 class CustomUserAdmin(UserAdmin):
     # The forms to add and change user instances
@@ -33,12 +17,12 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('__str__', 'full_name', 'is_active')
     if User.USERNAME_FIELD == 'email':
         fieldsets = (
-            (None, {'fields': (User.USERNAME_FIELD,'password', 'first_name', 'last_name', 'profile_pic')}),
+            (None, {'fields': (User.USERNAME_FIELD,'password', 'first_name', 'last_name', 'profile_pic', 'type')}),
             (_('Permissions'), {'fields': ('is_superuser','is_staff','is_active','user_permissions')}),
         )
     else:
         fieldsets = (
-            (None, {'fields': (User.USERNAME_FIELD,'password', 'first_name', 'last_name', 'email', 'profile_pic')}),
+            (None, {'fields': (User.USERNAME_FIELD,'password', 'first_name', 'last_name', 'email', 'profile_pic', 'type')}),
             (_('Permissions'), {'fields': ('is_superuser','is_staff','is_active','user_permissions')}),
         )
     add_fieldsets = (
@@ -51,39 +35,14 @@ class CustomUserAdmin(UserAdmin):
     search_fields = (User.USERNAME_FIELD,)
     ordering = (User.USERNAME_FIELD,)
     filter_horizontal = ()
-    inlines = [LabInline]
     list_filter = ('is_staff', 'is_active', 'is_superuser')
 
 
 class LaboratoryAdmin(admin.ModelAdmin):
     model = Laboratory
     list_display = ('name', 'is_active')
-    inlines = [MemberInline]
 
-
-class LabMemberAdmin(GroupAdmin):
-    model = LabMember
-    form = LabMemberChangeForm #Both create and change forms
-
-    @admin.display(description=_('user type'))
-    def user_type_name(self, obj):
-        if obj.user_type:
-            return f"{obj.user_type.type}"
-
-    list_display = ('user', 'laboratory', 'user_type_name', 'is_active')
-    ordering = ('user', 'laboratory')
-    search_fields = ('user', 'laboratory__name', 'type')
-    list_filter = ('is_active',)
-
-
-class LabUserTypeAdmin(GroupAdmin):
-    model = LabUserType
-    list_display = ('laboratory', 'type', 'is_active')
-    ordering = ('laboratory', 'type')
-    search_fields = ('laboratory__name', 'type')
-    list_filter = ('is_active',)
 
 admin.site.register(Laboratory, LaboratoryAdmin)
-admin.site.register(LabMember, LabMemberAdmin)
-admin.site.register(LabUserType, LabUserTypeAdmin)
+admin.site.register(UserType)
 admin.site.register(User, CustomUserAdmin)
