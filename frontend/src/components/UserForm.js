@@ -9,29 +9,27 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 import { ConfirmDelete, FormCheckBox, FormInput, FormSelectInput, FormSaveCancelButton } from './FormComponents'
-import { MsgContext, PermsContext, UserContext } from './HomePage'
+import { MsgContext, UserContext } from './HomePage'
 import { fetchServer } from './AuthServer'
 import { _hasPerms, getInitialValues } from './utils'
 import UserAvatar from './UserAvatar';
 
-const API_URL = '/api/accounts/lab-users/';
-const USERTYPES_API_URL = '/api/accounts/lab-user-types/';
+const API_URL = '/api/accounts/users/';
+const USERTYPES_API_URL = '/api/accounts/user-types/';
 const REQ_PERMS = {
-  add: ['accounts.add_labmember'],
-  change: ['accounts.change_labmember','accounts.list_labusertype'],
-  delete: ['accounts.delete_labmember'],
+  add: ['accounts.add_customuser'],
+  change: ['accounts.change_customuser','accounts.list_usertype'],
+  delete: ['accounts.delete_customuser'],
 }
 const INITIAL_VALUES = {
-  user: {
-    email: '',
-    first_name: '',
-    last_name: '',
-    profile_pic: '',
-    delete_pic: 'false',
-    photo_url: '',
-  },
+  email: '',
+  first_name: '',
+  last_name: '',
+  profile_pic: '',
+  delete_pic: 'false',
+  photo_url: '',
   is_active: 'true',
-  user_type: '',
+  type: '',
 }
 
 export default function LabUserForm(props) {
@@ -40,11 +38,10 @@ export default function LabUserForm(props) {
   const [initialValues, setInitialValues] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState('');
   const { msg, setMsg } = useContext(MsgContext);
-  const { perms, setPerms } = useContext(PermsContext);
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { id } = useParams();
-  const hasPerms = _hasPerms(perms, REQ_PERMS);
+  const hasPerms = _hasPerms(user.permissions, REQ_PERMS);
   const disabled = (id && !hasPerms.change) || (!id && !hasPerms.add)
 
   useEffect(() => {
@@ -57,18 +54,16 @@ export default function LabUserForm(props) {
       }
     });
     getInitialValues(API_URL, id, INITIAL_VALUES, setMsg, setInitialValues)
-    setAvatarPreview(initialValues?.user?.photo_url);
+    setAvatarPreview(initialValues?.photo_url);
   }, []);
 
   const schema = Yup.object().shape({
-    user: Yup.object().shape({
-      email: Yup.string().max(255, 'Too long. 255 characters maximum').email('Invalid email').required('Email is required'),
-      first_name: Yup.string().max(150, 'Too long. 150 characters maximum').nullable(),
-      last_name: Yup.string().max(150, 'Too long. 150 characters maximum').nullable(),
-      profile_pic: Yup.mixed().nullable(),
-      delete_pic: Yup.boolean().nullable(),
-    }),
-    user_type: Yup.string(),
+    email: Yup.string().max(255, 'Too long. 255 characters maximum').email('Invalid email').required('Email is required'),
+    first_name: Yup.string().max(150, 'Too long. 150 characters maximum').nullable(),
+    last_name: Yup.string().max(150, 'Too long. 150 characters maximum').nullable(),
+    profile_pic: Yup.mixed().nullable(),
+    delete_pic: Yup.boolean().nullable(),
+    type: Yup.string().nullable(),
     is_active: Yup.boolean(),
   });
 
@@ -77,17 +72,17 @@ export default function LabUserForm(props) {
     let url = id ? API_URL + `${id}/` : API_URL;
     let method = id ? 'PUT' : 'POST';
     let data = { ...values, multipart: true }
-    typeof(data.user.profile_pic) === 'string' ? delete data.user.profile_pic : null;
+    typeof(data.profile_pic) === 'string' ? delete data.profile_pic : null;
     fetchServer(method, url, data, (res, status) => {
       if (status === 200 || status === 201) {
         setMsg({msg: `Successfully ${ id ? 'updated' : 'created'}!`, severity: 'success'});
-        if (data.user.delete_pic) { 
-          setInitialValues({...initialValues, user:{...initialValues.user, photo_url:''}});
-          setFieldValue('user.delete_pic', false);
+        if (data.delete_pic) { 
+          setInitialValues({...initialValues, photo_url:''});
+          setFieldValue('delete_pic', false);
           setAvatarPreview('');
         }
         // This will force to fetch the server from Homepage component
-        if ( user.id === initialValues.user.id ) {setUser({...user, values})}
+        if ( user.id === initialValues.id ) {setUser({...user, values})}
         method === 'POST' ? navigate('../') : null;
       } else {
         errors = {...res}
@@ -137,64 +132,64 @@ export default function LabUserForm(props) {
               <FormInput label='Email'
                 className='col-md-12'
                 type='email'
-                name='user.email'
-                value={values.user.email}
+                name='email'
+                value={values.email}
                 onChange={handleChange}
-                error={errors.user ? errors.user.email : null}
+                error={errors ? errors.email : null}
                 disabled={disabled}
                 required
               />
               <FormInput label='First name'
                 className='col-md-6'
                 type='text'
-                name='user.first_name'
-                value={values.user.first_name}
+                name='first_name'
+                value={values.first_name}
                 onChange={handleChange}
-                error={errors.user ? errors.user.first_name : null}
+                error={errors ? errors.first_name : null}
                 disabled={disabled}
               />
               <FormInput label='Last name'
                 className='col-md-6'
                 type='text'
-                name='user.last_name'
-                value={values.user.last_name}
+                name='last_name'
+                value={values.last_name}
                 onChange={handleChange}
-                error={errors.user ? errors.user.last_name : null}
+                error={errors ? errors.last_name : null}
                 disabled={disabled}
               />
               <div className='col-md-4 d-flex justify-content-center'>
-                <UserAvatar sx={{width: 200, height: 200}} src={avatarPreview || initialValues?.user.photo_url }></UserAvatar>
+                <UserAvatar sx={{width: 200, height: 200}} src={avatarPreview || initialValues?.photo_url }></UserAvatar>
               </div>
               <div className='col-md-8'>
                 <FormInput label='Profile Picture'
                   className='col'
                   type='file'
                   accept='image/*'
-                  name='user.profile_pic'
+                  name='profile_pic'
                   onChange={(e) => {
                     let file = e.target.files[0]
-                    setAvatarPreview( file ? URL.createObjectURL(file) : initialValues?.user.photo_url );
-                    setFieldValue('user.profile_pic',file);
+                    setAvatarPreview( file ? URL.createObjectURL(file) : initialValues?.photo_url );
+                    setFieldValue('profile_pic',file);
                   }}
-                  error={errors.user ? errors.user.profile_pic : null}
+                  error={errors ? errors.profile_pic : null}
                   disabled={disabled}
                 />
                 <FormCheckBox label='Delete profile picture'
                   className='col'
                   type='checkbox'
-                  name='user.delete_pic'
-                  value={values.user.delete_pic}
+                  name='delete_pic'
+                  value={values.delete_pic}
                   onChange={handleChange}
-                  error={errors.user ? errors.user.delete_pic : null}
+                  error={errors ? errors.delete_pic : null}
                   disabled={disabled}
                 />
                 <FormSelectInput label='User Type'
                   className='col'
-                  name='user_type'
-                  value={values.user_type}
+                  name='type'
+                  value={values.type}
                   choices={userTypes}
                   onChange={handleChange}
-                  error={errors.user_type}
+                  error={errors.type}
                   disabled={disabled}
                 />
                 <FormCheckBox label='Is active?'

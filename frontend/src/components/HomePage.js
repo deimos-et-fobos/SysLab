@@ -11,8 +11,8 @@ import HealthcareForm from './HealthcareForm';
 import HealthcareList from './HealthcareList';
 import LabTestForm from './LabTestForm';
 import LabTestList from './LabTestList';
-import LabUserList from './LabUserList';
-import LabUserForm from './LabUserForm';
+import UserList from './UserList';
+import UserForm from './UserForm';
 import LoginPage from './LoginPage';
 import Menu from './Menu';
 import MenuBar from './MenuBar';
@@ -24,15 +24,14 @@ import RequirePerms from './RequirePerms';
 
 import UserTypeList from './UserTypeList';
 import ProtocolList from './ProtocolList';
-import UserList from './UserList';
 
 export const MsgContext = createContext({
   msg: false,
   setMsg: () => {},
 });
-export const PermsContext = createContext({
-  perms: null,
-  setPerms: () => {},
+export const UserContext = createContext({
+  user: null,
+  setUser: () => {},
 });
 
 const Dashboard = (props) => {
@@ -75,22 +74,22 @@ const Dashboard = (props) => {
 }
 
 export default function HomePage(props) {
-  const [perms, setPerms] = useState(null)
+  const [user, setUser] = useState(null)
   const [msg, setMsg] = useState(false)
   const [loading, setLoading] = useState(true)
   const msgContextValue = useMemo(
     () => ({ msg, setMsg }),
     [msg]
   );
-  const permsContextValue = useMemo(
-    () => ({ perms, setPerms }),
-    [perms]
+  const userContextValue = useMemo(
+    () => ({ user, setUser }),
+    [user]
   );
 
   useEffect(() => {
     login('GET', null, (res, status) => {
       if (status === 200 && res.user) {
-        JSON.stringify(res.perms) !== JSON.stringify(perms) ? setPerms(res.perms) : null;
+        JSON.stringify(res.user) !== JSON.stringify(user) ? setUser(res.user) : null;
       } else {
         res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
         res.detail ? console.error(res.detail) : null;
@@ -106,10 +105,10 @@ export default function HomePage(props) {
     <Box sx={{ bgcolor: 'background' }}>
       <Router>
         <MsgContext.Provider value={msgContextValue}>
-        <PermsContext.Provider value={permsContextValue}>
+        <UserContext.Provider value={userContextValue}>
           <Routes>
-            <Route index element={user ? <Dashboard/> : <LoginPage/>} >
-              <Route index element={<p>Home Page</p>} />
+            <Route element={user ? <Dashboard/> : <LoginPage/>} >
+              <Route index element={<p>Welcome to SysLab DashBoard</p>} />
               <Route path="doctors/" element={<Outlet/>} >
                 <Route index element={<RequirePerms req_perms={['lab.list_doctor']} children=<DoctorList/>/>} />
                 <Route path="new/" element={<RequirePerms req_perms={['lab.add_doctor']} children=<DoctorForm/>/>} />
@@ -121,8 +120,8 @@ export default function HomePage(props) {
                 <Route path=":id/" element={<RequirePerms req_perms={['lab.view_healthcareprovider']} children=<HealthcareForm/>/>} />
               </Route>
               <Route path="users/" element={<Outlet/>} >
-                <Route index element={<RequirePerms req_perms={['accounts.list_user']} children=<UserList/>/>} />
-                <Route path=":id/" index element={<RequirePerms req_perms={['accounts.view_user','accounts.list_user']} children=<UserForm/>/>} />
+                <Route index element={<RequirePerms req_perms={['accounts.list_customuser']} children=<UserList/>/>} />
+                <Route path=":id/" index element={<RequirePerms req_perms={['accounts.view_customuser','accounts.list_customuser']} children=<UserForm/>/>} />
               </Route>
               <Route path="patients/" element={<Outlet/>} >
                 <Route index element={<RequirePerms req_perms={['lab.list_patient']} children=<PatientList/>/>} />
@@ -136,12 +135,12 @@ export default function HomePage(props) {
                 <Route path=":id/" element={<RequirePerms req_perms={['lab.view_labtest']} children=<LabTestForm/>/>} />
               </Route>
 
-              // <Route path="lab-user-types/" element={<LabUserTypeList/>} />
-              // <Route path="lab-user-types/new/" element={<LoginPage/>} />
+              // <Route path="user-types/" element={<UserTypeList/>} />
+              // <Route path="user-types/new/" element={<LoginPage/>} />
               // <Route path="protocols/" element={<ProtocolList/>} />
             </Route>
           </Routes>
-        </PermsContext.Provider>
+        </UserContext.Provider>
         </MsgContext.Provider>
       </Router>
     </Box>

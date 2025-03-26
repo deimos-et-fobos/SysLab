@@ -10,22 +10,20 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import { logout } from './AuthServer'
-import { LabContext, MsgContext, PermsContext, UserContext } from './HomePage'
+import { MsgContext, UserContext } from './HomePage'
 
 export default function MenuBar(props) {
-  const { perms, setPerms } = useContext(PermsContext);
+  const { user, setUser } = useContext(UserContext);
   const { msg, setMsg } = useContext(MsgContext);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     logout((res, status) => {
       if (status === 200) {
-        const labName = laboratory.slug
         sessionStorage.removeItem("access_token");
         sessionStorage.removeItem("refresh_token");
-        sessionStorage.removeItem("perms");
-        setPerms(null)
-        navigate(`/${labName}/`)
+        setUser(null)
+        navigate(`/`)
       } else {
         res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
         res.detail ? console.error(res.detail) : null;
@@ -54,9 +52,6 @@ export default function MenuBar(props) {
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          {laboratory.name}
-        </Typography>
         {user ?
           <div>
             <Tooltip title={`${user.first_name} ${user.last_name}`}>

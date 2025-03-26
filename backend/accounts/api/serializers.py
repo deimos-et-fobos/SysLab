@@ -37,21 +37,43 @@ class UserTypeSerializer(serializers.ModelSerializer):
         fields = ('type')
 
 class UserSerializer(serializers.ModelSerializer):
+    type = serializers.SlugRelatedField(queryset=UserType.objects.all(), slug_field='type', allow_null=True)
     photo_url = serializers.SerializerMethodField()
-    type = UserTypeSerializer
+    permissions = serializers.SerializerMethodField()
+    delete_pic = serializers.BooleanField(default=False)
+    profile_pic = serializers.ImageField(allow_null=True, required=False)
     
     class Meta:
         model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'photo_url', 'type')
+        fields = ('id', 'email', 'first_name', 'last_name', 'photo_url', 'profile_pic', 'delete_pic', 'type', 'permissions', 'is_active')
 
     def get_photo_url(self, user):
         request = self.context.get('request')
         if user.profile_pic and hasattr(user.profile_pic, 'url'):
-           photo_url = user.profile_pic.url
-           return request.build_absolute_uri(photo_url)
-        else:
-           return None
+            photo_url = user.profile_pic.url
+            if photo_url:
+                    return request.build_absolute_uri(photo_url)
+        return None
 
+    def get_permissions(self, obj):
+        return obj.get_all_permissions()
+    
+    def update(self, instance, validated_data):
+        print('que obda')
+        data = validated_data
+        email = data.get('email')
+        user = User.objects.filter(email=email).first()
+        if user != instance:
+            raise serializers.ValidationError({'user': {'email': _('There is already another user with this email.')}})
+        if ('profile_pic' in data) and not data.get('profile_pic'):
+            data.pop('profile_pic')
+        if ('delete_pic' in data) and data.get('delete_pic'):
+            data['profile_pic'] = None
+        for attr, value in data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+    
 class UserUpdateSerializer(UserSerializer):
     delete_pic = serializers.BooleanField(default=False)
     profile_pic = serializers.ImageField(allow_null=True, required=False)

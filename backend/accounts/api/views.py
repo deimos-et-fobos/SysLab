@@ -17,8 +17,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from accounts.api.permissions import ListCreatePermission, RetrieveUpdateDestroyPermission
 from accounts.api.serializers import (  LoginSerializer, 
-                                        UserSerializer,
-                                        CustomTokenObtainPairSerializer )
+                                        UserSerializer )
 
 User = get_user_model()
 
@@ -30,11 +29,8 @@ class LoginView(APIView):
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return Response({'user': None, 'perms': []}, status=status.HTTP_200_OK)
-        return Response({   
-            'user': request.user.email,
-            'perms': request.user.get_all_permissions()
-            }, status=status.HTTP_200_OK)
+            return Response({'user': None}, status=status.HTTP_200_OK)
+        return Response({'user': UserSerializer(request.user).data}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         try:
@@ -45,7 +41,6 @@ class LoginView(APIView):
             return Response({
                 "access_token": str(refresh.access_token),
                 "refresh_token": str(refresh),
-                'perms': user.get_all_permissions(),
                 }, status=status.HTTP_200_OK)
         except Exception:
             return Response({"detail": "Bad credentials."}, status=status.HTTP_400_BAD_REQUEST)

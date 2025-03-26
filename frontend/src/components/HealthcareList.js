@@ -5,7 +5,7 @@ import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 
 import AddButton from './AddButton';
 import ListComponent from './ListComponent';
-import { PermsContext } from './HomePage';
+import { UserContext } from './HomePage';
 import { _hasPerms, getActionButtons } from './utils';
 
 const API_URL = '/api/lab/healthcare/'
@@ -17,8 +17,8 @@ const REQ_PERMS = {
 
 export default function HealthcareList(props) {
   const [open, setOpen] = useState({status: false, id: null});
-  const { perms, setPerms } = useContext(PermsContext);
-  const hasPerms = _hasPerms(perms, REQ_PERMS);
+  const { user, setUser } = useContext(UserContext);
+  const hasPerms = _hasPerms(user.permissions, REQ_PERMS);
   
   const columns = [
     { field: 'name', headerName: 'Nombre', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getName},

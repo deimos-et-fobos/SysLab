@@ -5,7 +5,7 @@ import BiotechIcon from '@mui/icons-material/Biotech';
 
 import AddButton from './AddButton';
 import ListComponent from './ListComponent';
-import { PermsContext } from './HomePage';
+import { UserContext } from './HomePage';
 import { _hasPerms, getActionButtons } from './utils';
 
 const API_URL = '/api/lab/lab-tests/'
@@ -17,8 +17,8 @@ const REQ_PERMS = {
 
 export default function LabTestList(props) {
   const [open, setOpen] = useState({status: false, id: null});
-  const { perms, setPerms } = useContext(PermsContext);
-  const hasPerms = _hasPerms(perms, REQ_PERMS);
+  const { user, setUser } = useContext(UserContext);
+  const hasPerms = _hasPerms(user.permissions, REQ_PERMS);
   
   const columns = [
     { field: 'code', headerName: 'Código', minWidth: 150, flex: 1, align:'center', headerAlign:'center', renderCell: getCode},

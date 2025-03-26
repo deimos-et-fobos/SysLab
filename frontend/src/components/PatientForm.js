@@ -9,7 +9,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 import { ConfirmDelete, FormDatalist, FormInput, FormSelectInput, FormSaveCancelButton } from './FormComponents'
-import { MsgContext, PermsContext } from './HomePage'
+import { MsgContext, UserContext } from './HomePage'
 import { fetchServer } from './AuthServer'
 import { _hasPerms, getInitialValues } from './utils'
 
@@ -42,10 +42,10 @@ export default function PatientForm(props) {
   const [healthcareProviders, setHealthcareProviders] = useState([]);
   const [initialValues, setInitialValues] = useState(null);
   const { msg, setMsg } = useContext(MsgContext);
-  const { perms, setPerms } = useContext(PermsContext);
+  const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { id } = useParams();
-  const hasPerms = _hasPerms(perms, REQ_PERMS);
+  const hasPerms = _hasPerms(user.permsissions, REQ_PERMS);
   const disabled = (id && !hasPerms.change) || (!id && !hasPerms.add)
 
   useEffect(() => {

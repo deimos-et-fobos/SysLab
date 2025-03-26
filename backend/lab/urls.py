@@ -29,4 +29,5 @@ urlpatterns = [
     path('protocols/new/', index),
     path('users/', index),
     path('users/new/', index),
+    path('users/<int:id>/', index),
 ]

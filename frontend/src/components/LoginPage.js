@@ -10,7 +10,7 @@ import * as Yup from 'yup';
 
 import { login } from './AuthServer'
 import { FormInput } from './FormComponents'
-import { LabContext, MsgContext, PermsContext, UserContext } from './HomePage'
+import { MsgContext, UserContext } from './HomePage'
 import Message from './Message'
 
 const schema = Yup.object().shape({
@@ -20,8 +20,7 @@ const schema = Yup.object().shape({
 
 export default function LoginPage(props) {
   const { msg, setMsg } = useContext(MsgContext);
-  // const { user, setUser } = useContext(UserContext);
-  const { perms, setPerms } = useContext(PermsContext);
+  const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const nextPage = useLocation().pathname
 
@@ -31,12 +30,11 @@ export default function LoginPage(props) {
       email: values.email, 
       password: values.password,
     }
-    login('POST', data, labName, (res, status) => {
+    login('POST', data, (res, status) => {
       if (status === 200) {
         sessionStorage.setItem("access_token", res.access_token);
         sessionStorage.setItem("refresh_token", res.refresh_token);
-        sessionStorage.setItem("perms", JSON.stringify(res.perms));
-        setPerms(res?.perms ?? []);
+        setUser(res.user);
       } else {
         errors = {...res}
         console.error(errors);

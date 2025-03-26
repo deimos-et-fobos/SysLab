@@ -1,11 +1,11 @@
 import React, { useContext } from 'react'
 import { Typography } from '@mui/material';
 
-import { PermsContext, UserContext } from './HomePage'
+import { UserContext } from './HomePage'
 
 export default function RequirePerms(props) {
-  const { perms, setPerms } = useContext(PermsContext);
-  const hasPerms = props.req_perms.every( perm => perms.includes(perm))
+  const { user, setUser } = useContext(UserContext);
+  const hasPerms = props.req_perms.every( perm => user.permissions.includes(perm))
   const msg = ''
   return hasPerms
     ? props.children

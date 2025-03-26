@@ -5,38 +5,38 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 
 import AddButton from './AddButton';
 import ListComponent from './ListComponent';
-import { PermsContext } from './HomePage';
+import { UserContext } from './HomePage';
 import UserAvatar from './UserAvatar';
 import { _hasPerms, getActionButtons } from './utils';
 
-const API_URL = '/api/accounts/lab-users/';
+const API_URL = '/api/accounts/users/';
 const REQ_PERMS = {
-  add: ['accounts.add_labmember'],
-  change: ['accounts.change_labmember'],
-  delete: ['accounts.delete_labmember'],
+  add: ['accounts.add_customuser'],
+  change: ['accounts.change_customuser'],
+  delete: ['accounts.delete_customuser'],
 }
 
 export default function PatientList(props) {
   const [open, setOpen] = useState({status: false, id: null});
-  const { perms, setPerms } = useContext(PermsContext);
-  const hasPerms = _hasPerms(perms, REQ_PERMS);
+  const { user, setUser } = useContext(UserContext);
+  const hasPerms = _hasPerms(user.permissions, REQ_PERMS);
 
   const columns = [
     { field: 'avatar', headerName: '', minWidth: 50, flex: 1, align:'center', headerAlign:'center', renderCell: getAvatar },
     { field: 'email', headerName: 'Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getEmail },
     { field: 'full_name', headerName: 'Nombre', minWidth: 200, flex: 2, align:'center', headerAlign:'center', valueGetter: getFullName },
-    { field: 'user_type', headerName: 'Tipo de Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', valueGetter: getUserType },
+    { field: 'type.type', headerName: 'Tipo de Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', valueGetter: getUserType },
     { field: 'is_active', headerName: 'Activo', minWidth: 100, flex: 1, align:'center', headerAlign:'center', type:'boolean', editable:'true'},
     { field: 'actions', type: 'actions', getActions: getActions}
   ];
 
   function getAvatar(params) {
-    const fullName = `${params.row.user.first_name || ''} ${params.row.user.last_name || ''}`;
-    return <UserAvatar sx={{}} alt={fullName} src={params.row.user.photo_url}>{fullName}</UserAvatar>
+    const fullName = `${params.row.first_name || ''} ${params.row.last_name || ''}`;
+    return <UserAvatar sx={{}} alt={fullName} src={params.row.photo_url}>{fullName}</UserAvatar>
   }
 
   function getEmail(params) {
-    const email = `${params.row.user.email}`;
+    const email = `${params.row.email}`;
     return (!hasPerms.change) ? email :
       <Link
         component={RouterLink}
@@ -49,11 +49,11 @@ export default function PatientList(props) {
   }
 
   function getFullName(params) {
-    return `${params.row.user.first_name || ''} ${params.row.user.last_name || ''}`;
+    return `${params.row.first_name || ''} ${params.row.last_name || ''}`;
   }
 
   function getUserType(params) {
-    return params.row.user_type ? params.row.user_type : '- - -';
+    return params.row.type ? params.row.type.type : '- - -';
   }
 
 
