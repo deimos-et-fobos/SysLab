@@ -30,7 +30,7 @@ class LoginView(APIView):
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return Response({'user': None}, status=status.HTTP_200_OK)
-        return Response({'user': UserSerializer(request.user).data}, status=status.HTTP_200_OK)
+        return Response({'user': UserSerializer(request.user, context={"request": request}).data}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         try:

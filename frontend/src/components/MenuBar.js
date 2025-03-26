@@ -52,6 +52,9 @@ export default function MenuBar(props) {
         >
           <MenuIcon />
         </IconButton>
+        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          {user.first_name} {user.last_name}
+        </Typography>
         {user ?
           <div>
             <Tooltip title={`${user.first_name} ${user.last_name}`}>

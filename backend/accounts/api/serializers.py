@@ -50,16 +50,14 @@ class UserSerializer(serializers.ModelSerializer):
     def get_photo_url(self, user):
         request = self.context.get('request')
         if user.profile_pic and hasattr(user.profile_pic, 'url'):
-            photo_url = user.profile_pic.url
-            if photo_url:
-                    return request.build_absolute_uri(photo_url)
+           photo_url = user.profile_pic.url
+           return request.build_absolute_uri(photo_url)
         return None
 
     def get_permissions(self, obj):
         return obj.get_all_permissions()
     
     def update(self, instance, validated_data):
-        print('que obda')
         data = validated_data
         email = data.get('email')
         user = User.objects.filter(email=email).first()

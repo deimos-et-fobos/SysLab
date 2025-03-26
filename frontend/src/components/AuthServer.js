@@ -87,17 +87,18 @@ export const fetchServer = async(method, url, data, callback) => {
     if (response.status === 401) {
       // Si el token está vencido (401), intentar renovar el token
       console.log('Token expirado, intentando renovar...');
+      const refreshToken = sessionStorage.getItem('refresh_token')
       const newTokenResponse = await fetch(`${API_URL}/token-refresh/`, {  // Endpoint para renovar el token
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${refreshToken}`,
         },
+        body: JSON.stringify({ refresh: refreshToken })
       });
-
+      
       if (newTokenResponse.ok) {
         const newTokenData = await newTokenResponse.json();
-        const newAccessToken = newTokenData.access_token;
+        const newAccessToken = newTokenData.access;
         sessionStorage.setItem('access_token', newAccessToken); // Almacenar el nuevo token en sessionStorage
 
         // Reintentar la solicitud original con el nuevo token
@@ -110,10 +111,7 @@ export const fetchServer = async(method, url, data, callback) => {
       } else if (response.status === 401) {
         sessionStorage.removeItem("access_token");
         sessionStorage.removeItem("refresh_token");
-        const loginUrl = `${API_URL}/login/`;
-        const currentUrl = encodeURIComponent(window.location.href);  // URL actual
-        history.push(`${loginUrl}?next=${currentUrl}`);
-        // window.location.href = `${loginUrl}?next=${currentUrl}`;  // Redirigir al login con el parámetro next
+        window.location.reload();
         return;
       } else {
         throw new Error('No se pudo renovar el token');
