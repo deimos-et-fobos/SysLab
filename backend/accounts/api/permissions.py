@@ -2,19 +2,58 @@ from django.contrib.auth import get_user_model
 from rest_framework import permissions
 
 User = get_user_model()
-    
-class ListCreatePermission(permissions.DjangoModelPermissions):
-    def __init__(self):
-        self.perms_map['GET'] = ['%(app_label)s.list_%(model_name)s']
 
-    def has_permission(self, request, view):
-        if not request.user.is_authenticated:
-            return False
-        queryset = self._queryset(view)
-        perms = self.get_required_permissions(request.method, queryset.model)
-        return request.user.has_perms(perms)
+REQ_PERMS = {
+    "doctor": {
+        "add": ["lab.add_doctor"],
+        "change": ["lab.change_doctor"],
+        "delete": ["lab.delete_doctor"],
+        "view": ["lab.view_doctor"],
+    },
+    "labtest": {
+        "add": ["lab.add_labtest", "lab.list_labtest", "lab.list_labtestgroup"],
+        "change": ["lab.change_labtest", "lab.list_labtest", "lab.list_labtestgroup"],
+        "delete": ["lab.delete_labtest","asdf"],
+        "view": ["lab.view_labtest"],
+    },
+    "healthcareprovider": {
+        "add": ["lab.add_healthcareprovider"],
+        "change": ["lab.change_healthcareprovider"],
+        "delete": ["lab.delete_healthcareprovider"],
+        "view": ["lab.view_healthcareprovider"],
+    },
+    "patient": {
+        "add": ["lab.add_patient", "lab.list_healthcareprovider"],
+        "change": ["lab.change_patient", "lab.list_healthcareprovider"],
+        "delete": ["lab.delete_patient"],
+        "view": ["lab.view_patient"],
+    },
+    "user": {
+        "add": ["accounts.add_customuser"],
+        "change": ["accounts.change_customuser", "accounts.list_usertype"],
+        "delete": ["accounts.delete_customuser"],
+        "view": ["accounts.view_customuser"],
+    },
+    "usertype": {
+        "add": ["lab.add_usertype"],
+        "change": ["lab.change_usertype"],
+        "delete": ["lab.delete_usertype"],
+        "view": ["lab.view_usertype"],
+    }
+}
 
-class RetrieveUpdateDestroyPermission(permissions.DjangoModelPermissions):
+# class ListCreatePermission(permissions.DjangoModelPermissions):
+#     def __init__(self):
+#         self.perms_map['GET'] = ['%(app_label)s.list_%(model_name)s']
+
+#     def has_permission(self, request, view):
+#         if not request.user.is_authenticated:
+#             return False
+#         queryset = self._queryset(view)
+#         perms = self.get_required_permissions(request.method, queryset.model)
+#         return request.user.has_perms(perms)
+
+class CreateRetrieveUpdateDestroyPermission(permissions.DjangoModelPermissions):
     def __init__(self):
         self.perms_map['GET'] = ['%(app_label)s.view_%(model_name)s']
 

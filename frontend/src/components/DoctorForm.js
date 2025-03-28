@@ -11,14 +11,9 @@ import * as Yup from 'yup';
 import { ConfirmDelete, FormInput, FormSaveCancelButton } from './FormComponents'
 import { MsgContext, UserContext } from './HomePage'
 import { fetchServer } from './AuthServer'
-import { _hasPerms, getInitialValues } from './utils'
+import { _hasPerms, getInitialValues, handleFormErrors } from './utils'
 
 const API_URL = '/api/lab/doctors/';
-const REQ_PERMS = {
-  add: ['lab.add_doctor'],
-  change: ['lab.change_doctor'],
-  delete: ['lab.delete_doctor'],
-}
 const INITIAL_VALUES = {
   first_name: '',
   last_name: '',
@@ -26,15 +21,14 @@ const INITIAL_VALUES = {
   speciality: '',
 }
 
-export default function PatientForm(props) {
+export default function PatientForm({ hasPerms }) {
   const [open, setOpen] = useState(false)
   const [initialValues, setInitialValues] = useState(null);
   const { msg, setMsg } = useContext(MsgContext);
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { id } = useParams();
-  const hasPerms = _hasPerms(user.permissions, REQ_PERMS);
-  const disabled = (id && !hasPerms.change) || (!id && !hasPerms.add)
+  const noEditable = (id && !hasPerms.change) || (!id && !hasPerms.add)
 
   useEffect(() => {
     getInitialValues(API_URL, id, INITIAL_VALUES, setMsg, setInitialValues)
@@ -56,10 +50,7 @@ export default function PatientForm(props) {
         setMsg({msg: `Successfully ${ id ? 'updated' : 'created'}!`, severity: 'success'});
         method === 'POST' ? navigate('../') : null;
       } else {
-        errors = {...res}
-        console.error(errors);
-        setMsg({msg: errors.non_field_errors || '' + errors.detail || '', severity:'error'});
-        setErrors(errors)
+        handleFormErrors(res, setErrors, setMsg)
       }
     })
   }
@@ -106,7 +97,7 @@ export default function PatientForm(props) {
                 value={values.first_name}
                 onChange={handleChange}
                 error={errors.first_name}
-                disabled={disabled}
+                disabled={noEditable}
                 required
               />
               <FormInput label='Last name'
@@ -116,7 +107,7 @@ export default function PatientForm(props) {
                 value={values.last_name}
                 onChange={handleChange}
                 error={errors.last_name}
-                disabled={disabled}
+                disabled={noEditable}
                 required
               />
               <FormInput label='License'
@@ -126,7 +117,7 @@ export default function PatientForm(props) {
                 value={values.medical_license}
                 onChange={handleChange}
                 error={errors.medical_license}
-                disabled={disabled}
+                disabled={noEditable}
                 required
               />
               <FormInput label='Specialty'
@@ -136,7 +127,7 @@ export default function PatientForm(props) {
                 value={values.specialty}
                 onChange={handleChange}
                 error={errors.specialty}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormSaveCancelButton
                 hasPerms={hasPerms}

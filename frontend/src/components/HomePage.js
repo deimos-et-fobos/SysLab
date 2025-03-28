@@ -110,34 +110,34 @@ export default function HomePage(props) {
             <Route element={user ? <Dashboard/> : <LoginPage/>} >
               <Route index element={<p>Welcome to SysLab DashBoard</p>} />
               <Route path="doctors/" element={<Outlet/>} >
-                <Route index element={<RequirePerms req_perms={['lab.list_doctor']} children=<DoctorList/>/>} />
-                <Route path="new/" element={<RequirePerms req_perms={['lab.add_doctor']} children=<DoctorForm/>/>} />
-                <Route path=":id/" element={<RequirePerms req_perms={['lab.view_doctor']} children=<DoctorForm/>/>} />
+                <Route index element={<RequirePerms entity='doctor' children={<DoctorList/>}/>} />
+                <Route path="new/" element={<RequirePerms entity='doctor' children={<DoctorForm/>}/>} />
+                <Route path=":id/" element={<RequirePerms entity='doctor' children={<DoctorForm/>}/>} />
               </Route>
               <Route path="healthcare/" element={<Outlet/>} >
-                <Route index element={<RequirePerms req_perms={['lab.list_healthcareprovider']} children=<HealthcareList/>/>} />
-                <Route path="new/" element={<RequirePerms req_perms={['lab.add_healthcareprovider']} children=<HealthcareForm/>/>} />
-                <Route path=":id/" element={<RequirePerms req_perms={['lab.view_healthcareprovider']} children=<HealthcareForm/>/>} />
+                <Route index element={<RequirePerms entity='healthcareprovider' children={<HealthcareList/>}/>} />
+                <Route path="new/" element={<RequirePerms entity='healthcareprovider' children={<HealthcareForm/>}/>} />
+                <Route path=":id/" element={<RequirePerms entity='healthcareprovider' children={<HealthcareForm/>}/>} />
               </Route>
               <Route path="users/" element={<Outlet/>} >
-                <Route index element={<RequirePerms req_perms={['accounts.list_customuser']} children=<UserList/>/>} />
-                <Route path=":id/" index element={<RequirePerms req_perms={['accounts.view_customuser','accounts.list_customuser']} children=<UserForm/>/>} />
+                <Route index element={<RequirePerms entity='user' children={<UserList/>}/>} />
+                <Route path=":id/" element={<RequirePerms entity='user' children={<UserForm/>}/>} />
               </Route>
               <Route path="patients/" element={<Outlet/>} >
-                <Route index element={<RequirePerms req_perms={['lab.list_patient']} children=<PatientList/>/>} />
-                <Route path="new/" element={<RequirePerms req_perms={['lab.add_patient','lab.list_healthcareprovider']} children=<PatientForm/>/>} />
-                <Route path=":id/" element={<RequirePerms req_perms={['lab.view_patient']} children=<PatientForm/>/>} />
+                <Route index element={<RequirePerms entity='patient' children={<PatientList/>}/>} />
+                <Route path="new/" element={<RequirePerms entity='patient' children={<PatientForm/>}/>} />
+                <Route path=":id/" element={<RequirePerms entity='patient' children={<PatientForm/>}/>} />
               </Route>
 
               <Route path="lab-tests/" element={<Outlet/>} >
-                <Route index element={<RequirePerms req_perms={['lab.list_labtest']} children=<LabTestList/>/>} />
-                <Route path="new/" element={<RequirePerms req_perms={['lab.add_labtest','lab.list_labtest','lab.list_labtestgroup']} children=<LabTestForm/>/>} />
-                <Route path=":id/" element={<RequirePerms req_perms={['lab.view_labtest']} children=<LabTestForm/>/>} />
+                <Route index element={<RequirePerms entity='labtest' children={<LabTestList/>}/>} />
+                <Route path="new/" element={<RequirePerms entity='labtest' children={<LabTestForm/>}/>} />
+                <Route path=":id/" element={<RequirePerms entity='labtest' children={<LabTestForm/>}/>} />
               </Route>
 
-              // <Route path="user-types/" element={<UserTypeList/>} />
-              // <Route path="user-types/new/" element={<LoginPage/>} />
-              // <Route path="protocols/" element={<ProtocolList/>} />
+              <Route path="user-types/" element={<UserTypeList/>} />
+              <Route path="user-types/new/" element={<LoginPage/>} />
+              <Route path="protocols/" element={<ProtocolList/>} /> 
             </Route>
           </Routes>
         </UserContext.Provider>

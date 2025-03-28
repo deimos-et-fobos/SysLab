@@ -11,26 +11,20 @@ import * as Yup from 'yup';
 import { ConfirmDelete, FormInput, FormSaveCancelButton } from './FormComponents'
 import { MsgContext, UserContext } from './HomePage'
 import { fetchServer } from './AuthServer'
-import { _hasPerms, getInitialValues } from './utils';
+import { _hasPerms, getInitialValues, handleFormErrors } from './utils';
 
 const API_URL = '/api/lab/healthcare/';
-const REQ_PERMS = {
-  add: ['lab.add_healthcareprovider'],
-  change: ['lab.change_healthcareprovider'],
-  delete: ['lab.delete_healthcareprovider'],
-}
 const INITIAL_VALUES = {
   name: '',
 }
 
-export default function PatientForm(props) {
+export default function PatientForm({ hasPerms }) {
   const [open, setOpen] = useState(false)
   const [initialValues, setInitialValues] = useState(null);
   const { msg, setMsg } = useContext(MsgContext);
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { id } = useParams();
-  const hasPerms = _hasPerms(user.permissions, REQ_PERMS);
   const noEditable = (id && !hasPerms.change) || (!id && !hasPerms.add)
 
   useEffect(() => {
@@ -50,10 +44,7 @@ export default function PatientForm(props) {
         setMsg({msg: `Successfully ${ id ? 'updated' : 'created'}!`, severity: 'success'});
         method === 'POST' ? navigate('../') : null;
       } else {
-        errors = {...res}
-        console.error(errors);
-        setMsg({msg: errors.non_field_errors || '' + errors.detail || '', severity:'error'});
-        setErrors(errors)
+        handleFormErrors(res, setErrors, setMsg)
       }
     })
   }

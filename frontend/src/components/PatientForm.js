@@ -11,18 +11,14 @@ import * as Yup from 'yup';
 import { ConfirmDelete, FormDatalist, FormInput, FormSelectInput, FormSaveCancelButton } from './FormComponents'
 import { MsgContext, UserContext } from './HomePage'
 import { fetchServer } from './AuthServer'
-import { _hasPerms, getInitialValues } from './utils'
+import { _hasPerms, getInitialValues, handleFormErrors } from './utils'
 
 const ID_TYPE = ['', 'DNI', 'LE', 'LC', 'Passport', 'Other']
 const GENDER = ['', 'Male', 'Female', 'Non-Binary', 'Other']
 
 const API_URL = '/api/lab/patients/';
 const HCP_API_URL = '/api/lab/healthcare/';
-const REQ_PERMS = {
-  add: ['lab.add_patient','lab.list_healthcareprovider'],
-  change: ['lab.change_patient','lab.list_healthcareprovider'],
-  delete: ['lab.delete_patient'],
-}
+
 const INITIAL_VALUES = {
   first_name: '',
   last_name: '',
@@ -37,7 +33,7 @@ const INITIAL_VALUES = {
   email: '',
 }
 
-export default function PatientForm(props) {
+export default function PatientForm({ hasPerms }) {
   const [open, setOpen] = useState(false)
   const [healthcareProviders, setHealthcareProviders] = useState([]);
   const [initialValues, setInitialValues] = useState(null);
@@ -45,8 +41,7 @@ export default function PatientForm(props) {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { id } = useParams();
-  const hasPerms = _hasPerms(user.permsissions, REQ_PERMS);
-  const disabled = (id && !hasPerms.change) || (!id && !hasPerms.add)
+  const noEditable = (id && !hasPerms.change) || (!id && !hasPerms.add)
 
   useEffect(() => {
     fetchServer('GET', HCP_API_URL, null, (res, status) => {
@@ -83,10 +78,7 @@ export default function PatientForm(props) {
         setMsg({msg: `Successfully ${ id ? 'updated' : 'created'}!`, severity: 'success'});
         method === 'POST' ? navigate('../') : null;
       } else {
-        errors = {...res}
-        console.error(errors);
-        setMsg({msg: errors.non_field_errors || '' + errors.detail || '', severity:'error'});
-        setErrors(errors)
+        handleFormErrors(res, setErrors, setMsg)
       }
     })
   }
@@ -133,7 +125,7 @@ export default function PatientForm(props) {
                 value={values.first_name}
                 onChange={handleChange}
                 error={errors.first_name}
-                disabled={disabled}
+                disabled={noEditable}
                 required
               />
               <FormInput label='Last name'
@@ -143,7 +135,7 @@ export default function PatientForm(props) {
                 value={values.last_name}
                 onChange={handleChange}
                 error={errors.last_name}
-                disabled={disabled}
+                disabled={noEditable}
                 required
               />
               <FormSelectInput label='ID Type'
@@ -153,7 +145,7 @@ export default function PatientForm(props) {
                 choices={ID_TYPE}
                 onChange={handleChange}
                 error={errors.id_type}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormInput label='ID Number'
                 className='col-md-4'
@@ -162,7 +154,7 @@ export default function PatientForm(props) {
                 value={values.id_number}
                 onChange={handleChange}
                 error={errors.id_number}
-                disabled={disabled}
+                disabled={noEditable}
                 required
               />
               <FormSelectInput label='Gender'
@@ -172,7 +164,7 @@ export default function PatientForm(props) {
                 choices={GENDER}
                 onChange={handleChange}
                 error={errors.gender}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <div className='w-100'/>
               <FormInput label='Birthday'
@@ -182,7 +174,7 @@ export default function PatientForm(props) {
                 value={values.birthday}
                 onChange={handleChange}
                 error={errors.birthday}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormInput label='Age'
                 className='col-md-4'
@@ -191,7 +183,7 @@ export default function PatientForm(props) {
                 value={values.age}
                 onChange={handleChange}
                 error={errors.age}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormDatalist label='Healthcare Provider'
                 className='col-md-6'
@@ -201,7 +193,7 @@ export default function PatientForm(props) {
                 choices={healthcareProviders}
                 onChange={handleChange}
                 error={errors.healthcare_provider}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormInput label='Address'
                 className='col-md-6'
@@ -210,7 +202,7 @@ export default function PatientForm(props) {
                 value={values.address}
                 onChange={handleChange}
                 error={errors.address}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormInput label='Phone number'
                 className='col-md-6'
@@ -219,7 +211,7 @@ export default function PatientForm(props) {
                 value={values.phone}
                 onChange={handleChange}
                 error={errors.phone}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormInput label='Email'
                 className='col-md-6'
@@ -228,7 +220,7 @@ export default function PatientForm(props) {
                 value={values.email}
                 onChange={handleChange}
                 error={errors.email}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormSaveCancelButton
                 hasPerms={hasPerms}

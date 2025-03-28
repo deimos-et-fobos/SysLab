@@ -6,15 +6,6 @@ import { GridActionsCellItem } from '@mui/x-data-grid';
 
 import { fetchServer } from "./AuthServer";
 
-export const _hasPerms = (perms, req_perms) => {
-  let hasPerms = {};
-  Object.keys(req_perms).forEach( key => { 
-    hasPerms[key] = req_perms[key].every( perm => perms.includes(perm));
-  });
-  return hasPerms;
-}
-
-
 export const getInitialValues = async(url, id, initialValues, setMsg, setInitialValues) => {
   if (id) {
     fetchServer('GET', url + `${id}/`, null, (res, status) => {
@@ -45,4 +36,11 @@ export const getActionButtons = (id, hasPerms, setOpen) => {
     actions.push(<GridActionsCellItem icon=<DeleteIcon/> onClick={() => setOpen({status: true, id: id})} label="Eliminar" />)
   }
   return actions
+}
+
+export const handleErrors = (data, setMsg, setErrors) => {
+  errors = {...data}
+  console.error(errors);
+  setMsg({msg: errors.non_field_errors || '' + errors.detail || '', severity:'error'});
+  setErrors(errors)
 }

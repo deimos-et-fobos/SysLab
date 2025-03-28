@@ -11,16 +11,11 @@ import * as Yup from 'yup';
 import { ConfirmDelete, FormCheckBox, FormInput, FormSelectInput, FormSaveCancelButton } from './FormComponents'
 import { MsgContext, UserContext } from './HomePage'
 import { fetchServer } from './AuthServer'
-import { _hasPerms, getInitialValues } from './utils'
+import { _hasPerms, getInitialValues, handleFormErrors } from './utils'
 import UserAvatar from './UserAvatar';
 
 const API_URL = '/api/accounts/users/';
 const USERTYPES_API_URL = '/api/accounts/user-types/';
-const REQ_PERMS = {
-  add: ['accounts.add_customuser'],
-  change: ['accounts.change_customuser','accounts.list_usertype'],
-  delete: ['accounts.delete_customuser'],
-}
 const INITIAL_VALUES = {
   email: '',
   first_name: '',
@@ -32,7 +27,7 @@ const INITIAL_VALUES = {
   type: '',
 }
 
-export default function LabUserForm(props) {
+export default function LabUserForm({ hasPerms }) {
   const [open, setOpen] = useState(false)
   const [userTypes, setUserTypes] = useState([]);
   const [initialValues, setInitialValues] = useState(null);
@@ -41,8 +36,7 @@ export default function LabUserForm(props) {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { id } = useParams();
-  const hasPerms = _hasPerms(user.permissions, REQ_PERMS);
-  const disabled = (id && !hasPerms.change) || (!id && !hasPerms.add)
+  const noEditable = (id && !hasPerms.change) || (!id && !hasPerms.add)
 
   useEffect(() => {
     fetchServer('GET', USERTYPES_API_URL, null, (res, status) => {
@@ -85,10 +79,7 @@ export default function LabUserForm(props) {
         if ( user.id === initialValues.id ) {setUser({...user, values})}
         method === 'POST' ? navigate('../') : null;
       } else {
-        errors = {...res}
-        console.error(errors);
-        setMsg({msg: errors.non_field_errors || '' + errors.detail || '', severity:'error'});
-        setErrors(errors)
+        handleFormErrors(res, setErrors, setMsg)
       }
     })
   }
@@ -136,7 +127,7 @@ export default function LabUserForm(props) {
                 value={values.email}
                 onChange={handleChange}
                 error={errors ? errors.email : null}
-                disabled={disabled}
+                disabled={noEditable}
                 required
               />
               <FormInput label='First name'
@@ -146,7 +137,7 @@ export default function LabUserForm(props) {
                 value={values.first_name}
                 onChange={handleChange}
                 error={errors ? errors.first_name : null}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormInput label='Last name'
                 className='col-md-6'
@@ -155,7 +146,7 @@ export default function LabUserForm(props) {
                 value={values.last_name}
                 onChange={handleChange}
                 error={errors ? errors.last_name : null}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <div className='col-md-4 d-flex justify-content-center'>
                 <UserAvatar sx={{width: 200, height: 200}} src={avatarPreview || initialValues?.photo_url }></UserAvatar>
@@ -172,7 +163,7 @@ export default function LabUserForm(props) {
                     setFieldValue('profile_pic',file);
                   }}
                   error={errors ? errors.profile_pic : null}
-                  disabled={disabled}
+                  disabled={noEditable}
                 />
                 <FormCheckBox label='Delete profile picture'
                   className='col'
@@ -181,7 +172,7 @@ export default function LabUserForm(props) {
                   value={values.delete_pic}
                   onChange={handleChange}
                   error={errors ? errors.delete_pic : null}
-                  disabled={disabled}
+                  disabled={noEditable}
                 />
                 <FormSelectInput label='User Type'
                   className='col'
@@ -190,7 +181,7 @@ export default function LabUserForm(props) {
                   choices={userTypes}
                   onChange={handleChange}
                   error={errors.type}
-                  disabled={disabled}
+                  disabled={noEditable}
                 />
                 <FormCheckBox label='Is active?'
                   className='col'
@@ -199,7 +190,7 @@ export default function LabUserForm(props) {
                   value={values.is_active}
                   onChange={handleChange}
                   error={errors.is_active}
-                  disabled={disabled}
+                  disabled={noEditable}
                 />
               </div>
               

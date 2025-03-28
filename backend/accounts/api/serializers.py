@@ -9,13 +9,6 @@ from accounts.models import Laboratory, UserType
 
 User = get_user_model()
 
-# class CustomTokenObtainPairSerializer(TokenObtainSerializer):
-#     @classmethod
-#     def get_token(cls, user):
-#         token = super().get_token(user)
-#         # token['lab_member'] = 
-#         return token
-
 class LoginSerializer(serializers.Serializer):
     email = serializers.CharField()
     password = serializers.CharField()
@@ -39,13 +32,13 @@ class UserTypeSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     type = serializers.SlugRelatedField(queryset=UserType.objects.all(), slug_field='type', allow_null=True)
     photo_url = serializers.SerializerMethodField()
-    permissions = serializers.SerializerMethodField()
+    # permissions = serializers.SerializerMethodField()
     delete_pic = serializers.BooleanField(default=False)
     profile_pic = serializers.ImageField(allow_null=True, required=False)
     
     class Meta:
         model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'photo_url', 'profile_pic', 'delete_pic', 'type', 'permissions', 'is_active')
+        fields = ('id', 'email', 'first_name', 'last_name', 'photo_url', 'profile_pic', 'delete_pic', 'type', 'is_active')
 
     def get_photo_url(self, user):
         request = self.context.get('request')
@@ -53,9 +46,6 @@ class UserSerializer(serializers.ModelSerializer):
            photo_url = user.profile_pic.url
            return request.build_absolute_uri(photo_url)
         return None
-
-    def get_permissions(self, obj):
-        return obj.get_all_permissions()
     
     def update(self, instance, validated_data):
         data = validated_data
@@ -71,6 +61,9 @@ class UserSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+    
+    # def get_permissions(self, obj):
+    #     return obj.get_all_permissions()
     
 class UserUpdateSerializer(UserSerializer):
     delete_pic = serializers.BooleanField(default=False)

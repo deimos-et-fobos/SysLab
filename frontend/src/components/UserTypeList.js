@@ -9,16 +9,9 @@ import { UserContext } from './HomePage';
 import { _hasPerms, getActionButtons } from './utils';
 
 const API_URL = '/api/accounts/lab-user-types/'
-const REQ_PERMS = {
-  add: ['lab.add_labusertype'],
-  change: ['lab.change_labusertype'],
-  delete: ['lab.delete_labusertype'],
-}
 
-export default function LabUserTypeList(props) {
+export default function LabUserTypeList({ hasPerms }) {
   const [open, setOpen] = useState({status: false, id: null});
-  const { user, setUser } = useContext(UserContext);
-  const hasPerms = _hasPerms(user.permissions, REQ_PERMS);
 
   const columns = [
     { field: 'type', headerName: 'Tipo de Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getType},

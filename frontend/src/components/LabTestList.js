@@ -9,16 +9,10 @@ import { UserContext } from './HomePage';
 import { _hasPerms, getActionButtons } from './utils';
 
 const API_URL = '/api/lab/lab-tests/'
-const REQ_PERMS = {
-  add: ['lab.add_labtest'],
-  change: ['lab.change_labtest'],
-  delete: ['lab.delete_labtest'],
-}
 
-export default function LabTestList(props) {
+export default function LabTestList({ hasPerms }) {
   const [open, setOpen] = useState({status: false, id: null});
   const { user, setUser } = useContext(UserContext);
-  const hasPerms = _hasPerms(user.permissions, REQ_PERMS);
   
   const columns = [
     { field: 'code', headerName: 'Código', minWidth: 150, flex: 1, align:'center', headerAlign:'center', renderCell: getCode},

@@ -10,16 +10,11 @@ import UserAvatar from './UserAvatar';
 import { _hasPerms, getActionButtons } from './utils';
 
 const API_URL = '/api/accounts/users/';
-const REQ_PERMS = {
-  add: ['accounts.add_customuser'],
-  change: ['accounts.change_customuser'],
-  delete: ['accounts.delete_customuser'],
-}
 
-export default function PatientList(props) {
+export default function PatientList({ hasPerms }) {
   const [open, setOpen] = useState({status: false, id: null});
   const { user, setUser } = useContext(UserContext);
-  const hasPerms = _hasPerms(user.permissions, REQ_PERMS);
+
 
   const columns = [
     { field: 'avatar', headerName: '', minWidth: 50, flex: 1, align:'center', headerAlign:'center', renderCell: getAvatar },

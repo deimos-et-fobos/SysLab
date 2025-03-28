@@ -140,15 +140,15 @@ export function FormAddItem(props) {
                 if (props.choices[key] == props.value) {
                   var childsIds = props.childs.map( (x) => x.id )
                   if ( id && Number(key) == id ) {
-                    props.handleAddItemErrors({[props.name]: 'No se puede agregar el análisis que se está editando.'})
+                    props.handleadditemerrors({[props.name]: 'No se puede agregar el análisis que se está editando.'})
                     return
                   }
                   if ( childsIds.includes(Number(key)) ) {
-                    props.handleAddItemErrors({[props.name]: 'No se puede agregar 2 veces el mismo análisis.'})
+                    props.handleadditemerrors({[props.name]: 'No se puede agregar 2 veces el mismo análisis.'})
                     return
                   }
-                  props.handleAddItem('childs', [...props.childs, {id: Number(key)}])
-                  props.handleAddItem(props.name, '')
+                  props.handleadditem('childs', [...props.childs, {id: Number(key)}])
+                  props.handleadditem(props.name, '')
                   document.getElementById(`${props.name}Input`).value ='' 
                   break
                 } 
@@ -176,7 +176,7 @@ export function FormAddItem(props) {
                 <IconButton 
                   color='neutral'
                   onClick={ (e) => {
-                    props.handleAddItem('childs', props.childs.filter( (child) => child.id != item.id))
+                    props.handleadditem('childs', props.childs.filter( (child) => child.id != item.id))
                   }}
                   children={<DeleteIcon/>}
                 />

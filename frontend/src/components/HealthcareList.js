@@ -9,16 +9,11 @@ import { UserContext } from './HomePage';
 import { _hasPerms, getActionButtons } from './utils';
 
 const API_URL = '/api/lab/healthcare/'
-const REQ_PERMS = {
-  add: ['lab.add_healthcareprovider'],
-  change: ['lab.change_healthcareprovider'],
-  delete: ['lab.delete_healthcareprovider'],
-}
 
-export default function HealthcareList(props) {
+export default function HealthcareList({ hasPerms }) {
   const [open, setOpen] = useState({status: false, id: null});
   const { user, setUser } = useContext(UserContext);
-  const hasPerms = _hasPerms(user.permissions, REQ_PERMS);
+
   
   const columns = [
     { field: 'name', headerName: 'Nombre', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getName},

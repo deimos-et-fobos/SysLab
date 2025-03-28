@@ -12,18 +12,13 @@ import * as Yup from 'yup';
 import { ConfirmDelete, FormAddItem, FormCheckBox, FormDatalist, FormInput, FormSelectInput, FormSaveCancelButton } from './FormComponents'
 import { MsgContext, UserContext } from './HomePage'
 import { fetchServer } from './AuthServer'
-import { _hasPerms, getInitialValues } from './utils'
+import { _hasPerms, getInitialValues, handleFormErrors } from './utils'
 
 const TYPE = ['Single', 'Compound'];
 const SAMPLE_TYPE = ['','Blood','Urine','Vaginal discharge','Semen','Saliva','Stool','Other'];
 
 const API_URL = '/api/lab/lab-tests/';
 const LTG_API_URL = '/api/lab/lab-test-groups/';
-const REQ_PERMS = {
-  add: ['lab.add_labtest','lab.list_labtest','lab.list_labtestgroup'],
-  change: ['lab.change_labtest','lab.list_labtest','lab.list_labtestgroup'],
-  delete: ['lab.delete_labtest'],
-}
 
 const INITIAL_VALUES = {
   code: '',
@@ -41,7 +36,7 @@ const INITIAL_VALUES = {
   newchild: '',
 }
 
-export default function LabTestForm(props) {
+export default function LabTestForm({ hasPerms }) {
   const [open, setOpen] = useState(false)
   const [initialValues, setInitialValues] = useState(null);
   const [labTests, setLabTests] = useState({id:[], name:[]});
@@ -50,8 +45,7 @@ export default function LabTestForm(props) {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { id } = useParams();
-  const hasPerms = _hasPerms(user.permissions, REQ_PERMS);
-  const disabled = (id && !hasPerms.change) || (!id && !hasPerms.add)
+  const noEditable = (id && !hasPerms.change) || (!id && !hasPerms.add)
   
   useEffect(() => {
     fetchServer('GET', API_URL, null, (res, status) => {
@@ -103,10 +97,7 @@ export default function LabTestForm(props) {
         setMsg({msg: `Successfully ${ id ? 'updated' : 'created'}!`, severity: 'success'});
         method === 'POST' ? navigate('../') : null;
       } else {
-        errors = {...res}
-        console.error(errors);
-        setMsg({msg: errors.non_field_errors || '' + errors.detail || '', severity:'error'});
-        setErrors(errors)
+        handleFormErrors(res, setErrors, setMsg)
       }
     })
   }
@@ -155,7 +146,7 @@ export default function LabTestForm(props) {
                 value={values.code}
                 onChange={handleChange}
                 error={errors.code}
-                disabled={disabled}
+                disabled={noEditable}
                 required
               />
               <FormInput label='Name'
@@ -165,7 +156,7 @@ export default function LabTestForm(props) {
                 value={values.name}
                 onChange={handleChange}
                 error={errors.name}
-                disabled={disabled}
+                disabled={noEditable}
                 required
               />
               <FormInput label='UB'
@@ -175,7 +166,7 @@ export default function LabTestForm(props) {
                 value={values.ub}
                 onChange={handleChange}
                 error={errors.ub}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormInput label='Method'
                 className='col-md-3'
@@ -184,7 +175,7 @@ export default function LabTestForm(props) {
                 value={values.method}
                 onChange={handleChange}
                 error={errors.method}
-                disabled={disabled}
+                disabled={noEditable}
               />
 
               <div className='w-100'/>
@@ -195,7 +186,7 @@ export default function LabTestForm(props) {
                 value={values.price}
                 onChange={handleChange}
                 error={errors.price}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormDatalist label='Group'
                 className='col-md-3'
@@ -205,7 +196,7 @@ export default function LabTestForm(props) {
                 choices={labTestGroups}
                 onChange={handleChange}
                 error={errors.group}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormSelectInput label='Sample Type'
                 className='col-md-3'
@@ -214,7 +205,7 @@ export default function LabTestForm(props) {
                 choices={SAMPLE_TYPE}
                 onChange={handleChange}
                 error={errors.sample_type}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormSelectInput label='Type'
                 className='col-md-3'
@@ -223,7 +214,7 @@ export default function LabTestForm(props) {
                 choices={TYPE}
                 onChange={handleChange}
                 error={errors.type}
-                disabled={disabled}
+                disabled={noEditable}
                 required
               />
 
@@ -235,7 +226,7 @@ export default function LabTestForm(props) {
                 value={values.reference_value}
                 onChange={handleChange}
                 error={errors.reference_value}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormInput label='Unit'
                 className='col-md-3'
@@ -244,7 +235,7 @@ export default function LabTestForm(props) {
                 value={values.unit}
                 onChange={handleChange}
                 error={errors.unit}
-                disabled={disabled}
+                disabled={noEditable}
               />
               <FormCheckBox label='Antibiogram?'
                 className='col-md-3'
@@ -253,7 +244,7 @@ export default function LabTestForm(props) {
                 value={values.is_antibiogram}
                 onChange={handleChange}
                 error={errors.is_antibiogram}
-                disabled={disabled}
+                disabled={noEditable}
               />
 
               { (values.type == 'Compound' ) ?
@@ -264,12 +255,12 @@ export default function LabTestForm(props) {
                   value={values.newchild}
                   childs={values.childs}
                   choices={labTests}
-                  handleAddItem={setFieldValue}
-                  handleAddItemErrors={setErrors}
+                  handleadditem={setFieldValue}
+                  handleadditemerrors={setErrors}
                   onChange={handleChange}
                   error={errors.newchild}
                   error_childs={errors.childs}
-                  disabled={disabled}
+                  disabled={noEditable}
                 />
                 : null
               }

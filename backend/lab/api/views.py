@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.response import Response
 
-from accounts.api.permissions import ListCreatePermission, RetrieveUpdateDestroyPermission
+from accounts.api.permissions import CreateRetrieveUpdateDestroyPermission
 from lab.models import LabTest, Patient
 from lab.api.serializers import LabTestSerializer, LabTestListSerializer,  PatientSerializer
 
@@ -45,9 +45,9 @@ class LabTestViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action == 'list' or self.action == 'create':
-            permission_classes = [ListCreatePermission]
+            permission_classes = [CreateRetrieveUpdateDestroyPermission]
         else:
-            permission_classes = [RetrieveUpdateDestroyPermission]
+            permission_classes = [CreateRetrieveUpdateDestroyPermission]
         return [permission() for permission in permission_classes]
 
     def list(self, request):
@@ -78,7 +78,7 @@ class LabTestViewSet(viewsets.ModelViewSet):
 class ListCreateView(generics.ListCreateAPIView):
     queryset = Patient.active.all().order_by('-id')
     serializer_class = PatientSerializer
-    permission_classes = [ListCreatePermission]
+    permission_classes = [CreateRetrieveUpdateDestroyPermission]
 
     # def get_object(self, request, *args, **kwargs):
     #     self.check_permissions(request)
@@ -89,7 +89,7 @@ class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Patient.active.all()
     lookup_field = 'id'
     serializer_class = PatientSerializer
-    permission_classes = [RetrieveUpdateDestroyPermission]
+    permission_classes = [CreateRetrieveUpdateDestroyPermission]
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()

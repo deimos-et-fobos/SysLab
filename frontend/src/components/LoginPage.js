@@ -12,6 +12,7 @@ import { login } from './AuthServer'
 import { FormInput } from './FormComponents'
 import { MsgContext, UserContext } from './HomePage'
 import Message from './Message'
+import handleFormErrors from './utils';
 
 const schema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -36,10 +37,7 @@ export default function LoginPage(props) {
         sessionStorage.setItem("refresh_token", res.refresh_token);
         setUser(res.user);
       } else {
-        errors = {...res}
-        console.error(errors);
-        setMsg({msg: errors.non_field_errors || '' + errors.detail || '', severity:'error'});
-        setErrors(errors)
+        handleFormErrors(res, setErrors, setMsg)
       }
     })
     setSubmitting(false);
