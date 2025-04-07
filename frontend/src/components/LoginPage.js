@@ -12,7 +12,7 @@ import { login } from './AuthServer'
 import { FormInput } from './FormComponents'
 import { MsgContext, UserContext } from './HomePage'
 import Message from './Message'
-import handleFormErrors from './utils';
+import { handleFormErrors } from './utils';
 
 const schema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),

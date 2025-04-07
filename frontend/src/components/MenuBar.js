@@ -20,8 +20,7 @@ export default function MenuBar(props) {
   const handleLogout = async () => {
     logout((res, status) => {
       if (status === 200) {
-        sessionStorage.removeItem("access_token");
-        sessionStorage.removeItem("refresh_token");
+        sessionStorage.clear();
         setUser(null)
         navigate(`/`)
       } else {
