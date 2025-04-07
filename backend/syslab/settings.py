@@ -26,6 +26,9 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", True)
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+if ENVIRONMENT == 'production':
+    DEBUG = False
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS","127.0.0.1").split(",")
 
@@ -107,7 +110,7 @@ DATABASES = {
         'PORT': os.getenv('POSTGRES_PORT', 5432),
     }
 }
-
+print(DATABASES['default']['ENGINE'])
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 

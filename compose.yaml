@@ -16,6 +16,8 @@ services:
       - 8000:8000
       - 35729:35729
     environment:
+      - ENVIROMENT=development
+      - DATABASE_ENGINE=postgresql
       - POSTGRES_DB=db.syslab
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
