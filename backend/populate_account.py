@@ -6,7 +6,8 @@ django.setup()
 
 # FAKE POP SCRIPT
 import random
-from accounts.models import CustomUser, Laboratory, LabMember, LabUserType
+from django.contrib.auth.models import Group
+from accounts.models import CustomUser, Laboratory, UserType
 from faker import Faker
 
 fakegen = Faker()
@@ -27,7 +28,7 @@ labs = ['UAM',
         'Privado',
         'Universitario',]
 
-roles = ['Administrador', 'Bioquimico', 'Tecnico']
+roles = ['Administrador', 'Bioquimico', 'Técnico']
 
 def populate_user(N=5):
     if N > len(emails):
@@ -53,23 +54,11 @@ def populate_lab(N=5):
         fake_url = fakegen.url()
         lab = Laboratory.objects.get_or_create(name=fake_name,address=fake_address,email=fake_email,phone=fake_phone,url=fake_url)[0]
 
-def populate_labusertype():
-    labs = Laboratory.objects.all()
-    for lab in labs:
-        for rol in roles:
-            labusertype = LabUserType.objects.get_or_create(laboratory=lab,type=rol)[0]
+def populate_usertype():
+    for rol in roles:
+        group = Group.objects.get_or_create(name=rol)[0]
+        usertype = UserType.objects.get_or_create(type=rol,group=group)[0]
 
-def populate_labmember(N=5):
-    users = CustomUser.objects.all()
-    labs = Laboratory.objects.all()
-    N = min(N,len(labs)*len(users))
-    for entry in range(N):
-        lab = random.choice(labs)
-        user = random.choice(users)
-        user_type = random.choice( list(lab.labusertype_set.all()) + [None] )
-        member = LabMember.objects.get_or_create(user=user,laboratory=lab)[0]
-        member.user_type=user_type
-        member.save()
 
 if __name__ == '__main__':
     print("Populating script...")
@@ -77,8 +66,6 @@ if __name__ == '__main__':
     populate_user(5)
     print(" + Populating Laboratory")
     populate_lab(20)
-    print(" + Populating LabUserType")
-    populate_labusertype()
-    print(" + Populating LabMember")
-    populate_labmember(20)
+    print(" + Populating UserType")
+    populate_usertype()
     print("Populating complete!")
