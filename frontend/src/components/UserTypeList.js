@@ -5,23 +5,18 @@ import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
 import AddButton from './AddButton';
 import ListComponent from './ListComponent';
-import { UserContext } from './HomePage';
 import { _hasPerms, getActionButtons } from './utils';
 
-const API_URL = '/api/accounts/lab-user-types/'
+const API_URL = '/api/accounts/user-types/'
 
 export default function LabUserTypeList({ hasPerms }) {
   const [open, setOpen] = useState({status: false, id: null});
 
   const columns = [
     { field: 'type', headerName: 'Tipo de Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getType},
-    { field: 'laboratoryName', headerName: 'Laboratorio', minWidth: 130, flex: 2, align:'center', headerAlign:'center', valueGetter: getLaboratoryName},
     { field: 'is_active', headerName: 'Activo', minWidth: 100, flex: 1, align:'center', headerAlign:'center', type:'boolean'},
-    { field: 'actions', type: 'actions', getActions: getActions}
+    // { field: 'actions', type: 'actions', getActions: getActions}
     ];
-  function getLaboratoryName(params) {
-    return `${params.row.laboratory.name}`;
-  }
 
   function getType(params) {
     const type = `${params.row.type}`;
@@ -39,7 +34,6 @@ export default function LabUserTypeList({ hasPerms }) {
     return getActionButtons(params.row.id, hasPerms, setOpen);
   }
 
-
   return (
     <ListComponent
       open={open}
@@ -47,7 +41,7 @@ export default function LabUserTypeList({ hasPerms }) {
       columns={columns}
       api_url={API_URL}
       title='Tipos de Usuarios'
-      addButton={hasPerms.add ? <AddButton icon={<AccountBoxIcon/>} /> : null}
+      // addButton={hasPerms.add ? <AddButton icon={<AccountBoxIcon/>} /> : null} 
     />
   )
 };

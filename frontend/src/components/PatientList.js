@@ -12,8 +12,6 @@ const API_URL = '/api/lab/patients/';
 
 export default function PatientList({ hasPerms }) {
   const [open, setOpen] = useState({status: false, id: null});
-  const { user, setUser } = useContext(UserContext);
-
 
   const columns = [
     { field: 'full_name', headerName: 'Nombre', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getFullName},

@@ -20,8 +20,8 @@ const schema = Yup.object().shape({
 });
 
 export default function LoginPage(props) {
-  const { msg, setMsg } = useContext(MsgContext);
-  const { user, setUser } = useContext(UserContext);
+  const { setMsg } = useContext(MsgContext);
+  const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const nextPage = useLocation().pathname
 

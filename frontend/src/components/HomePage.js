@@ -106,40 +106,28 @@ export default function HomePage(props) {
       <Router>
         <MsgContext.Provider value={msgContextValue}>
         <UserContext.Provider value={userContextValue}>
-          <Routes>
-            <Route element={user ? <Dashboard/> : <LoginPage/>} >
-              <Route index element={<p>Welcome to SysLab DashBoard</p>} />
-              <Route path="doctors/" element={<Outlet/>} >
-                <Route index element={<RequirePerms entity='doctor' children={<DoctorList/>}/>} />
-                <Route path="new/" element={<RequirePerms entity='doctor' children={<DoctorForm/>}/>} />
-                <Route path=":id/" element={<RequirePerms entity='doctor' children={<DoctorForm/>}/>} />
-              </Route>
-              <Route path="healthcare/" element={<Outlet/>} >
-                <Route index element={<RequirePerms entity='healthcareprovider' children={<HealthcareList/>}/>} />
-                <Route path="new/" element={<RequirePerms entity='healthcareprovider' children={<HealthcareForm/>}/>} />
-                <Route path=":id/" element={<RequirePerms entity='healthcareprovider' children={<HealthcareForm/>}/>} />
-              </Route>
-              <Route path="users/" element={<Outlet/>} >
-                <Route index element={<RequirePerms entity='user' children={<UserList/>}/>} />
-                <Route path=":id/" element={<RequirePerms entity='user' children={<UserForm/>}/>} />
-              </Route>
-              <Route path="patients/" element={<Outlet/>} >
-                <Route index element={<RequirePerms entity='patient' children={<PatientList/>}/>} />
-                <Route path="new/" element={<RequirePerms entity='patient' children={<PatientForm/>}/>} />
-                <Route path=":id/" element={<RequirePerms entity='patient' children={<PatientForm/>}/>} />
-              </Route>
+        <Routes>
+          <Route element={user ? <Dashboard /> : <LoginPage />}>
+            <Route index element={<p>Welcome to SysLab DashBoard</p>} />
 
-              <Route path="lab-tests/" element={<Outlet/>} >
-                <Route index element={<RequirePerms entity='labtest' children={<LabTestList/>}/>} />
-                <Route path="new/" element={<RequirePerms entity='labtest' children={<LabTestForm/>}/>} />
-                <Route path=":id/" element={<RequirePerms entity='labtest' children={<LabTestForm/>}/>} />
+            {[
+              { path: "doctors", entity: "doctor", list: <DoctorList />, form: <DoctorForm /> },
+              { path: "healthcare", entity: "healthcareprovider", list: <HealthcareList />, form: <HealthcareForm /> },
+              { path: "users", entity: "user", list: <UserList />, form: <UserForm />, hasNew: false },
+              { path: "patients", entity: "patient", list: <PatientList />, form: <PatientForm /> },
+              { path: "lab-tests", entity: "labtest", list: <LabTestList />, form: <LabTestForm /> }
+            ].map(({ path, entity, list, form, hasNew = true }) => (
+              <Route key={path} path={`${path}/`} element={<Outlet />}>
+                <Route index element={<RequirePerms entity={entity}>{list}</RequirePerms>} />
+                {hasNew && <Route path="new/" element={<RequirePerms entity={entity}>{form}</RequirePerms>} />}
+                <Route path=":id/" element={<RequirePerms entity={entity}>{form}</RequirePerms>} />
               </Route>
+            ))}
+            <Route path="user-types/" element={<RequirePerms entity='usertype'>{<UserTypeList/>}</RequirePerms>} />
 
-              <Route path="user-types/" element={<UserTypeList/>} />
-              <Route path="user-types/new/" element={<LoginPage/>} />
-              <Route path="protocols/" element={<ProtocolList/>} /> 
-            </Route>
-          </Routes>
+            <Route path="protocols/" element={<ProtocolList />} />
+          </Route>
+        </Routes>
         </UserContext.Provider>
         </MsgContext.Provider>
       </Router>

@@ -1,12 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.shortcuts import render
-from rest_framework import generics, permissions, status, viewsets
+from rest_framework import generics, permissions, status, viewsets, views
 from rest_framework.response import Response
 
 from accounts.api.permissions import CreateRetrieveUpdateDestroyPermission
-from lab.models import LabTest, Patient
-from lab.api.serializers import LabTestSerializer, LabTestListSerializer,  PatientSerializer
+from lab.models import HealthcareProvider, LabTest, LabTestGroup, Patient, Sample
+from lab.api.serializers import LabTestSerializer, LabTestListSerializer,  PatientSerializer,  PatientListSerializer
 
 # User = get_user_model()
 def index(request):
@@ -77,7 +77,7 @@ class LabTestViewSet(viewsets.ModelViewSet):
 
 class ListCreateView(generics.ListCreateAPIView):
     queryset = Patient.active.all().order_by('-id')
-    serializer_class = PatientSerializer
+    serializer_class = PatientListSerializer
     permission_classes = [CreateRetrieveUpdateDestroyPermission]
 
     # def get_object(self, request, *args, **kwargs):
@@ -118,4 +118,25 @@ class TestView(generics.RetrieveUpdateDestroyAPIView):
         # pat.save()
         return super().get(request, *args, **kwargs)
 
+
+class PatientChoices(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        choices = {
+            'gender_choices': [value for key, value in Patient.GENDER],
+            'id_type_choices':[value for key, value in Patient.ID_TYPE],
+            'healthcare_provider_choices':[None] + list(HealthcareProvider.objects.only('name').values_list('name', flat=True))
+        }
+        return Response(choices, status=status.HTTP_200_OK)
     
+class LabTestChoices(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        choices = {
+            'type_choices': [value for key, value in LabTest.LABTEST_TYPE],
+            'sample_type_choices':[value for key, value in Sample.SAMPLE_TYPE],
+            'group_choices':[None] + list(LabTestGroup.objects.only('name').values_list('name', flat=True))
+        }
+        return Response(choices, status=status.HTTP_200_OK)

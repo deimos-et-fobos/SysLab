@@ -14,11 +14,7 @@ import { MsgContext, UserContext } from './HomePage'
 import { fetchServer } from './AuthServer'
 import { _hasPerms, getInitialValues, handleFormErrors } from './utils'
 
-const TYPE = ['Single', 'Compound'];
-const SAMPLE_TYPE = ['','Blood','Urine','Vaginal discharge','Semen','Saliva','Stool','Other'];
-
 const API_URL = '/api/lab/lab-tests/';
-const LTG_API_URL = '/api/lab/lab-test-groups/';
 
 const INITIAL_VALUES = {
   code: '',
@@ -27,8 +23,11 @@ const INITIAL_VALUES = {
   method: '',
   price: '',
   group: undefined,
+  group_choices: [],
   sample_type: '',
-  type: 'Single',
+  sample_type_choices: [],
+  type: 'Single', // puede ir undefined tmb
+  type_choices: [],
   childs: [],
   is_antibiogram: false,
   reference_value: '',
@@ -42,31 +41,23 @@ export default function LabTestForm({ hasPerms }) {
   const [labTests, setLabTests] = useState({id:[], name:[]});
   const [labTestGroups, setLabTestGroups] = useState([]);
   const { msg, setMsg } = useContext(MsgContext);
-  const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { id } = useParams();
   const noEditable = (id && !hasPerms.change) || (!id && !hasPerms.add)
   
   useEffect(() => {
     fetchServer('GET', API_URL, null, (res, status) => {
+      console.log(res, status);
+      
       if (status === 200) {
-        let _labTests = res.filter( (item) => item.type == TYPE[0] );
+        let _labTests = res.filter( (item) => item.type == 'Single' );
         _labTests = Object.assign({}, ..._labTests.map((item) => ({[item.id]: item.code + ' - ' + item.name})));
         setLabTests(_labTests)
       } else {
-        res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
-        console.error( res.detail ? res.detail : null)
+        handleFormErrors(res, setErrors, setMsg)
       }
     });
-    fetchServer('GET', LTG_API_URL, null, (res, status) => {
-      if (status === 200) {
-        setLabTestGroups(res.map( item => item.name));
-      } else {
-        res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
-        console.error( res.detail ? res.detail : null)
-      }
-    });
-    getInitialValues(API_URL, id, INITIAL_VALUES, setMsg, setInitialValues)
+    getInitialValues(API_URL, id, INITIAL_VALUES, setMsg, setInitialValues, {choices:true})
   }, []);
 
   const schema = Yup.object().shape({
@@ -75,9 +66,9 @@ export default function LabTestForm({ hasPerms }) {
     ub:  Yup.string().max(10, 'Too long. 10 characters maximum'),
     method: Yup.string().max(50, 'Too long. 50 characters maximum'),
     price: Yup.string().max(30, 'Too long. 30 characters maximum'),
-    group: Yup.string().oneOf([null, ...labTestGroups],'Debe seleccionar una de las opciones de la lista'),
+    group: Yup.string().oneOf(initialValues?.group_choices ?? [],'Debe seleccionar una de las opciones de la lista'),
     sample_type: Yup.string(),
-    type: Yup.string(),
+    type: Yup.string().nullable(),
     childs: Yup.array(),
     newchild: Yup.string().oneOf(['', ...Object.values(labTests)],'Debe seleccionar una de las opciones de la lista'),
     // childs: Yup.string().max(150, 'Too long. 150 characters maximum'),
@@ -97,7 +88,7 @@ export default function LabTestForm({ hasPerms }) {
         setMsg({msg: `Successfully ${ id ? 'updated' : 'created'}!`, severity: 'success'});
         method === 'POST' ? navigate('../') : null;
       } else {
-        handleFormErrors(res, setErrors, setMsg)
+        handleFormErrors(res, setMsg, setErrors)
       }
     })
   }
@@ -193,7 +184,7 @@ export default function LabTestForm({ hasPerms }) {
                 type='text'
                 name='group'
                 value={values.group}
-                choices={labTestGroups}
+                choices={initialValues.group_choices}
                 onChange={handleChange}
                 error={errors.group}
                 disabled={noEditable}
@@ -202,7 +193,7 @@ export default function LabTestForm({ hasPerms }) {
                 className='col-md-3'
                 name='sample_type'
                 value={values.sample_type}
-                choices={SAMPLE_TYPE}
+                choices={initialValues.sample_type_choices}
                 onChange={handleChange}
                 error={errors.sample_type}
                 disabled={noEditable}
@@ -211,7 +202,7 @@ export default function LabTestForm({ hasPerms }) {
                 className='col-md-3'
                 name='type'
                 value={values.type}
-                choices={TYPE}
+                choices={initialValues.type_choices}
                 onChange={handleChange}
                 error={errors.type}
                 disabled={noEditable}

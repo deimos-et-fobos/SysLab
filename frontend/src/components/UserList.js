@@ -13,14 +13,12 @@ const API_URL = '/api/accounts/users/';
 
 export default function PatientList({ hasPerms }) {
   const [open, setOpen] = useState({status: false, id: null});
-  const { user, setUser } = useContext(UserContext);
-
 
   const columns = [
     { field: 'avatar', headerName: '', minWidth: 50, flex: 1, align:'center', headerAlign:'center', renderCell: getAvatar },
     { field: 'email', headerName: 'Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', renderCell: getEmail },
     { field: 'full_name', headerName: 'Nombre', minWidth: 200, flex: 2, align:'center', headerAlign:'center', valueGetter: getFullName },
-    { field: 'type.type', headerName: 'Tipo de Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', valueGetter: getUserType },
+    { field: 'type', headerName: 'Tipo de Usuario', minWidth: 200, flex: 2, align:'center', headerAlign:'center', valueGetter: getUserType },
     { field: 'is_active', headerName: 'Activo', minWidth: 100, flex: 1, align:'center', headerAlign:'center', type:'boolean', editable:'true'},
     { field: 'actions', type: 'actions', getActions: getActions}
   ];
@@ -48,7 +46,7 @@ export default function PatientList({ hasPerms }) {
   }
 
   function getUserType(params) {
-    return params.row.type ? params.row.type.type : '- - -';
+    return params.row.type ? params.row.type : '- - -';
   }
 
 
@@ -63,7 +61,7 @@ export default function PatientList({ hasPerms }) {
       columns={columns}
       api_url={API_URL}
       title='Usuarios'
-      addButton={hasPerms.add ? <AddButton icon={<PeopleAltIcon/>} /> : null}
+      // addButton={hasPerms.add ? <AddButton icon={<PeopleAltIcon />} /> : null} 
     />
   )
 };

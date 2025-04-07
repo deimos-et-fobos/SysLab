@@ -13,21 +13,19 @@ import { MsgContext, UserContext } from './HomePage'
 import { fetchServer } from './AuthServer'
 import { _hasPerms, getInitialValues, handleFormErrors } from './utils'
 
-const ID_TYPE = ['', 'DNI', 'LE', 'LC', 'Passport', 'Other']
-const GENDER = ['', 'Male', 'Female', 'Non-Binary', 'Other']
-
 const API_URL = '/api/lab/patients/';
-const HCP_API_URL = '/api/lab/healthcare/';
-
 const INITIAL_VALUES = {
   first_name: '',
   last_name: '',
   id_type: '',
+  id_type_choices: [],
   id_number: '',
   birthday: undefined,
   age: undefined,
   gender: '',
+  gender_choices: [],
   healthcare_provider: '',
+  healthcare_provider_choices: [],  
   phone: '',
   address: '',
   email: '',
@@ -35,24 +33,14 @@ const INITIAL_VALUES = {
 
 export default function PatientForm({ hasPerms }) {
   const [open, setOpen] = useState(false)
-  const [healthcareProviders, setHealthcareProviders] = useState([]);
   const [initialValues, setInitialValues] = useState(null);
   const { msg, setMsg } = useContext(MsgContext);
-  const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { id } = useParams();
   const noEditable = (id && !hasPerms.change) || (!id && !hasPerms.add)
 
   useEffect(() => {
-    fetchServer('GET', HCP_API_URL, null, (res, status) => {
-      if (status === 200) {
-        setHealthcareProviders(res.map( item => item.name));
-      } else {
-        res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
-        console.error( res.detail ? res.detail : null)
-      }
-    });
-    getInitialValues(API_URL, id, INITIAL_VALUES, setMsg, setInitialValues)
+    getInitialValues(API_URL, id, INITIAL_VALUES, setMsg, setInitialValues, {choice: true})
   }, []);
 
   const schema = Yup.object().shape({
@@ -63,7 +51,7 @@ export default function PatientForm({ hasPerms }) {
     birthday: Yup.date(),
     age: Yup.number().min(0, 'Age must be >= 0').integer(),
     gender: Yup.string(),
-    healthcare_provider: Yup.string().oneOf([null, ...healthcareProviders],'Debe seleccionar una de las opciones de la lista'),
+    healthcare_provider: Yup.string().oneOf(initialValues?.healthcare_provider_choices ?? [],'Debe seleccionar una de las opciones de la lista'),
     phone: Yup.string().max(30, 'Too long. 30 characters maximum'),
     address: Yup.string().max(150, 'Too long. 150 characters maximum'),
     email: Yup.string().max(150, 'Too long. 150 characters maximum').email('Invalid email'),
@@ -142,7 +130,7 @@ export default function PatientForm({ hasPerms }) {
                 className='col-md-4'
                 name='id_type'
                 value={values.id_type}
-                choices={ID_TYPE}
+                choices={initialValues.id_type_choices}
                 onChange={handleChange}
                 error={errors.id_type}
                 disabled={noEditable}
@@ -161,7 +149,7 @@ export default function PatientForm({ hasPerms }) {
                 className='col-md-4'
                 name='gender'
                 value={values.gender}
-                choices={GENDER}
+                choices={initialValues.gender_choices}
                 onChange={handleChange}
                 error={errors.gender}
                 disabled={noEditable}
@@ -190,7 +178,7 @@ export default function PatientForm({ hasPerms }) {
                 type='text'
                 name='healthcare_provider'
                 value={values.healthcare_provider}
-                choices={healthcareProviders}
+                choices={initialValues.healthcare_provider_choices}
                 onChange={handleChange}
                 error={errors.healthcare_provider}
                 disabled={noEditable}

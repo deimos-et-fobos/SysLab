@@ -35,10 +35,10 @@ REQ_PERMS = {
         "view": ["accounts.view_customuser"],
     },
     "usertype": {
-        "add": ["lab.add_usertype"],
-        "change": ["lab.change_usertype"],
-        "delete": ["lab.delete_usertype"],
-        "view": ["lab.view_usertype"],
+        "add": ["accounts.add_usertype"],
+        "change": ["accounts.change_usertype"],
+        "delete": ["accounts.delete_usertype"],
+        "view": ["accounts.view_usertype"],
     }
 }
 

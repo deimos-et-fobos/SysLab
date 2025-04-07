@@ -5,15 +5,14 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from accounts.models import UserType
 from accounts.api.serializers import UserTypeSerializer
-from accounts.api.views import (check_perms, 
+from accounts.api.views import (CheckPerms, 
                                 LoginView, LogoutView, 
                                 ListCreateView, RetrieveUpdateDestroyView )
 
 app_name = 'accounts-api'
 urlpatterns = [
-    path('check-perms/', check_perms, name='check-perms'),
+    path('check-perms/', CheckPerms.as_view(), name='check-perms'),
     path('login/', LoginView.as_view(), name='login'),
-    path('login/<slug:labName>/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('users/', ListCreateView.as_view(), name='user-list'),
     path('users/<int:id>/', RetrieveUpdateDestroyView.as_view(), name='user-detail'),

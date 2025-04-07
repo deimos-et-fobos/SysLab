@@ -13,9 +13,9 @@ import { MsgContext, UserContext } from './HomePage'
 import { fetchServer } from './AuthServer'
 import { _hasPerms, getInitialValues, handleFormErrors } from './utils'
 import UserAvatar from './UserAvatar';
+import { checkGridRowIdIsValid } from '@mui/x-data-grid';
 
 const API_URL = '/api/accounts/users/';
-const USERTYPES_API_URL = '/api/accounts/user-types/';
 const INITIAL_VALUES = {
   email: '',
   first_name: '',
@@ -25,6 +25,7 @@ const INITIAL_VALUES = {
   photo_url: '',
   is_active: 'true',
   type: '',
+  type_choices: []
 }
 
 export default function LabUserForm({ hasPerms }) {
@@ -39,15 +40,7 @@ export default function LabUserForm({ hasPerms }) {
   const noEditable = (id && !hasPerms.change) || (!id && !hasPerms.add)
 
   useEffect(() => {
-    fetchServer('GET', USERTYPES_API_URL, null, (res, status) => {
-      if (status === 200) {
-        setUserTypes(['', ...res].map( item => item.type));
-      } else {
-        res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
-        console.error( res.detail ? res.detail : null)
-      }
-    });
-    getInitialValues(API_URL, id, INITIAL_VALUES, setMsg, setInitialValues)
+    getInitialValues(API_URL, id, INITIAL_VALUES, setMsg, setInitialValues, {choice: true})
     setAvatarPreview(initialValues?.photo_url);
   }, []);
 
@@ -178,7 +171,7 @@ export default function LabUserForm({ hasPerms }) {
                   className='col'
                   name='type'
                   value={values.type}
-                  choices={userTypes}
+                  choices={initialValues.type_choices}
                   onChange={handleChange}
                   error={errors.type}
                   disabled={noEditable}

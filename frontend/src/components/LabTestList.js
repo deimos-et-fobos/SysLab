@@ -12,7 +12,6 @@ const API_URL = '/api/lab/lab-tests/'
 
 export default function LabTestList({ hasPerms }) {
   const [open, setOpen] = useState({status: false, id: null});
-  const { user, setUser } = useContext(UserContext);
   
   const columns = [
     { field: 'code', headerName: 'Código', minWidth: 150, flex: 1, align:'center', headerAlign:'center', renderCell: getCode},

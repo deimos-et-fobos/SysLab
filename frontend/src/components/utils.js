@@ -6,14 +6,20 @@ import { GridActionsCellItem } from '@mui/x-data-grid';
 
 import { fetchServer } from "./AuthServer";
 
-export const getInitialValues = async(url, id, initialValues, setMsg, setInitialValues) => {
-  if (id) {
-    fetchServer('GET', url + `${id}/`, null, (res, status) => {
+export const getInitialValues = async(url, id, initialValues, setMsg, setInitialValues, choices=false) => {
+  let URL = url + (id ? `${id}/` : 'new/');
+  console.log(URL);
+  console.log(id||choices);
+  
+  if (id || choices) {
+    fetchServer('GET', URL, null, (res, status) => {
       if (status === 200) {
+        let values = { ...initialValues };
         Object.keys(res).forEach(
-          (key) => { (res[key] === null) ? res[key] = initialValues[key] : null; }
+          (key) => { 
+            (res[key] !== null) ? values[key] = res[key] : null; }
         );
-        setInitialValues(res);
+        setInitialValues(values);
       } else {
         res.detail ? setMsg({msg: res.detail , severity:'error'}) : null;
         console.error( res.detail ? res.detail : null)
@@ -24,7 +30,6 @@ export const getInitialValues = async(url, id, initialValues, setMsg, setInitial
     setInitialValues(initialValues);
   }
 }
-
 
 export const getActionButtons = (id, hasPerms, setOpen) => {
   let actions = []
@@ -38,9 +43,10 @@ export const getActionButtons = (id, hasPerms, setOpen) => {
   return actions
 }
 
-export const handleErrors = (data, setMsg, setErrors) => {
-  errors = {...data}
+export const handleFormErrors = (data, setMsg, setErrors ) => {
+  let errors = {...data};
   console.error(errors);
-  setMsg({msg: errors.non_field_errors || '' + errors.detail || '', severity:'error'});
-  setErrors(errors)
+  const msg = (errors.non_field_errors || '') + (errors.detail || '')
+  if (msg) { setMsg({msg: msg, severity:'error'}); }
+  setErrors(errors);
 }

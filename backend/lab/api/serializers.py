@@ -12,7 +12,7 @@ class CustomChoiceField(serializers.ChoiceField):
     def to_representation(self, obj):
         if obj == '' and self.allow_blank:
             return obj
-        return self._choices[obj]
+        return self._choices.get(obj, obj) 
     # To support inserts with the value
     def to_internal_value(self, data):
         if data == '' and self.allow_blank:
@@ -21,7 +21,6 @@ class CustomChoiceField(serializers.ChoiceField):
             if val == data:
                 return key
         self.fail('invalid_choice', input=data)
-        
 
 # class AntibiogramSerializer(serializers.ModelSerializer):
 #     protocol = serializers.PrimaryKeyRelatedField(allow_null=True, queryset=Protocol.active.all(), required=False)
@@ -62,17 +61,31 @@ class LabTestSerializer(serializers.ModelSerializer):
                 lookup = 'iexact',
                 )]
     group = serializers.SlugRelatedField(queryset=LabTestGroup.active.all(), slug_field='name', allow_null=True, required=False)
+    group_choices =  serializers.SerializerMethodField(read_only=True)
     sample_type = CustomChoiceField(choices=Sample.SAMPLE_TYPE)
-    type = CustomChoiceField(choices=LabTest.LABTEST_TYPE)
-    childs = LabTestChildsSerializer(many=True)
+    sample_type_choices =  serializers.SerializerMethodField(read_only=True)
+    type = CustomChoiceField(choices=LabTest.LABTEST_TYPE, default=LabTest.LABTEST_TYPE[0][0])
+    type_choices = serializers.SerializerMethodField(read_only=True)
+    childs = LabTestChildsSerializer(many=True, allow_null=True)
     code = serializers.CharField( validators = iexact_name() )
-
+    
     class Meta:
         model = LabTest
         fields = ('__all__')
 
+    def get_type_choices(self, obj):
+        return [value for key, value in LabTest.LABTEST_TYPE]
+    
+    def get_sample_type_choices(self, obj):
+        return [value for key, value in Sample.SAMPLE_TYPE]
+    
+    def get_group_choices(self, obj):
+        return [None] + list(LabTestGroup.active.all().values_list('name', flat=True))
+    
     def validate_childs(self, data):
         child_ids = []
+        if self.initial_data.get('type') == LabTest.LABTEST_TYPE[0][1]:
+            return child_ids
         for child in data:
             if (LabTest.active.all().get(id=child.get('id')).id == self.initial_data.get('id')): # Sub test same id as Test
                 raise serializers.ValidationError(_('The current test cannot be also a sub test.'))
@@ -93,22 +106,22 @@ class LabTestSerializer(serializers.ModelSerializer):
         labtest.childs.set(childs)
         return labtest
 
-class LabTestListSerializer(serializers.ModelSerializer):
-    group = serializers.SlugRelatedField(queryset=LabTestGroup.active.all(), slug_field='name', allow_null=True, required=False)
-    type = CustomChoiceField(choices=LabTest.LABTEST_TYPE)
-
+class LabTestListSerializer(LabTestSerializer):
     class Meta:
         model = LabTest
         fields = ('id', 'code', 'name', 'ub', 'group', 'type')
+        
 
 class LabTestGroupSerializer(serializers.ModelSerializer):
-    def iexact_name():
-        return [ UniqueValidator( 
-                queryset=LabTestGroup.objects.all(), 
-                message = _('There is already another lab test group with this name.'), 
-                lookup = 'iexact',
-                )]
-    name = serializers.CharField( validators = iexact_name() )
+    name = serializers.CharField(
+        validators=[
+            UniqueValidator(
+                queryset=LabTestGroup.objects.all(),
+                message=_("There is already another lab test group with this name."),
+                lookup='iexact',
+            )
+        ]
+    )
     class Meta:
         model = LabTestGroup
         fields = ('id', 'name')
@@ -127,31 +140,28 @@ class PatientSerializer(serializers.ModelSerializer):
     healthcare_provider = serializers.SlugRelatedField(queryset=HealthcareProvider.active.all(), slug_field='name', allow_null=True, required=False)
     gender = CustomChoiceField(choices=Patient.GENDER)
     id_type = CustomChoiceField(choices=Patient.ID_TYPE)
+    gender_choices = serializers.SerializerMethodField(read_only=True)
+    id_type_choices = serializers.SerializerMethodField(read_only=True)
+    healthcare_provider_choices = serializers.SerializerMethodField(read_only=True)
+    birthday = serializers.DateField(required=False, allow_null=True, default=None) 
 
     class Meta:
         model = Patient
         fields = '__all__'
+       
+    def get_gender_choices(self, obj):
+        return [value for key, value in Patient.GENDER]
     
-# class PatientSerializer(PatientListSerializer):
-#     gender_choices = serializers.SerializerMethodField(read_only=True)
-#     id_type_choices = serializers.SerializerMethodField(read_only=True)
-#     healthcare_provider_choices = serializers.SerializerMethodField(read_only=True)
+    def get_id_type_choices(self, obj):
+        return [value for key, value in Patient.ID_TYPE]
+    
+    def get_healthcare_provider_choices(self, obj):
+        return [None] + list(HealthcareProvider.objects.only('name').values_list('name', flat=True))
 
-#     class Meta:
-#         model = Patient
-#         fields = '__all__'
-
-#     def get_gender_choices(self, instance):
-#         choices = Patient.GENDER
-#         return [x[1] for x in choices]
-    
-#     def get_id_type_choices(self, instance):
-#         choices = Patient.ID_TYPE
-#         return [x[1] for x in choices]
-    
-#     def get_healthcare_provider_choices(self, instance):
-#         choices = [None] + list(HealthcareProvider.objects.values_list('name', flat=True))
-#         return choices
+class PatientListSerializer(PatientSerializer):
+    class Meta:
+        model = Patient
+        fields = ('id', 'first_name', 'last_name', 'id_type', 'id_number', 'healthcare_provider', 'age', 'birthday')
 
 # class ProtocolSerializer(serializers.ModelSerializer):
 #     laboratory = LaboratorySerializer()

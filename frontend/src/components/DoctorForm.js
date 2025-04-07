@@ -25,7 +25,6 @@ export default function PatientForm({ hasPerms }) {
   const [open, setOpen] = useState(false)
   const [initialValues, setInitialValues] = useState(null);
   const { msg, setMsg } = useContext(MsgContext);
-  const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { id } = useParams();
   const noEditable = (id && !hasPerms.change) || (!id && !hasPerms.add)

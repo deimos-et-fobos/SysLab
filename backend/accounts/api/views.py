@@ -16,22 +16,23 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.api.permissions import CreateRetrieveUpdateDestroyPermission, REQ_PERMS
-from accounts.api.serializers import (  LoginSerializer, 
-                                        UserSerializer )
+from accounts.api.serializers import LoginSerializer, UserSerializer, UserListSerializer
 
 User = get_user_model()
 
-@login_required
-def check_perms(request):
-    entity = request.GET.get("entity")  
-    has_perms = {key: False for key in ["add", "change", "delete", "view"]}
-    if entity in REQ_PERMS:
-        user_perms = set(request.user.get_all_permissions())  # Permisos del usuario en Django
-        for key in has_perms:
-            has_perms[key] = all(perm in user_perms for perm in REQ_PERMS[entity].get(key,[]))
-    print(has_perms)
-    
-    return JsonResponse({"has_perms": has_perms})
+class CheckPerms(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        entity = request.GET.get("entity")  
+        has_perms = {key: False for key in ["add", "change", "delete", "view"]}
+        if entity in REQ_PERMS:
+            user_perms = set(request.user.get_all_permissions())  # Permisos del usuario en Django
+            for key in has_perms:
+                has_perms[key] = all(perm in user_perms for perm in REQ_PERMS[entity].get(key,[]))
+        print(has_perms)
+        return Response({"has_perms": has_perms})
+
 
 class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -69,7 +70,7 @@ class LogoutView(APIView):
         
 class ListCreateView(generics.ListCreateAPIView):
     queryset = User.active.all()
-    serializer_class = UserSerializer
+    serializer_class = UserListSerializer
     permission_classes = [CreateRetrieveUpdateDestroyPermission]
 
 class RetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):

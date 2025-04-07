@@ -47,12 +47,16 @@ class ActiveCustomUserManager(CustomUserManager):
 class UserType(models.Model):
     type = models.CharField(_('user type'), max_length=100, unique=True)
     group = models.OneToOneField(Group, verbose_name=_('group'), on_delete=models.SET_NULL, null=True)
+    is_active = models.BooleanField(_('active'), default=True)
+    
+    active = ActiveCustomUserManager()
+    objects = models.Manager()
 
     class Meta:
         permissions = (('list_usertype', "Can list UserTypes"),)
         
     def __str__(self):
-        return self.name
+        return self.type
 
 class CustomUser(AbstractUser):
     username = None
@@ -61,7 +65,7 @@ class CustomUser(AbstractUser):
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
     profile_pic = models.ImageField(verbose_name=_('profile picture'), upload_to=upload_location, blank=True, null=True)
-    type = models.ForeignKey(UserType, verbose_name=_('user type'), on_delete=models.SET_NULL, null=True)
+    type = models.ForeignKey(UserType, verbose_name=_('user type'), on_delete=models.SET_NULL, null=True, blank=True)
     # Fields from AbstractUser:
     # first_name, last_name, groups, is_staff, is_active, is_superuser, last_login, date_joinded
 
