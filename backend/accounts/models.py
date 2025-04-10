@@ -89,26 +89,6 @@ class CustomUser(AbstractUser):
     _full_name.short_description = _('name')
     full_name = property(_full_name)
 
-def save_user_type(sender, instance, *args, **kwargs):
-    user = instance
-    user_type = user.type
-    if user_type:
-        # Asignar solo el grupo del UserType
-        user.groups.set([user_type.group])
-    else:
-        # Limpiar los grupos si no hay UserType
-        user.groups.clear()
-
-@receiver(post_save, sender=CustomUser)
-def save_user_type(sender, instance, *args, **kwargs):
-    user = instance
-    user_type = user.type
-    if user_type:
-        user.groups.set([user_type.group])
-    else:
-        user.groups.clear()
-
-
     # def get_absolute_url(self):
     #     if self.is_active:
     #         return reverse('lab:users_edit', kwargs={'pk':self.id})

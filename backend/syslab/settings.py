@@ -23,7 +23,7 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-1234567890fakekeyfordev!!")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", True)
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
@@ -33,7 +33,6 @@ if ENVIRONMENT == 'production':
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS","127.0.0.1").split(",")
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -150,6 +149,7 @@ STATIC_URL = 'static/'
 STATIC_DIR = os.path.join(BASE_DIR,'static')
 STATICFILES_DIRS = [STATIC_DIR,]
 
+# Para las traducciones
 LOCALE_PATHS = [
     os.path.join(BASE_DIR,'accounts/locale'),
     os.path.join(BASE_DIR,'lab/locale'),
@@ -163,6 +163,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # SIMPLE_JWT = {
 #     'ACCESS_TOKEN_LIFETIME': timedelta(seconds=5),
