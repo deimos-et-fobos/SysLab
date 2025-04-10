@@ -16,7 +16,6 @@ django-admin compilemessages
 
 
 ## TO DO
-- Agregar al HomePage SelectLaboratory
 - Comenzar con la interfase, la API y la lógica
 # (DONE) defaultValues selectInputs.
 # (DONE) Avatar en userList
@@ -33,7 +32,41 @@ django-admin compilemessages
 # (DONE) Healthcare Providers. 
 # (DONE) Pacientes
 # (DONE) Doctores
-# (DONE) LabMembers
 # (DONE) LabTests
-- LabUserTypes
-- Tests
+
+accounts/
+Usuarios, roles, autenticación.
+
+CustomUser
+
+UserType
+
+labs/
+Estructura del laboratorio, tests, organización.
+
+Laboratory
+
+LabTest → Define un análisis (por ejemplo, "Glucemia").
+
+LabTestGroup → Conjunto de tests agrupados, por ejemplo, "Perfil Lipídico".
+
+(Si tenés modelos como LabTestResult, también van acá.)
+
+patients/
+Gestión de pacientes.
+
+Patient
+
+protocols/
+Protocolos médicos y su contexto.
+
+Protocol
+
+ProtocolType
+
+SampleType
+
+Doctor
+
+HealthcareProvider
+
